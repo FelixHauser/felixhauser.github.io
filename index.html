@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barretina Software</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            color: #2c3e50;
+            background: #ffffff;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+        
+        /* Header */
+        header {
+            padding: 100px 30px 80px;
+            text-align: center;
+            background: #fafbfc;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        h1 {
+            font-size: 3.2em;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+            letter-spacing: -0.5px;
+        }
+        
+        .tagline {
+            font-size: 1.3em;
+            color: #5a6c7d;
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+        
+        /* Main Content */
+        section {
+            padding: 80px 30px;
+        }
+        
+        h2 {
+            font-size: 2em;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .intro {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.1em;
+            color: #5a6c7d;
+            line-height: 1.8;
+        }
+        
+        .intro p {
+            margin-bottom: 20px;
+        }
+        
+        /* Apps Section */
+        .apps-section {
+            background: #fafbfc;
+        }
+        
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 50px;
+        }
+        
+        .app-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 40px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .app-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .app-card h3 {
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .app-card p {
+            color: #5a6c7d;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+        
+        .app-link {
+            display: inline-block;
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 2px;
+            transition: opacity 0.2s;
+        }
+        
+        .app-link:hover {
+            opacity: 0.7;
+        }
+        
+        .coming-soon {
+            color: #95a5a6;
+            font-style: italic;
+        }
+        
+        /* Footer */
+        footer {
+            background: #2c3e50;
+            color: #ffffff;
+            padding: 50px 30px;
+            text-align: center;
+        }
+        
+        footer p {
+            color: #95a5a6;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2em;
+            }
+            
+            .tagline {
+                font-size: 1.1em;
+            }
+            
+            h2 {
+                font-size: 1.6em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>Barretina Software</h1>
+            <p class="tagline">Practical tools built for real needs</p>
+        </div>
+    </header>
+
+    <!-- About Section -->
+    <section>
+        <div class="container">
+            <div class="intro">
+                <h2>About</h2>
+                <p>I develop iOS applications as personal projects—tools that solve practical problems I've encountered in my own work and studies. Each app is built with a focus on functionality and simplicity, free from unnecessary complexity or commercial distractions.</p>
+                <p>My approach is straightforward: identify a need, build a clean solution, and share it freely. No subscriptions, no advertisements, no data collection. Just useful software that does what it's supposed to do.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Apps Section -->
+    <section class="apps-section">
+        <div class="container">
+            <h2>Applications</h2>
+            <div class="apps-grid">
+                <div class="app-card">
+                    <h3>Concentrations</h3>
+                    <p>Chemical calculator for iOS designed for students and laboratory professionals. Performs molarity, molality, normality, fraction, and dilution calculations.</p>
+                    <a href="/Concentrations" class="app-link">View Details →</a>
+                </div>
+                
+                <div class="app-card">
+                    <h3>Future Project</h3>
+                    <p class="coming-soon">Currently in development. Details coming soon.</p>
+                </div>
+                
+                <div class="app-card">
+                    <h3>Future Project</h3>
+                    <p class="coming-soon">Currently in development. Details coming soon.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Barretina Software. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
