@@ -1,0 +1,175 @@
+---
+layout: default
+title: About
+---
+
+<style>
+    main {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 80px 30px;
+    }
+    
+    h1 {
+        font-size: 2.8em;
+        margin-bottom: 50px;
+        font-weight: 600;
+        color: #1a1a1a;
+        text-align: center;
+    }
+    
+    .intro-section {
+        font-size: 1.15em;
+        color: #5a6c7d;
+        line-height: 1.8;
+        margin-bottom: 60px;
+    }
+    
+    .intro-section p {
+        margin-bottom: 20px;
+    }
+    
+    h2 {
+        font-size: 1.8em;
+        margin-top: 50px;
+        margin-bottom: 25px;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+    
+    .section-content {
+        color: #5a6c7d;
+        line-height: 1.8;
+        margin-bottom: 30px;
+    }
+    
+    .section-content p {
+        margin-bottom: 15px;
+    }
+    
+    .skills-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+    }
+    
+    .skill-item {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        border-radius: 6px;
+        border-left: 3px solid #2c3e50;
+        font-size: 1.05em;
+        color: #2c3e50;
+    }
+    
+    .links-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 30px;
+        margin-top: 40px;
+    }
+    
+    .links-section h3 {
+        font-size: 1.3em;
+        margin-bottom: 20px;
+        color: #2c3e50;
+    }
+    
+    .link-item {
+        margin-bottom: 15px;
+    }
+    
+    .link-item a {
+        color: #2c3e50;
+        text-decoration: none;
+        font-weight: 600;
+        border-bottom: 2px solid #2c3e50;
+        padding-bottom: 2px;
+        transition: opacity 0.2s;
+    }
+    
+    .link-item a:hover {
+        opacity: 0.7;
+    }
+    
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2em;
+        }
+        
+        h2 {
+            font-size: 1.4em;
+        }
+    }
+</style>
+
+<main>
+    <h1>About</h1>
+    
+    <div class="intro-section">
+        <p>I'm Felix Hauser, a chemistry and physics teacher at a German middle school with a degree in organic chemistry. Beyond the classroom, I'm a maker, tinkerer, and lifelong learner who believes in the power of open-source collaboration and hands-on problem-solving.</p>
+    </div>
+    
+    <h2>Background</h2>
+    <div class="section-content">
+        <p>My professional work centers on science education, teaching chemistry, physics, and general science to students. I'm passionate about making scientific concepts accessible and engaging, which naturally extends to my personal projects and hobbies.</p>
+        
+        <p>I first explored iOS development between 2011 and 2014 as a hobby, successfully deploying three applications. After a hiatus, I'm now revisiting mobile development with Swift and SwiftUI—not as a commercial venture, but as a personal challenge and opportunity to create tools that solve real problems.</p>
+    </div>
+    
+    <h2>Interests & Hobbies</h2>
+    <div class="section-content">
+        <p>I'm deeply involved in the maker movement, working with a variety of technologies and fabrication methods:</p>
+        
+        <div class="skills-grid">
+            <div class="skill-item">3D Printing</div>
+            <div class="skill-item">CNC Fabrication</div>
+            <div class="skill-item">Arduino Projects</div>
+            <div class="skill-item">Open Source Software</div>
+        </div>
+        
+        <p>When I'm not at a workbench or keyboard, I enjoy motorcycle travel—combining the freedom of the open road with the technical satisfaction of maintaining and understanding the machines I ride.</p>
+    </div>
+    
+    <h2>Technical Skills</h2>
+    <div class="section-content">
+        <p>My programming experience spans several languages, each serving different purposes in my projects:</p>
+        
+        <div class="skills-grid">
+            <div class="skill-item">C++</div>
+            <div class="skill-item">Python</div>
+            <div class="skill-item">Swift / SwiftUI</div>
+        </div>
+        
+        <p>These tools allow me to work on everything from embedded systems and automation to iOS applications and data processing.</p>
+    </div>
+    
+    <h2>Philosophy</h2>
+    <div class="section-content">
+        <p>I approach development and making with a straightforward philosophy: build solutions for real problems, share knowledge freely, and prioritize functionality over complexity. The applications I develop are tools first—no monetization schemes, no user tracking, just clean functionality.</p>
+        
+        <p>As an advocate for science education and open-source collaboration, I believe in making knowledge and tools accessible to everyone who can benefit from them.</p>
+    </div>
+    
+    <div class="links-section">
+        <h3>Find Me Online</h3>
+        <div class="link-item">
+            <strong>GitHub:</strong> <a href="https://github.com/FelixHauser" target="_blank" rel="noopener">github.com/FelixHauser</a>
+        </div>
+        <div class="link-item">
+            <strong>MakerWorld:</strong> <a href="https://makerworld.com/en/@FelixHauser" target="_blank" rel="noopener">makerworld.com/en/@FelixHauser</a>
+        </div>
+    </div>
+    
+    <div class="links-section" style="margin-top: 30px;">
+        <h3>Support Development</h3>
+        <p style="color: #5a6c7d; margin-bottom: 15px;">All applications are free and will remain free. If you find them useful and would like to help cover the costs of the Apple Developer Program and domain hosting, donations are welcome via PayPal:</p>
+        <div class="link-item">
+            <a href="#" onclick="location.href='https://paypal.me/' + btoa('support@barretina-software.de').substring(0,20); location.href='https://www.paypal.com/paypalme/my/profile'; return false;" style="display: inline-block; background: #2c3e50; color: white; padding: 12px 30px; border-radius: 6px; border: none; text-decoration: none;">
+                Donate via PayPal
+            </a>
+        </div>
+        <p style="color: #7a8a9a; font-size: 0.95em; margin-top: 15px;">PayPal: <span onclick="location.href='https://www.paypal.com/paypalme/my/profile'; return false;" style="cursor: pointer;">support</span><span>@</span><span>barretina-software.de</span></p>
+    </div>
+</main>
