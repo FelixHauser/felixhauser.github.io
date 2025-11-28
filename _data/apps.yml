@@ -4,9 +4,11 @@
   url: /Concentrations
   status: published
 
-- name: Future Project
-  description: Currently in development. Details coming soon.
-  status: coming-soon
+- name: Pure NMR
+  icon: /PureNMR/icon.png
+  description: NMR impurity reference database with chemical shift data for common laboratory impurities and residual solvents across multiple deuterated solvents.
+  url: /purenmr
+  status: published
 
 - name: Future Project
   description: Currently in development. Details coming soon.
