@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Pure NMR
+title: Concentrations
 ---
 
 <style>
@@ -144,9 +144,9 @@ title: Pure NMR
 <!-- Header -->
 <header>
     <div class="container">
-        <img src="icon.png" alt="Pure NMR Icon" style="width: 120px; height: 120px; border-radius: 27px; margin: 0 auto 30px; display: block; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-        <h1>Pure NMR</h1>
-        <p class="subtitle">NMR Impurity Reference for iOS</p>
+        <img src="icon.png" alt="Concentrations Icon" style="width: 120px; height: 120px; border-radius: 27px; margin: 0 auto 30px; display: block; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <h1>Concentrations</h1>
+        <p class="subtitle">Chemical Calculator for iOS</p>
         <p class="meta">Free • No Ads • No Data Collection</p>
         <a href="#" class="download-btn">Download on the App Store</a>
     </div>
@@ -158,7 +158,7 @@ title: Pure NMR
         <h2>Purpose</h2>
         <div class="features-list">
             <div class="feature">
-                <p>Pure NMR is a comprehensive reference tool for identifying common impurities in NMR spectra. It provides quick access to chemical shift data for residual solvents and common laboratory impurities across multiple deuterated solvents and nuclei. The application requires no account, collects no data, and functions purely as a reference database.</p>
+                <p>Concentrations is a straightforward calculator designed for chemistry students and laboratory professionals. It eliminates manual calculation errors and speeds up routine lab work. The application requires no account, collects no data, and functions purely as a computational tool.</p>
             </div>
         </div>
     </div>
@@ -170,8 +170,8 @@ title: Pure NMR
         <h2>About This Project</h2>
         <div class="features-list">
             <div class="feature">
-                <p>I developed Pure NMR as a mobile companion to the widely-cited publications by Fulmer et al. (Organometallics 2010) and Gottlieb et al. (J. Org. Chem. 1997). These papers are essential references in any NMR spectroscopy lab, but constantly looking up chemical shifts in printed tables or PDFs is inconvenient during routine spectral analysis.</p>
-                <p>The app remains free and ad-free because it serves the scientific community. It's a practical tool for students learning NMR interpretation and for experienced researchers who want quick reference data at their fingertips. No monetization, no data collection, no complexity—just fast access to reliable chemical shift information.</p>
+                <p>I developed Concentrations as a personal project and mental exercise. As someone who frequently worked with chemical calculations, I wanted to create a tool that would simplify these routine tasks. The project served as both a practical solution to a real problem and an opportunity to develop my programming skills.</p>
+                <p>The app remains free and ad-free because it was never intended as a commercial venture. It's simply a useful tool that I'm sharing with students and professionals who might benefit from it. No monetization, no data collection, no complexity—just a calculator that does what it's supposed to do.</p>
             </div>
         </div>
     </div>
@@ -183,24 +183,20 @@ title: Pure NMR
         <h2>Features</h2>
         <div class="features-list">
             <div class="feature">
-                <h3>Comprehensive Database</h3>
-                <p>Complete chemical shift data for common impurities in all standard deuterated solvents. Includes both ¹H and ¹³C NMR data based on peer-reviewed literature.</p>
+                <h3>For Students</h3>
+                <p>Designed with high school and undergraduate chemistry students in mind. Covers all standard concentration calculations required in coursework and laboratory sessions.</p>
             </div>
             <div class="feature">
-                <h3>Smart Search</h3>
-                <p>Search by chemical shift value with adjustable tolerance. Quickly identify unknown peaks in your spectra by matching them against the database.</p>
+                <h3>For Laboratory Staff</h3>
+                <p>Quick reference tool for preparing solutions and performing dilutions. Reduces time spent on repetitive calculations during routine lab operations.</p>
             </div>
             <div class="feature">
-                <h3>Custom Entries</h3>
-                <p>Add your own chemical shift data for compounds specific to your research. Create a personalized reference library alongside the built-in database.</p>
-            </div>
-            <div class="feature">
-                <h3>Multiple Solvents & Nuclei</h3>
-                <p>Filter by solvent and nucleus to see only relevant data for your experiments. Supports all common deuterated solvents and both ¹H and ¹³C nuclei.</p>
+                <h3>Customizable Interface</h3>
+                <p>Configure the application's appearance according to your preferences. Adapts to different working environments and lighting conditions.</p>
             </div>
             <div class="feature">
                 <h3>Privacy Focused</h3>
-                <p>No user accounts. No data collection. No analytics. The application operates entirely offline and stores no information about your searches or usage patterns.</p>
+                <p>No user accounts. No data collection. No analytics. The application operates entirely offline and stores no information about your calculations or usage patterns.</p>
             </div>
         </div>
     </div>
@@ -209,20 +205,17 @@ title: Pure NMR
 <!-- Calculations -->
 <section>
     <div class="container">
-        <h2>Supported Solvents</h2>
+        <h2>Supported Calculations</h2>
         <div class="calc-grid">
-            <div class="calc-item">Chloroform-d (CDCl₃)</div>
-            <div class="calc-item">DMSO-d₆</div>
-            <div class="calc-item">Acetone-d₆</div>
-            <div class="calc-item">Methanol-d₄</div>
-            <div class="calc-item">Acetonitrile-d₃</div>
-            <div class="calc-item">Benzene-d₆</div>
-            <div class="calc-item">D₂O</div>
-            <div class="calc-item">THF-d₈</div>
-            <div class="calc-item">Toluene-d₈</div>
-            <div class="calc-item">Dichloromethane-d₂</div>
-            <div class="calc-item">Chlorobenzene-d₅</div>
-            <div class="calc-item">TFE-d₃</div>
+            <div class="calc-item">Molarity (M)</div>
+            <div class="calc-item">Molality (m)</div>
+            <div class="calc-item">Normality (N)</div>
+            <div class="calc-item">Mole Fraction</div>
+            <div class="calc-item">Volume Fraction (mL/mL)</div>
+            <div class="calc-item">Mass Fraction (g/g)</div>
+            <div class="calc-item">Mass Concentration (g/100mL)</div>
+            <div class="calc-item">Stock Solution Dilutions</div>
+            <div class="calc-item">Direct Dilutions</div>
         </div>
     </div>
 </section>
@@ -232,9 +225,9 @@ title: Pure NMR
     <div class="container">
         <h2>Interface</h2>
         <div class="screenshot-grid">
-            <img src="search_screenshot.PNG" alt="Search Interface" class="screenshot-placeholder">
-            <img src="results_screenshot.PNG" alt="Search Results" class="screenshot-placeholder">
-            <img src="custom_screenshot.PNG" alt="Custom Entry" class="screenshot-placeholder">
+            <img src="molarity_screenshot.PNG" alt="Molarity Calculator" class="screenshot-placeholder">
+            <img src="dilutions_screenshot.PNG" alt="Dilutions Calculator" class="screenshot-placeholder">
+            <img src="result_screenshot.PNG" alt="Calculation Results" class="screenshot-placeholder">
             <img src="settings_screenshot.PNG" alt="App Settings" class="screenshot-placeholder">
         </div>
     </div>
