@@ -157,20 +157,22 @@ title: Home
     <div class="container">
         <h2>Applications</h2>
         <div class="apps-grid">
-            {% for app in site.data.apps %}
+            
+            <!-- Concentrations App -->
             <div class="app-card">
-                {% if app.icon %}
-                <img src="{{ app.icon }}" alt="{{ app.name }} Icon" class="app-icon">
-                {% endif %}
-                <h3>{{ app.name }}</h3>
-                {% if app.status == 'published' %}
-                <p>{{ app.description }}</p>
-                <a href="{{ app.url }}" class="app-link">View Details →</a>
-                {% else %}
-                <p class="coming-soon">{{ app.description }}</p>
-                {% endif %}
+                <img src="concentrations_icon.png" alt="Concentrations Icon" class="app-icon">
+                <h3>Concentrations</h3>
+                <p>Chemical calculator for concentration and dilution problems. Designed for chemistry students and laboratory professionals.</p>
+                <a href="concentrations.html" class="app-link">View Details →</a>
             </div>
-            {% endfor %}
+            
+            <!-- Pure NMR App -->
+            <div class="app-card">
+                <img src="purenmr_icon.png" alt="Pure NMR Icon" class="app-icon">
+                <h3>Pure NMR</h3>
+                <p>NMR impurity reference database with chemical shift data for common laboratory impurities and residual solvents.</p>
+                <a href="purenmr.html" class="app-link">View Details →</a>
+            </div>
         </div>
     </div>
 </section>
