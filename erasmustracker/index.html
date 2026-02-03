@@ -1,1 +1,258 @@
+---
+layout: default
+title: Erasmus Tracker
+---
 
+<style>
+    /* Header */
+    header {
+        padding: 100px 30px 80px;
+        text-align: center;
+        background: #fafbfc;
+    }
+    
+    h1 {
+        font-size: 3.2em;
+        margin-bottom: 20px;
+        font-weight: 600;
+        color: #1a1a1a;
+        letter-spacing: -0.5px;
+    }
+    
+    .subtitle {
+        font-size: 1.3em;
+        color: #5a6c7d;
+        margin-bottom: 15px;
+        font-weight: 400;
+    }
+    
+    .meta {
+        font-size: 1em;
+        color: #7a8a9a;
+        margin-bottom: 40px;
+    }
+    
+    .download-btn {
+        display: inline-block;
+        background: #000000;
+        color: white;
+        padding: 14px 40px;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 1em;
+        transition: background 0.2s;
+    }
+    
+    .download-btn:hover {
+        background: #333333;
+    }
+    
+    /* Main Content */
+    section {
+        padding: 70px 30px;
+    }
+    
+    section:nth-child(even) {
+        background: #fafbfc;
+    }
+    
+    h2 {
+        font-size: 2em;
+        margin-bottom: 40px;
+        font-weight: 600;
+        color: #1a1a1a;
+        text-align: center;
+    }
+    
+    /* Features */
+    .features-list {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .feature {
+        margin-bottom: 50px;
+    }
+    
+    .feature h3 {
+        font-size: 1.4em;
+        margin-bottom: 12px;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+    
+    .feature p {
+        font-size: 1.05em;
+        color: #5a6c7d;
+        line-height: 1.7;
+    }
+    
+    /* Budget Categories */
+    .budget-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .budget-item {
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        padding: 25px;
+        border-radius: 6px;
+        font-size: 1.05em;
+        color: #2c3e50;
+    }
+    
+    section:nth-child(even) .budget-item {
+        background: #ffffff;
+    }
+    
+    /* Screenshots */
+    .screenshot-grid {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        margin-top: 50px;
+    }
+    
+    .screenshot-placeholder {
+        width: 240px;
+        height: 520px;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2.2em;
+        }
+        
+        .subtitle {
+            font-size: 1.1em;
+        }
+        
+        h2 {
+            font-size: 1.6em;
+        }
+    }
+</style>
+
+<!-- Header -->
+<header>
+    <div class="container">
+        <img src="icon.png" alt="Erasmus Tracker Icon" style="width: 120px; height: 120px; border-radius: 27px; margin: 0 auto 30px; display: block; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <h1>Erasmus Tracker</h1>
+        <p class="subtitle">Expense Management for Erasmus+ Mobility Projects</p>
+        <p class="meta">Free • No Ads • Privacy-First</p>
+        <a href="#" class="download-btn">Download on the App Store</a>
+    </div>
+</header>
+
+<!-- About -->
+<section>
+    <div class="container">
+        <h2>Purpose</h2>
+        <div class="features-list">
+            <div class="feature">
+                <p>Erasmus Tracker is a comprehensive expense management tool designed specifically for teachers coordinating Erasmus+ mobility projects. It simplifies budget tracking across multiple funding categories, handles multi-currency expenses, generates professional PDF reports, and ensures accurate financial reporting to the European Commission. The app uses official Erasmus+ terminology and requires no account or external servers—all data stays on your device.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why I Made This -->
+<section>
+    <div class="container">
+        <h2>About This Project</h2>
+        <div class="features-list">
+            <div class="feature">
+                <p>I developed Erasmus Tracker after experiencing firsthand the complexity of managing Erasmus+ finances with spreadsheets and paper receipts. Coordinating mobility projects involves tracking four separate budget categories, managing expenses in multiple currencies, calculating refunds owed to the EU, and generating detailed reports—all while ensuring compliance with European Commission guidelines.</p>
+                <p>The app remains free and privacy-focused because it serves educators who are already investing significant time and effort into creating life-changing experiences for their students. No subscriptions, no data collection, no complexity—just straightforward expense tracking that respects your time and privacy while helping you stay organized and compliant.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section>
+    <div class="container">
+        <h2>Features</h2>
+        <div class="features-list">
+            <div class="feature">
+                <h3>Four Budget Categories</h3>
+                <p>Track Individual Support for Students and Teachers, Travel Grant, and Organizational Support separately. Uses official Erasmus+ terminology in English, German, Spanish, and Catalan.</p>
+            </div>
+            <div class="feature">
+                <h3>Multi-Currency Support</h3>
+                <p>Handle expenses in foreign currencies with automatic conversion. Track exchange rates and see amounts in both local and primary currencies.</p>
+            </div>
+            <div class="feature">
+                <h3>Receipt Photos</h3>
+                <p>Attach photos to expenses for documentation. All photos are stored locally or synced privately through your iCloud Drive.</p>
+            </div>
+            <div class="feature">
+                <h3>Professional PDF Reports</h3>
+                <p>Generate comprehensive PDF reports with budget breakdowns, expense tables, and receipt documentation. Perfect for submitting to National Agencies.</p>
+            </div>
+            <div class="feature">
+                <h3>Real-Time Budget Monitoring</h3>
+                <p>See at a glance how much you've spent and how much remains in each category. Automatic calculation of refunds owed to the EU.</p>
+            </div>
+            <div class="feature">
+                <h3>iCloud Sync</h3>
+                <p>Optionally sync your data across devices using your personal iCloud account. All data remains encrypted and private.</p>
+            </div>
+            <div class="feature">
+                <h3>Face ID Protection</h3>
+                <p>Secure sensitive financial data with Face ID. Authentication happens entirely on your device.</p>
+            </div>
+            <div class="feature">
+                <h3>Privacy-First Design</h3>
+                <p>No accounts. No external servers. No data collection. No analytics. Everything stays on your device unless you enable iCloud sync.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Budget Categories -->
+<section>
+    <div class="container">
+        <h2>Erasmus+ Budget Categories</h2>
+        <div class="budget-grid">
+            <div class="budget-item"><strong>Individual Support (Students)</strong><br>Daily allowances for participating students</div>
+            <div class="budget-item"><strong>Individual Support (Teachers)</strong><br>Daily allowances for accompanying staff</div>
+            <div class="budget-item"><strong>Travel Grant</strong><br>Transportation costs for all participants</div>
+            <div class="budget-item"><strong>Organizational Support</strong><br>Project preparation and implementation costs</div>
+        </div>
+    </div>
+</section>
+
+<!-- Screenshots -->
+<section>
+    <div class="container">
+        <h2>Interface</h2>
+        <div class="screenshot-grid">
+            <img src="overview_screenshot.png" alt="Trip Overview" class="screenshot-placeholder">
+            <img src="overview_screenshot_2.png" alt="Budget Overview" class="screenshot-placeholder">
+            <img src="details_screenshot.png" alt="Expense Details" class="screenshot-placeholder">
+            <img src="report_screenshot.png" alt="PDF Report" class="screenshot-placeholder">
+            <img src="settings_screenshot.png" alt="Settings" class="screenshot-placeholder">
+        </div>
+    </div>
+</section>
+
+<!-- Disclaimer -->
+<section>
+    <div class="container">
+        <h2>Important Notice</h2>
+        <div class="features-list">
+            <div class="feature">
+                <p style="text-align: center;"><em>This app is an independent project and is not officially endorsed by, affiliated with, or approved by the European Commission, the Erasmus+ Programme, or any National Agency. All Erasmus+ trademarks and terminology are used solely for descriptive purposes to indicate compatibility with the programme's requirements.</em></p>
+            </div>
+        </div>
+    </div>
+</section>
