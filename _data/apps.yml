@@ -1,4 +1,4 @@
-asm- name: Concentrations
+- name: Concentrations
   icon: /Concentrations/icon.png
   description: Chemical calculator for iOS designed for students and laboratory professionals. Performs molarity, molality, normality, fraction, and dilution calculations.
   url: /Concentrations
