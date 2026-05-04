@@ -15,3 +15,9 @@
   description: Expense management tool for Erasmus+ mobility projects. Track budgets across four funding categories, handle multi-currency expenses, and generate professional PDF reports.
   url: /erasmustracker
   status: published
+
+- name: Road Trip Journal
+  icon: /roadtripjournal/icon.png
+  description: Personal travel diary for motorcycle and road trips. Log daily entries, track fuel and expenses, record stops, and document your journey with photos and GPS tracks.
+  url: /roadtripjournal
+  status: published
