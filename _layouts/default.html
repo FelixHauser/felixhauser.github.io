@@ -54,6 +54,64 @@
         nav a:hover {
             color: #2c3e50;
         }
+
+        /* Dropdown */
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown {
+            position: relative;
+            margin-left: 30px;
+        }
+
+        .dropdown-toggle {
+            color: #5a6c7d;
+            text-decoration: none;
+            font-size: 0.95em;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            font-family: inherit;
+        }
+
+        .dropdown-toggle:hover {
+            color: #2c3e50;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 12px);
+            left: 0;
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            min-width: 180px;
+            z-index: 100;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            margin: 0;
+            padding: 10px 18px;
+            font-size: 0.92em;
+            color: #5a6c7d;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f8f9fa;
+            color: #2c3e50;
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
         
         /* Footer */
         footer {
@@ -84,38 +142,51 @@
                 margin-left: 15px;
                 font-size: 0.9em;
             }
+
+            .dropdown {
+                margin-left: 15px;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
-<nav>
-    <div class="container">
-        <a href="/" class="logo">Barretina Software</a>
-        <div>
-            <a href="/">Home</a>
-            <a href="/about/">About</a>
-            <a href="/Concentrations">Concentrations</a>
-            <a href="/purenmr">Pure NMR</a>
-            <a href="/erasmustracker">Erasmus Tracker</a>
-            <a href="/roadtripjournal">Road Trip Journal</a>
-            {% if page.url contains '/Concentrations' %}
-            <a href="/Concentrations/privacy/">Privacy</a>
-            {% endif %}
-            {% if page.url contains '/purenmr' %}
-            <a href="/purenmr/privacy/">Privacy</a>
-            {% endif %}
-            {% if page.url contains '/erasmustracker' %}
-            <a href="/erasmustracker/privacy/">Privacy</a>
-            {% endif %}
-            {% if page.url contains '/roadtripjournal' %}
-            <a href="/roadtripjournal/privacy/">Privacy</a>
-            <a href="/roadtripjournal/guide/">User Guide</a>
-            {% endif %}
-            <a href="/support/">Support</a>
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">Barretina Software</a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/about/">About</a>
+
+                <!-- Apps dropdown -->
+                <div class="dropdown">
+                    <button class="dropdown-toggle">Apps ▾</button>
+                    <div class="dropdown-menu">
+                        <a href="/Concentrations">Concentrations</a>
+                        <a href="/purenmr">Pure NMR</a>
+                        <a href="/erasmustracker">Erasmus Tracker</a>
+                        <a href="/roadtripjournal">Road Trip Journal</a>
+                    </div>
+                </div>
+
+                {% if page.url contains '/Concentrations' %}
+                <a href="/Concentrations/privacy/">Privacy</a>
+                {% endif %}
+                {% if page.url contains '/purenmr' %}
+                <a href="/purenmr/privacy/">Privacy</a>
+                {% endif %}
+                {% if page.url contains '/erasmustracker' %}
+                <a href="/erasmustracker/privacy/">Privacy</a>
+                {% endif %}
+                {% if page.url contains '/roadtripjournal' %}
+                <a href="/roadtripjournal/privacy/">Privacy</a>
+                <a href="/roadtripjournal/guide/">User Guide</a>
+                {% endif %}
+
+                <a href="/support/">Support</a>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
     <!-- Main Content -->
     {{ content }}
