@@ -1,0 +1,471 @@
+---
+layout: default
+title: Guide d'utilisation - Road Trip Journal
+---
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+        }
+
+        /* Header */
+        header {
+            padding: 80px 30px 60px;
+            text-align: center;
+            background: #fafbfc;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        header h1 {
+            font-size: 3em;
+            font-weight: 600;
+            color: #1a1a1a;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            color: #5a6c7d;
+        }
+
+        /* Layout */
+        .page-wrap {
+            display: flex;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 30px;
+            gap: 60px;
+            align-items: flex-start;
+        }
+
+        /* Sidebar TOC */
+        .toc {
+            width: 220px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 40px;
+        }
+
+        .toc h3 {
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #7a8a9a;
+            margin-bottom: 16px;
+        }
+
+        .toc a {
+            display: block;
+            font-size: 0.92em;
+            color: #5a6c7d;
+            text-decoration: none;
+            padding: 6px 0;
+            border-left: 2px solid #e8e8e8;
+            padding-left: 14px;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        .toc a:hover {
+            color: #1a1a1a;
+            border-left-color: #2c3e50;
+        }
+
+        /* Main content */
+        .content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Flow banner */
+        .flow-banner {
+            background: #2c3e50;
+            color: #ffffff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            font-size: 1.05em;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 60px;
+            letter-spacing: 0.02em;
+        }
+
+        .flow-banner span {
+            opacity: 0.5;
+            margin: 0 10px;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 70px;
+        }
+
+        .section h2 {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e8e8e8;
+        }
+
+        .section h3 {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 32px 0 12px;
+        }
+
+        .section p {
+            font-size: 1.05em;
+            color: #5a6c7d;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        .section ul {
+            margin: 12px 0 20px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .section ul li {
+            font-size: 1.05em;
+            color: #5a6c7d;
+            line-height: 1.7;
+            padding: 6px 0 6px 20px;
+            position: relative;
+        }
+
+        .section ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        /* Screenshot groups */
+        .screenshots {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 28px 0;
+            align-items: flex-start;
+        }
+
+        .screenshots figure {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .screenshots img {
+            height: 420px;
+            width: auto;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            display: block;
+        }
+
+        .screenshots img[src=""],
+        .screenshots img:not([src]) {
+            display: none;
+        }
+
+        figcaption {
+            font-size: 0.82em;
+            color: #7a8a9a;
+            text-align: center;
+            font-style: italic;
+            max-width: 200px;
+            line-height: 1.4;
+        }
+
+        /* Export options */
+        .export-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .export-item {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 22px;
+        }
+
+        .export-item strong {
+            display: block;
+            font-size: 1em;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .export-item p {
+            font-size: 0.95em;
+            margin-bottom: 0;
+        }
+
+        /* Note box */
+        .note {
+            background: #f8f9fa;
+            border-left: 4px solid #2c3e50;
+            padding: 18px 22px;
+            border-radius: 0 6px 6px 0;
+            margin: 20px 0;
+        }
+
+        .note p {
+            margin-bottom: 0;
+            font-size: 0.97em;
+        }
+
+        @media (max-width: 768px) {
+            .page-wrap {
+                flex-direction: column;
+                gap: 40px;
+            }
+
+            .toc {
+                width: 100%;
+                position: static;
+            }
+
+            header h1 {
+                font-size: 2.2em;
+            }
+
+            .screenshots img {
+                height: 320px;
+            }
+        }
+    </style>
+
+<header>
+    <h1>Guide d'utilisation</h1>
+    <p>Road Trip Journal pour iPhone et iPad</p>
+</header>
+
+<div class="page-wrap">
+
+    <!-- TOC -->
+    <aside class="toc">
+        <h3>Sommaire</h3>
+        <a href="#creer-voyage">Créer un voyage</a>
+        <a href="#ajouter-devises">Ajouter des devises</a>
+        <a href="#compteur">Compteur kilométrique</a>
+        <a href="#modifier-voyage">Modifier le voyage</a>
+        <a href="#creer-jour">Créer une journée</a>
+        <a href="#ajouter-entrees">Ajouter des entrées</a>
+        <a href="#exporter">Exporter le voyage</a>
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+
+        <div class="flow-banner">
+            Créer un voyage <span>→</span> Créer une journée <span>→</span> Ajouter des entrées <span>→</span> Répéter <span>→</span> Exporter en PDF
+        </div>
+
+        <p style="font-size:1.1em; color:#5a6c7d; line-height:1.8; margin-bottom:60px;">
+            Road Trip Journal a été conçu pour être simple à utiliser, avec les gestes habituels de l'environnement iOS et iPadOS.
+        </p>
+
+        <!-- Créer un voyage -->
+        <div class="section" id="creer-voyage">
+            <h2>Créer un voyage</h2>
+            <p>En dehors des réglages évidents comme le nom, la marque et le modèle du véhicule, et le compteur kilométrique, il y a d'autres paramètres qui méritent d'être connus.</p>
+            <ul>
+                <li>En appuyant sur le dégradé de couleur en haut, vous pouvez définir une photo de couverture pour votre voyage.</li>
+                <li>Vous pouvez ajouter des devises supplémentaires.</li>
+                <li>Vous pouvez définir les unités préférées pour différentes métriques comme la distance, la consommation et le volume.</li>
+            </ul>
+            <div class="screenshots">
+                <figure>
+                    <img src="../addtripphoto.png" alt="Ajouter une photo de couverture">
+                    <figcaption>Ajouter une photo de couverture au voyage</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Ajouter des devises -->
+        <div class="section" id="ajouter-devises">
+            <h2>Ajouter des devises</h2>
+
+            <h3>Devise principale</h3>
+            <p>Vous pouvez définir la devise principale du voyage. Une fois configurée, elle ne peut plus être modifiée. La devise principale ne doit pas nécessairement être une devise que vous utiliserez pendant le voyage — elle doit plutôt être une devise qui vous est familière. Par exemple, si vous vivez en Europe et que votre quotidien implique l'euro, et que vous faites un road trip au Maroc, vous pouvez tout de même utiliser l'euro comme devise principale pour avoir une vue claire de vos dépenses.</p>
+            <p>Si vous voyagez dans plusieurs pays avec des devises différentes, vous pouvez configurer le voyage pour prendre en charge plusieurs devises.</p>
+            <ul>
+                <li>Appuyez sur « Ajouter une devise ».</li>
+                <li>Appuyez sur le symbole de la devise à gauche et sélectionnez la nouvelle devise dans la liste.</li>
+                <li>Si activé dans les réglages, le taux de change sera récupéré automatiquement depuis internet. Vous pouvez également le saisir manuellement.</li>
+                <li>Appuyez sur « Ajouter » pour intégrer la devise au voyage.</li>
+            </ul>
+            <div class="screenshots">
+                <figure>
+                    <img src="../editTripSettings.png" alt="Réglages du voyage">
+                    <figcaption>Appuyer sur « Ajouter une devise »</figcaption>
+                </figure>
+                <figure>
+                    <img src="../editTripaddCurrency.png" alt="Ajouter une devise">
+                    <figcaption>Appuyer sur le symbole de la devise</figcaption>
+                </figure>
+                <figure>
+                    <img src="../currenciesList.png" alt="Liste des devises">
+                    <figcaption>Sélectionner la devise et appuyer sur « Ajouter »</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Compteur kilométrique -->
+        <div class="section" id="compteur">
+            <h2>Compteur kilométrique</h2>
+            <p>Il est important de saisir le relevé du compteur kilométrique du véhicule au début du voyage. À chaque arrêt carburant, vous pourrez saisir le relevé actuel du compteur pour calculer la consommation du véhicule. Vous pouvez également enregistrer le compteur à la fin de chaque journée, ce qui vous donnera un journal des kilomètres parcourus quotidiennement et sur l'ensemble du voyage.</p>
+            <div class="screenshots">
+                <figure>
+                    <img src="../readyTripBottom.png" alt="Compteur initial">
+                    <figcaption>Saisir le relevé initial du compteur</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Modifier le voyage -->
+        <div class="section" id="modifier-voyage">
+            <h2>Modifier les réglages du voyage</h2>
+            <p>Vous pouvez maintenir appuyée la carte du voyage à tout moment pour accéder aux options de modification ou de suppression. Veuillez noter que la suppression d'un voyage ne supprime pas les photos prises lors de celui-ci. Elles resteront disponibles pour l'export dans la Galerie de stockage, accessible dans la section Réglages de l'app.</p>
+            <div class="screenshots">
+                <figure>
+                    <img src="../tripgrid.png" alt="Liste des voyages">
+                    <figcaption>Maintenir appuyée la carte du voyage…</figcaption>
+                </figure>
+                <figure>
+                    <img src="../editTripMenu.png" alt="Menu du voyage">
+                    <figcaption>…pour modifier ou supprimer le voyage</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Créer une journée -->
+        <div class="section" id="creer-jour">
+            <h2>Créer une journée</h2>
+            <p>Lors de la création d'un voyage, une première journée est créée automatiquement.</p>
+            <p>Lors de la création d'une journée, le lieu de départ est récupéré depuis votre position actuelle (si l'accès à la localisation est autorisé), ainsi que la date et l'heure actuelles.</p>
+            <p>À la fin de votre journée de route, modifiez la journée en la faisant glisser vers la droite, et ajoutez votre destination, l'heure d'arrivée et le relevé du compteur. Tous les autres réglages de la journée peuvent également être modifiés à tout moment.</p>
+            <div class="note">
+                <p>Pour supprimer une journée, faites glisser vers la gauche. Veuillez noter que la suppression d'une journée est irréversible.</p>
+            </div>
+            <div class="screenshots">
+                <figure>
+                    <img src="../editDay.png" alt="Modifier la journée">
+                    <figcaption>Glisser vers la droite pour modifier</figcaption>
+                </figure>
+                <figure>
+                    <img src="../daySettings.png" alt="Réglages de la journée">
+                    <figcaption>Modifier les réglages de la journée</figcaption>
+                </figure>
+                <figure>
+                    <img src="../deleteDay.png" alt="Supprimer la journée">
+                    <figcaption>Glisser vers la gauche pour supprimer</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Ajouter des entrées -->
+        <div class="section" id="ajouter-entrees">
+            <h2>Ajouter des entrées à une journée</h2>
+            <p>Lorsque vous naviguez dans une journée, vous pouvez ajouter différents types d'entrées en appuyant sur le bouton « + » en haut à droite de l'écran. Les types d'entrées disponibles sont :</p>
+            <ul>
+                <li>Journal de carburant</li>
+                <li>Dépense</li>
+                <li>Entretien</li>
+                <li>Photo</li>
+                <li>Arrêt</li>
+                <li>Journal</li>
+                <li>GPX</li>
+            </ul>
+            <div class="screenshots">
+                <figure>
+                    <img src="../emptyDay.png" alt="Journée vide">
+                    <figcaption>Appuyer sur « + » pour ajouter des entrées</figcaption>
+                </figure>
+                <figure>
+                    <img src="../entriesList.png" alt="Liste des entrées">
+                    <figcaption>Sélectionner le type d'entrée</figcaption>
+                </figure>
+            </div>
+
+            <div class="note">
+                <p>Tout comme les journées, les entrées peuvent être modifiées ou supprimées avec les mêmes gestes — glisser vers la droite pour modifier, glisser vers la gauche pour supprimer.</p>
+            </div>
+
+            <p>La plupart des types d'entrées sont explicites, mais quelques détails méritent d'être mentionnés.</p>
+            <p>Les entrées Journal de carburant, Dépense et Entretien ont toutes un coût associé. Le montant peut être saisi dans n'importe quelle devise configurée pour le voyage — sélectionnez simplement la devise dans le menu.</p>
+            <p>Le taux de change entre la devise principale et les devises secondaires peut être ajusté au moment de la saisie, mais ne peut plus être modifié une fois l'entrée enregistrée.</p>
+            <p>Les taux de change peuvent être mis à jour automatiquement, ou récupérés manuellement en appuyant sur le bouton du symbole de devise. Ce comportement est configurable dans les réglages de l'app.</p>
+
+            <h3>Devise préférée</h3>
+            <p>En plus de la devise principale, l'app dispose d'une devise préférée, que vous pouvez définir en appuyant sur l'étoile à côté du symbole de devise. Cette devise apparaîtra en premier dans la liste. C'est particulièrement utile lors de longs voyages où vous passez beaucoup de temps dans un même pays — configurer la devise préférée en conséquence évite de devoir la sélectionner manuellement pour chaque dépense. Vous pouvez changer la devise préférée à tout moment.</p>
+            <div class="screenshots">
+                <figure>
+                    <img src="../fuelLog.png" alt="Journal de carburant">
+                    <figcaption>Appuyer sur le menu des devises</figcaption>
+                </figure>
+                <figure>
+                    <img src="../fuelLogCurrencies.png" alt="Devises disponibles">
+                    <figcaption>Sélectionner la devise de paiement</figcaption>
+                </figure>
+                <figure>
+                    <img src="../fuelLogCurrencyFavorite.png" alt="Devise préférée">
+                    <figcaption>Appuyer sur l'étoile pour définir la devise préférée</figcaption>
+                </figure>
+            </div>
+
+            <div class="note">
+                <p>Pour des calculs de consommation cohérents et fiables, il est important de saisir le relevé du compteur à chaque arrêt carburant. Des saisies incohérentes produiront des données de consommation peu fiables. Notez que la plupart des véhicules disposent également de leurs propres indicateurs de consommation, qui peuvent différer des valeurs calculées par l'app.</p>
+            </div>
+
+            <h3>Traces GPX</h3>
+            <p>Road Trip Journal n'enregistre pas directement les traces GPX. Cependant, le type d'entrée GPX vous permet d'importer un fichier GPX généré par un appareil de navigation externe tel qu'un Garmin ou TomTom.</p>
+        </div>
+
+        <!-- Exporter -->
+        <div class="section" id="exporter">
+            <h2>Exporter le voyage</h2>
+            <p>L'objectif final de Road Trip Journal est de vous donner quelque chose que vous pouvez tenir entre vos mains — un journal de votre voyage auquel vous pouvez revenir. Il existe trois options d'export :</p>
+            <div class="export-grid">
+                <div class="export-item">
+                    <strong>PDF avec photos</strong>
+                    <p>Un résumé complet en PDF de toutes les entrées, avec les photos incluses à la fin de chaque journée.</p>
+                </div>
+                <div class="export-item">
+                    <strong>PDF sans photos</strong>
+                    <p>Le même PDF, mais sans les photos.</p>
+                </div>
+                <div class="export-item">
+                    <strong>Export complet</strong>
+                    <p>Le PDF avec photos, ainsi que toutes les photos et traces GPX du voyage exportées dans leur format numérique d'origine.</p>
+                </div>
+            </div>
+            <div class="screenshots">
+                <figure>
+                    <img src="../exportOptions.png" alt="Options d'export">
+                    <figcaption>Exporter votre voyage</figcaption>
+                </figure>
+            </div>
+        </div>
+
+    </main>
+</div>

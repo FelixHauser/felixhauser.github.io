@@ -1,0 +1,471 @@
+---
+layout: default
+title: Benutzerhandbuch - Road Trip Journal
+---
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+        }
+
+        /* Header */
+        header {
+            padding: 80px 30px 60px;
+            text-align: center;
+            background: #fafbfc;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        header h1 {
+            font-size: 3em;
+            font-weight: 600;
+            color: #1a1a1a;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            color: #5a6c7d;
+        }
+
+        /* Layout */
+        .page-wrap {
+            display: flex;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 30px;
+            gap: 60px;
+            align-items: flex-start;
+        }
+
+        /* Sidebar TOC */
+        .toc {
+            width: 220px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 40px;
+        }
+
+        .toc h3 {
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #7a8a9a;
+            margin-bottom: 16px;
+        }
+
+        .toc a {
+            display: block;
+            font-size: 0.92em;
+            color: #5a6c7d;
+            text-decoration: none;
+            padding: 6px 0;
+            border-left: 2px solid #e8e8e8;
+            padding-left: 14px;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        .toc a:hover {
+            color: #1a1a1a;
+            border-left-color: #2c3e50;
+        }
+
+        /* Main content */
+        .content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Flow banner */
+        .flow-banner {
+            background: #2c3e50;
+            color: #ffffff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            font-size: 1.05em;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 60px;
+            letter-spacing: 0.02em;
+        }
+
+        .flow-banner span {
+            opacity: 0.5;
+            margin: 0 10px;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 70px;
+        }
+
+        .section h2 {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e8e8e8;
+        }
+
+        .section h3 {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 32px 0 12px;
+        }
+
+        .section p {
+            font-size: 1.05em;
+            color: #5a6c7d;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        .section ul {
+            margin: 12px 0 20px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .section ul li {
+            font-size: 1.05em;
+            color: #5a6c7d;
+            line-height: 1.7;
+            padding: 6px 0 6px 20px;
+            position: relative;
+        }
+
+        .section ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        /* Screenshot groups */
+        .screenshots {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 28px 0;
+            align-items: flex-start;
+        }
+
+        .screenshots figure {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .screenshots img {
+            height: 420px;
+            width: auto;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            display: block;
+        }
+
+        .screenshots img[src=""],
+        .screenshots img:not([src]) {
+            display: none;
+        }
+
+        figcaption {
+            font-size: 0.82em;
+            color: #7a8a9a;
+            text-align: center;
+            font-style: italic;
+            max-width: 200px;
+            line-height: 1.4;
+        }
+
+        /* Export options */
+        .export-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .export-item {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 22px;
+        }
+
+        .export-item strong {
+            display: block;
+            font-size: 1em;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .export-item p {
+            font-size: 0.95em;
+            margin-bottom: 0;
+        }
+
+        /* Note box */
+        .note {
+            background: #f8f9fa;
+            border-left: 4px solid #2c3e50;
+            padding: 18px 22px;
+            border-radius: 0 6px 6px 0;
+            margin: 20px 0;
+        }
+
+        .note p {
+            margin-bottom: 0;
+            font-size: 0.97em;
+        }
+
+        @media (max-width: 768px) {
+            .page-wrap {
+                flex-direction: column;
+                gap: 40px;
+            }
+
+            .toc {
+                width: 100%;
+                position: static;
+            }
+
+            header h1 {
+                font-size: 2.2em;
+            }
+
+            .screenshots img {
+                height: 320px;
+            }
+        }
+    </style>
+
+<header>
+    <h1>Benutzerhandbuch</h1>
+    <p>Road Trip Journal für iPhone und iPad</p>
+</header>
+
+<div class="page-wrap">
+
+    <!-- TOC -->
+    <aside class="toc">
+        <h3>Inhalt</h3>
+        <a href="#reise-erstellen">Reise erstellen</a>
+        <a href="#waehrungen">Währungen hinzufügen</a>
+        <a href="#tacho">Tachostand</a>
+        <a href="#reise-bearbeiten">Reise bearbeiten</a>
+        <a href="#tag-erstellen">Tag erstellen</a>
+        <a href="#eintraege">Einträge hinzufügen</a>
+        <a href="#exportieren">Reise exportieren</a>
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+
+        <div class="flow-banner">
+            Reise erstellen <span>→</span> Tag erstellen <span>→</span> Einträge hinzufügen <span>→</span> Wiederholen <span>→</span> PDF exportieren
+        </div>
+
+        <p style="font-size:1.1em; color:#5a6c7d; line-height:1.8; margin-bottom:60px;">
+            Road Trip Journal wurde entwickelt, um einfach bedienbar zu sein — mit den vertrauten Gesten, die du aus iOS und iPadOS kennst.
+        </p>
+
+        <!-- Reise erstellen -->
+        <div class="section" id="reise-erstellen">
+            <h2>Reise erstellen</h2>
+            <p>Neben den selbsterklärenden Einstellungen wie Name, Fahrzeugmarke und -modell sowie Tachostand gibt es einige weitere Optionen, die es wert sind, sie zu kennen.</p>
+            <ul>
+                <li>Durch Tippen auf den Farbverlauf oben kannst du ein Titelbild für deine Reise festlegen.</li>
+                <li>Du kannst zusätzliche Währungen hinzufügen.</li>
+                <li>Du kannst bevorzugte Einheiten für verschiedene Messwerte wie Distanz, Verbrauch und Volumen festlegen.</li>
+            </ul>
+            <div class="screenshots">
+                <figure>
+                    <img src="../addtripphoto.png" alt="Titelbild hinzufügen">
+                    <figcaption>Titelbild für die Reise hinzufügen</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Währungen -->
+        <div class="section" id="waehrungen">
+            <h2>Währungen hinzufügen</h2>
+
+            <h3>Hauptwährung</h3>
+            <p>Du kannst die Hauptwährung der Reise festlegen. Einmal gesetzt, kann sie nicht mehr geändert werden. Die Hauptwährung muss nicht unbedingt eine Währung sein, die du auf der Reise verwendest — sie sollte vielmehr eine Währung sein, die dir vertraut ist. Wenn du zum Beispiel in Europa lebst und im Alltag mit Euro bezahlst und dann eine Motorradreise durch Marokko machst, kannst du trotzdem den Euro als Hauptwährung verwenden, um einen klaren Überblick über deine Ausgaben zu behalten.</p>
+            <p>Wenn du durch verschiedene Länder mit unterschiedlichen Währungen reist, kannst du die Reise so einrichten, dass mehrere Währungen unterstützt werden.</p>
+            <ul>
+                <li>Tippe auf „Währung hinzufügen."</li>
+                <li>Tippe auf das Währungssymbol auf der linken Seite und wähle die neue Währung aus der Liste.</li>
+                <li>Wenn in den Einstellungen aktiviert, wird der Wechselkurs automatisch aus dem Internet abgerufen. Du kannst ihn auch manuell eingeben.</li>
+                <li>Tippe auf „Hinzufügen", um die Währung zur Reise hinzuzufügen.</li>
+            </ul>
+            <div class="screenshots">
+                <figure>
+                    <img src="../editTripSettings.png" alt="Reiseeinstellungen">
+                    <figcaption>Tippe auf „Währung hinzufügen"</figcaption>
+                </figure>
+                <figure>
+                    <img src="../editTripaddCurrency.png" alt="Währung hinzufügen">
+                    <figcaption>Tippe auf das Währungssymbol</figcaption>
+                </figure>
+                <figure>
+                    <img src="../currenciesList.png" alt="Währungsliste">
+                    <figcaption>Währung auswählen und auf „Hinzufügen" tippen</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Tachostand -->
+        <div class="section" id="tacho">
+            <h2>Tachostand</h2>
+            <p>Es ist wichtig, den Tachostand des Fahrzeugs zu Beginn der Reise einzugeben. An jeder Tankstelle kannst du den aktuellen Tachostand eingeben, um den Kraftstoffverbrauch des Fahrzeugs zu berechnen. Du kannst den Tachostand auch am Ende jedes Tages erfassen — so hast du eine genaue Aufzeichnung, wie weit du täglich und insgesamt gefahren bist.</p>
+            <div class="screenshots">
+                <figure>
+                    <img src="../readyTripBottom.png" alt="Anfangstachostand">
+                    <figcaption>Anfangstachostand eingeben</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Reise bearbeiten -->
+        <div class="section" id="reise-bearbeiten">
+            <h2>Reise bearbeiten</h2>
+            <p>Du kannst die Reisekarte jederzeit lange gedrückt halten, um die Optionen zum Bearbeiten oder Löschen der Reise aufzurufen. Bitte beachte: Das Löschen einer Reise löscht nicht die dabei aufgenommenen Fotos. Diese stehen weiterhin zum Export in der Speichergalerie im Einstellungsbereich der App zur Verfügung.</p>
+            <div class="screenshots">
+                <figure>
+                    <img src="../tripgrid.png" alt="Reiseübersicht">
+                    <figcaption>Reisekarte lange drücken…</figcaption>
+                </figure>
+                <figure>
+                    <img src="../editTripMenu.png" alt="Reisemenü">
+                    <figcaption>…um die Reise zu bearbeiten oder zu löschen</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Tag erstellen -->
+        <div class="section" id="tag-erstellen">
+            <h2>Tag erstellen</h2>
+            <p>Wenn du eine Reise erstellst, wird automatisch ein erster Tag angelegt.</p>
+            <p>Beim Erstellen eines Tages wird der Startort aus deiner aktuellen Position übernommen (sofern die Standortnutzung erlaubt ist), zusammen mit aktuellem Datum und Uhrzeit.</p>
+            <p>Am Ende deines Fahrtages bearbeitest du den Tag, indem du ihn nach rechts wischst, und trägst Zielort, Ankunftszeit und Tachostand ein. Alle anderen Tageseinstellungen können jederzeit bearbeitet werden.</p>
+            <div class="note">
+                <p>Um einen Tag zu löschen, wische nach links. Bitte beachte, dass das Löschen eines Tages unwiderruflich ist.</p>
+            </div>
+            <div class="screenshots">
+                <figure>
+                    <img src="../editDay.png" alt="Tag bearbeiten">
+                    <figcaption>Nach rechts wischen zum Bearbeiten</figcaption>
+                </figure>
+                <figure>
+                    <img src="../daySettings.png" alt="Tageseinstellungen">
+                    <figcaption>Tageseinstellungen bearbeiten</figcaption>
+                </figure>
+                <figure>
+                    <img src="../deleteDay.png" alt="Tag löschen">
+                    <figcaption>Nach links wischen zum Löschen</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Einträge hinzufügen -->
+        <div class="section" id="eintraege">
+            <h2>Einträge zu einem Tag hinzufügen</h2>
+            <p>Wenn du einen Tag öffnest, kannst du verschiedene Eintragstypen hinzufügen, indem du auf die „+"-Schaltfläche oben rechts tippst. Die verfügbaren Eintragstypen sind:</p>
+            <ul>
+                <li>Tankprotokoll</li>
+                <li>Ausgabe</li>
+                <li>Wartung</li>
+                <li>Foto</li>
+                <li>Halt</li>
+                <li>Tagebuch</li>
+                <li>GPX</li>
+            </ul>
+            <div class="screenshots">
+                <figure>
+                    <img src="../emptyDay.png" alt="Leerer Tag">
+                    <figcaption>Auf „+" tippen, um Einträge hinzuzufügen</figcaption>
+                </figure>
+                <figure>
+                    <img src="../entriesList.png" alt="Eintragstypen">
+                    <figcaption>Eintragstyp auswählen</figcaption>
+                </figure>
+            </div>
+
+            <div class="note">
+                <p>Genau wie Tage können Einträge mit denselben Wischgesten bearbeitet oder gelöscht werden — nach rechts wischen zum Bearbeiten, nach links wischen zum Löschen.</p>
+            </div>
+
+            <p>Die meisten Eintragstypen sind selbsterklärend, aber einige Details sind erwähnenswert.</p>
+            <p>Tankprotokoll-, Ausgaben- und Wartungseinträge haben alle einen zugehörigen Betrag. Dieser kann in jeder der für die Reise eingerichteten Währungen eingegeben werden — wähle einfach die Währung aus dem Menü.</p>
+            <p>Der Wechselkurs zwischen der Hauptwährung und den Nebenwährungen kann zum Zeitpunkt der Eingabe angepasst werden, ist aber nach dem Speichern des Eintrags nicht mehr editierbar.</p>
+            <p>Wechselkurse können automatisch aktualisiert oder manuell durch Tippen auf das Währungssymbol abgerufen werden. Dieses Verhalten ist in den App-Einstellungen konfigurierbar.</p>
+
+            <h3>Bevorzugte Währung</h3>
+            <p>Neben der Hauptwährung gibt es eine bevorzugte Währung, die du durch Tippen auf den Stern neben dem Währungssymbol festlegen kannst. Diese Währung erscheint dann als erste in der Liste. Das ist besonders nützlich auf längeren Reisen, bei denen du viel Zeit in einem bestimmten Land verbringst — wenn du die bevorzugte Währung entsprechend einstellst, musst du sie nicht bei jeder Ausgabe manuell auswählen. Du kannst die bevorzugte Währung jederzeit ändern.</p>
+            <div class="screenshots">
+                <figure>
+                    <img src="../fuelLog.png" alt="Tankprotokoll">
+                    <figcaption>Auf das Währungsmenü tippen</figcaption>
+                </figure>
+                <figure>
+                    <img src="../fuelLogCurrencies.png" alt="Währungsauswahl">
+                    <figcaption>Zahlungswährung auswählen</figcaption>
+                </figure>
+                <figure>
+                    <img src="../fuelLogCurrencyFavorite.png" alt="Bevorzugte Währung">
+                    <figcaption>Stern tippen für bevorzugte Währung</figcaption>
+                </figure>
+            </div>
+
+            <div class="note">
+                <p>Für konsistente und zuverlässige Verbrauchsberechnungen ist es wichtig, den Tachostand bei jedem Tankstop einzugeben. Inkonsistente Eingaben führen zu unzuverlässigen Verbrauchswerten. Beachte, dass die meisten Fahrzeuge auch eigene Verbrauchsanzeigen haben, die von den in der App berechneten Werten abweichen können.</p>
+            </div>
+
+            <h3>GPX-Strecken</h3>
+            <p>Road Trip Journal zeichnet GPX-Strecken nicht direkt auf. Der GPX-Eintragstyp ermöglicht es dir jedoch, eine GPX-Datei hochzuladen, die von einem externen Navigationsgerät wie einem Garmin oder TomTom erzeugt wurde.</p>
+        </div>
+
+        <!-- Exportieren -->
+        <div class="section" id="exportieren">
+            <h2>Reise exportieren</h2>
+            <p>Das eigentliche Ziel von Road Trip Journal ist es, dir etwas in die Hände zu geben — eine Aufzeichnung deiner Reise, zu der du immer wieder zurückkehren kannst. Es gibt drei Exportoptionen:</p>
+            <div class="export-grid">
+                <div class="export-item">
+                    <strong>PDF mit Fotos</strong>
+                    <p>Eine vollständige PDF-Zusammenfassung aller Einträge, mit Fotos am Ende jedes Tages.</p>
+                </div>
+                <div class="export-item">
+                    <strong>PDF ohne Fotos</strong>
+                    <p>Dasselbe PDF, aber ohne Fotos.</p>
+                </div>
+                <div class="export-item">
+                    <strong>Vollständiger Datenexport</strong>
+                    <p>Das PDF mit Fotos sowie alle Fotos und GPX-Strecken der Reise im digitalen Originalformat.</p>
+                </div>
+            </div>
+            <div class="screenshots">
+                <figure>
+                    <img src="../exportOptions.png" alt="Exportoptionen">
+                    <figcaption>Reise exportieren</figcaption>
+                </figure>
+            </div>
+        </div>
+
+    </main>
+</div>
