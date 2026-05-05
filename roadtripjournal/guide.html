@@ -279,6 +279,506 @@ title: User Guide - Road Trip Journal
             }
         }
     </style>
+</head>
+<body>
+
+<nav>Barretina Software &rsaquo; Road Trip Journal &rsaquo; User Guide</nav>
+
+<header>
+    <h1>User Guide</h1>
+    <p>Road Trip Journal for iPhone and iPad</p>
+</header>
+
+<div class="page-wrap">
+
+    <!-- TOC -->
+    <aside class="toc">
+        <h3>Contents</h3>
+        <a href="#creating-a-trip">Creating a Trip</a>
+        <a href="#adding-currencies">Adding Currencies</a>
+        <a href="#odometer">Odometer</a>
+        <a href="#editing-trip">Editing Trip Settings</a>
+        <a href="#creating-a-day">Creating a Day</a>
+        <a href="#adding-entries">Adding Entries</a>
+        <a href="#exporting">Exporting a Trip</a>
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+
+        <div class="flow-banner">
+            Create a trip <span>→</span> Create a day <span>→</span> Add entries <span>→</span> Repeat <span>→</span> Export PDF
+        </div>
+
+        <p style="font-size:1.1em; color:#5a6c7d; line-height:1.8; margin-bottom:60px;">
+            Road Trip Journal has been designed to be easy to use, with the familiar gestures you are used to in an iOS and iPadOS environment.
+        </p>
+
+        <!-- Creating a Trip -->
+        <div class="section" id="creating-a-trip">
+            <h2>Creating a Trip</h2>
+            <p>Aside from self-explanatory settings such as name, vehicle make and model, and odometer, there are some other settings worth knowing.</p>
+            <ul>
+                <li>By tapping the color gradient at the top, you can set a cover photo for your trip.</li>
+                <li>You can add additional currencies.</li>
+                <li>You can set your preferred units for different metrics such as distance, mileage, and volume.</li>
+            </ul>
+            <div class="screenshots">
+                <figure>
+                    <img src="../addtripphoto.png" alt="Add Trip Photo">
+                    <figcaption>Add a cover photo for your trip</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Adding Currencies -->
+        <div class="section" id="adding-currencies">
+            <h2>Adding Currencies</h2>
+
+            <h3>Main Currency</h3>
+            <p>You can set your main currency for the trip. Once set, it cannot be changed. Your main currency doesn't necessarily have to be a currency you will use on the trip — rather, it should be a currency familiar to you. For example, if you live in Europe and your daily routine involves Euros, and you go on a road trip in Morocco, you can still use Euros as your main currency to keep a clear overview of your expenses.</p>
+            <p>If you are travelling across different countries with different currencies, you can set up the trip to support multiple currencies.</p>
+            <ul>
+                <li>Tap "Add Currency."</li>
+                <li>Tap the currency symbol on the left and select the new currency from the list.</li>
+                <li>If enabled in Settings, the exchange rate will be fetched automatically from the internet. You can also set it manually.</li>
+                <li>Tap "Add" to add the currency to the trip.</li>
+            </ul>
+            <div class="screenshots">
+                <figure>
+                    <img src="../editTripSettings.png" alt="Edit Trip Settings">
+                    <figcaption>Tap on "Add Currency"</figcaption>
+                </figure>
+                <figure>
+                    <img src="../editTripaddCurrency.png" alt="Add Currency">
+                    <figcaption>Tap on the currency symbol</figcaption>
+                </figure>
+                <figure>
+                    <img src="../currenciesList.png" alt="Currencies List">
+                    <figcaption>Select the new currency and tap "Add"</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Odometer -->
+        <div class="section" id="odometer">
+            <h2>Odometer</h2>
+            <p>It is important to enter your vehicle's odometer reading at the beginning of the trip. At each fuel stop, you can input the current odometer reading to calculate your vehicle's fuel consumption. You can also record the odometer at the end of each day, giving you a log of how far you are riding daily and throughout the trip overall.</p>
+            <div class="screenshots">
+                <figure>
+                    <img src="../readyTripBottom.png" alt="Trip Odometer">
+                    <figcaption>Set the initial odometer reading</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Editing Trip Settings -->
+        <div class="section" id="editing-trip">
+            <h2>Editing Trip Settings</h2>
+            <p>You can long-press the trip card at any time to access the options to edit or delete the trip. Please note that deleting a trip does not delete the photos taken within it. These will still be available for export in the Storage Gallery, found in the Settings section of the app.</p>
+            <div class="screenshots">
+                <figure>
+                    <img src="../tripgrid.png" alt="Trip Grid">
+                    <figcaption>Long-press the trip card…</figcaption>
+                </figure>
+                <figure>
+                    <img src="../editTripMenu.png" alt="Edit Trip Menu">
+                    <figcaption>…to edit or delete a trip</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Creating a Day -->
+        <div class="section" id="creating-a-day">
+            <h2>Creating a Day</h2>
+            <p>When you create a trip, a first day is created automatically.</p>
+            <p>When a day is created, the starting location is taken from your current position (if location access is allowed), along with the current date and time.</p>
+            <p>At the end of your riding day, edit the day by swiping it from left to right, and add your destination, arrival time, and odometer reading. All other day settings can also be edited at any time.</p>
+            <div class="note">
+                <p>To delete a day, swipe it from right to left. Please note that deleting a day is irreversible.</p>
+            </div>
+            <div class="screenshots">
+                <figure>
+                    <img src="../editDay.png" alt="Edit Day">
+                    <figcaption>Swipe right to edit</figcaption>
+                </figure>
+                <figure>
+                    <img src="../daySettings.png" alt="Day Settings">
+                    <figcaption>Edit the day settings</figcaption>
+                </figure>
+                <figure>
+                    <img src="../deleteDay.png" alt="Delete Day">
+                    <figcaption>Swipe left to delete</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Adding Entries -->
+        <div class="section" id="adding-entries">
+            <h2>Adding Entries to a Day</h2>
+            <p>When you navigate into a day, you can add different types of entries by tapping the "+" button at the top right of the screen. The available entry types are:</p>
+            <ul>
+                <li>Fuel Log</li>
+                <li>Expense</li>
+                <li>Service</li>
+                <li>Photo</li>
+                <li>Stop</li>
+                <li>Journal</li>
+                <li>GPX</li>
+            </ul>
+            <div class="screenshots">
+                <figure>
+                    <img src="../emptyDay.png" alt="Empty Day">
+                    <figcaption>Tap "+" to add entries</figcaption>
+                </figure>
+                <figure>
+                    <img src="../entriesList.png" alt="Entries List">
+                    <figcaption>Select the entry type</figcaption>
+                </figure>
+            </div>
+
+            <div class="note">
+                <p>Just like days, entries can be edited or deleted using the same swipe gestures — swipe right to edit, swipe left to delete.</p>
+            </div>
+
+            <p>Most entry types are self-explanatory, but a few details are worth mentioning.</p>
+            <p>Fuel Log, Expense, and Service entries all have an associated cost. The amount can be entered in any of the currencies you have set up for the trip — simply select the currency from the menu.</p>
+            <p>The exchange rate between your main currency and any secondary currencies can be adjusted at the time of entry, but cannot be edited once the entry has been saved.</p>
+            <p>Exchange rates can be updated automatically, or fetched manually by tapping the currency symbol button. This behaviour is configurable in the app's Settings.</p>
+
+            <h3>Preferred Currency</h3>
+            <p>In addition to the main currency, the app features a preferred currency, which you can set by tapping the star next to the currency symbol. This currency will appear first in the currency list. This is particularly useful on longer trips where you spend a significant amount of time in one country — setting the preferred currency to match means you don't have to select it manually for every expense. You can change the preferred currency at any time.</p>
+            <div class="screenshots">
+                <figure>
+                    <img src="../fuelLog.png" alt="Fuel Log">
+                    <figcaption>Tap on the currency menu</figcaption>
+                </figure>
+                <figure>
+                    <img src="../fuelLogCurrencies.png" alt="Fuel Log Currencies">
+                    <figcaption>Select the currency you pay with</figcaption>
+                </figure>
+                <figure>
+                    <img src="../fuelLogCurrencyFavorite.png" alt="Preferred Currency">
+                    <figcaption>Tap the star to set a preferred currency</figcaption>
+                </figure>
+            </div>
+
+            <div class="note">
+                <p>For consistent and reliable mileage calculations, it is important to enter the odometer reading at every fuel stop. Inconsistent entries will produce unreliable consumption figures. Note that most vehicles also have their own onboard fuel consumption indicators, which may differ from the values calculated by the app.</p>
+            </div>
+
+            <h3>GPX Tracks</h3>
+            <p>Road Trip Journal does not record GPX tracks directly. However, the GPX entry type allows you to upload a GPX file generated by an external navigation device such as a Garmin or TomTom.</p>
+        </div>
+
+        <!-- Exporting -->
+        <div class="section" id="exporting">
+            <h2>Exporting a Trip</h2>
+            <p>The ultimate goal of Road Trip Journal is to give you something you can hold in your hands — a record of your journey you can come back to. There are three export options:</p>
+            <div class="export-grid">
+                <div class="export-item">
+                    <strong>PDF with Photos</strong>
+                    <p>A full PDF summary of all entries, with photos included at the end of each day.</p>
+                </div>
+                <div class="export-item">
+                    <strong>PDF without Photos</strong>
+                    <p>The same PDF, but without photos.</p>
+                </div>
+                <div class="export-item">
+                    <strong>Full Data Export</strong>
+                    <p>The PDF with photos, plus all photos and GPX tracks from the trip exported in their original digital format.</p>
+                </div>
+            </div>
+            <div class="screenshots">
+                <figure>
+                    <img src="../exportOptions.png" alt="Export Options">
+                    <figcaption>Export your trip</figcaption>
+                </figure>
+            </div>
+        </div>
+
+    </main>
+</div>---
+layout: default
+title: User Guide - Road Trip Journal
+---
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+        }
+
+        /* Nav placeholder */
+        nav {
+            background: #ffffff;
+            border-bottom: 1px solid #e8e8e8;
+            padding: 16px 30px;
+            font-size: 0.9em;
+            color: #7a8a9a;
+        }
+
+        /* Header */
+        header {
+            padding: 80px 30px 60px;
+            text-align: center;
+            background: #fafbfc;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        header h1 {
+            font-size: 3em;
+            font-weight: 600;
+            color: #1a1a1a;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            color: #5a6c7d;
+        }
+
+        /* Layout */
+        .page-wrap {
+            display: flex;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 30px;
+            gap: 60px;
+            align-items: flex-start;
+        }
+
+        /* Sidebar TOC */
+        .toc {
+            width: 220px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 40px;
+        }
+
+        .toc h3 {
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #7a8a9a;
+            margin-bottom: 16px;
+        }
+
+        .toc a {
+            display: block;
+            font-size: 0.92em;
+            color: #5a6c7d;
+            text-decoration: none;
+            padding: 6px 0;
+            border-left: 2px solid #e8e8e8;
+            padding-left: 14px;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        .toc a:hover {
+            color: #1a1a1a;
+            border-left-color: #2c3e50;
+        }
+
+        /* Main content */
+        .content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Flow banner */
+        .flow-banner {
+            background: #2c3e50;
+            color: #ffffff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            font-size: 1.05em;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 60px;
+            letter-spacing: 0.02em;
+        }
+
+        .flow-banner span {
+            opacity: 0.5;
+            margin: 0 10px;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 70px;
+        }
+
+        .section h2 {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e8e8e8;
+        }
+
+        .section h3 {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 32px 0 12px;
+        }
+
+        .section p {
+            font-size: 1.05em;
+            color: #5a6c7d;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        .section ul {
+            margin: 12px 0 20px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .section ul li {
+            font-size: 1.05em;
+            color: #5a6c7d;
+            line-height: 1.7;
+            padding: 6px 0 6px 20px;
+            position: relative;
+        }
+
+        .section ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        /* Screenshot groups */
+        .screenshots {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 28px 0;
+            align-items: flex-start;
+        }
+
+        .screenshots figure {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .screenshots img {
+            height: 420px;
+            width: auto;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            display: block;
+        }
+
+        /* Placeholder for missing images */
+        .screenshots img[src=""],
+        .screenshots img:not([src]) {
+            display: none;
+        }
+
+        .img-placeholder {
+            height: 420px;
+            width: 200px;
+            border-radius: 16px;
+            background: #f0f2f4;
+            border: 2px dashed #c8d0d8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            color: #7a8a9a;
+            text-align: center;
+            padding: 20px;
+        }
+
+        figcaption {
+            font-size: 0.82em;
+            color: #7a8a9a;
+            text-align: center;
+            font-style: italic;
+            max-width: 200px;
+            line-height: 1.4;
+        }
+
+        /* Export options */
+        .export-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .export-item {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 22px;
+        }
+
+        .export-item strong {
+            display: block;
+            font-size: 1em;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .export-item p {
+            font-size: 0.95em;
+            margin-bottom: 0;
+        }
+
+        /* Note box */
+        .note {
+            background: #f8f9fa;
+            border-left: 4px solid #2c3e50;
+            padding: 18px 22px;
+            border-radius: 0 6px 6px 0;
+            margin: 20px 0;
+        }
+
+        .note p {
+            margin-bottom: 0;
+            font-size: 0.97em;
+        }
+
+        @media (max-width: 768px) {
+            .page-wrap {
+                flex-direction: column;
+                gap: 40px;
+            }
+
+            .toc {
+                width: 100%;
+                position: static;
+            }
+
+            header h1 {
+                font-size: 2.2em;
+            }
+
+            .screenshots img,
+            .img-placeholder {
+                height: 320px;
+            }
+        }
+    </style>
 
 
 <nav>Barretina Software &rsaquo; Road Trip Journal &rsaquo; User Guide</nav>
