@@ -1,0 +1,487 @@
+---
+layout: default
+title: Gebruikershandleiding - Road Trip Journal
+---
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+        }
+
+        /* Header */
+        header {
+            padding: 80px 30px 60px;
+            text-align: center;
+            background: #fafbfc;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        header h1 {
+            font-size: 3em;
+            font-weight: 600;
+            color: #1a1a1a;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            color: #5a6c7d;
+        }
+
+        /* Layout */
+        .page-wrap {
+            display: flex;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 30px;
+            gap: 60px;
+            align-items: flex-start;
+        }
+
+        /* Sidebar TOC */
+        .toc {
+            width: 220px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 40px;
+        }
+
+        .toc h3 {
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #7a8a9a;
+            margin-bottom: 16px;
+        }
+
+        .toc a {
+            display: block;
+            font-size: 0.92em;
+            color: #5a6c7d;
+            text-decoration: none;
+            padding: 6px 0;
+            border-left: 2px solid #e8e8e8;
+            padding-left: 14px;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        .toc a:hover {
+            color: #1a1a1a;
+            border-left-color: #2c3e50;
+        }
+
+        /* Main content */
+        .content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Flow banner */
+        .flow-banner {
+            background: #2c3e50;
+            color: #ffffff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            font-size: 1.05em;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 60px;
+            letter-spacing: 0.02em;
+        }
+
+        .flow-banner span {
+            opacity: 0.5;
+            margin: 0 10px;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 70px;
+        }
+
+        .section h2 {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e8e8e8;
+        }
+
+        .section h3 {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 32px 0 12px;
+        }
+
+        .section p {
+            font-size: 1.05em;
+            color: #5a6c7d;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        .section ul {
+            margin: 12px 0 20px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .section ul li {
+            font-size: 1.05em;
+            color: #5a6c7d;
+            line-height: 1.7;
+            padding: 6px 0 6px 20px;
+            position: relative;
+        }
+
+        .section ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        /* Screenshot groups */
+        .screenshots {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 28px 0;
+            align-items: flex-start;
+        }
+
+        .screenshots figure {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .screenshots img {
+            height: 420px;
+            width: auto;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            display: block;
+        }
+
+        .screenshots img[src=""],
+        .screenshots img:not([src]) {
+            display: none;
+        }
+
+        .img-placeholder {
+            height: 420px;
+            width: 200px;
+            border-radius: 16px;
+            background: #f0f2f4;
+            border: 2px dashed #c8d0d8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            color: #7a8a9a;
+            text-align: center;
+            padding: 20px;
+        }
+
+        figcaption {
+            font-size: 0.82em;
+            color: #7a8a9a;
+            text-align: center;
+            font-style: italic;
+            max-width: 200px;
+            line-height: 1.4;
+        }
+
+        /* Export options */
+        .export-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .export-item {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 22px;
+        }
+
+        .export-item strong {
+            display: block;
+            font-size: 1em;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .export-item p {
+            font-size: 0.95em;
+            margin-bottom: 0;
+        }
+
+        /* Note box */
+        .note {
+            background: #f8f9fa;
+            border-left: 4px solid #2c3e50;
+            padding: 18px 22px;
+            border-radius: 0 6px 6px 0;
+            margin: 20px 0;
+        }
+
+        .note p {
+            margin-bottom: 0;
+            font-size: 0.97em;
+        }
+
+        @media (max-width: 768px) {
+            .page-wrap {
+                flex-direction: column;
+                gap: 40px;
+            }
+
+            .toc {
+                width: 100%;
+                position: static;
+            }
+
+            header h1 {
+                font-size: 2.2em;
+            }
+
+            .screenshots img,
+            .img-placeholder {
+                height: 320px;
+            }
+        }
+    </style>
+
+<header>
+    <h1>Gebruikershandleiding</h1>
+    <p>Road Trip Journal voor iPhone en iPad</p>
+</header>
+
+<div class="page-wrap">
+
+    <!-- TOC -->
+    <aside class="toc">
+        <h3>Inhoud</h3>
+        <a href="#creating-a-trip">Een reis aanmaken</a>
+        <a href="#adding-currencies">Valuta toevoegen</a>
+        <a href="#odometer">Kilometerteller</a>
+        <a href="#editing-trip">Reisinstelling bewerken</a>
+        <a href="#creating-a-day">Een dag aanmaken</a>
+        <a href="#adding-entries">Vermeldingen toevoegen</a>
+        <a href="#exporting">Een reis exporteren</a>
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+
+        <div class="flow-banner">
+            Reis aanmaken <span>→</span> Dag aanmaken <span>→</span> Vermeldingen toevoegen <span>→</span> Herhalen <span>→</span> PDF exporteren
+        </div>
+
+        <p style="font-size:1.1em; color:#5a6c7d; line-height:1.8; margin-bottom:60px;">
+            Road Trip Journal is ontworpen om eenvoudig te gebruiken, met de vertrouwde gebaren die je gewend bent in iOS en iPadOS.
+        </p>
+
+        <!-- Een reis aanmaken -->
+        <div class="section" id="creating-a-trip">
+            <h2>Een reis aanmaken</h2>
+            <p>Naast voor de hand liggende instellingen zoals naam, merk en model van het voertuig, en kilometerteller, zijn er nog een paar andere instellingen die het waard zijn te kennen.</p>
+            <ul>
+                <li>Door op de kleurverloop bovenaan te tikken, kun je een omslagfoto voor je reis instellen.</li>
+                <li>Je kunt extra valuta toevoegen.</li>
+                <li>Je kunt je voorkeurseenheden instellen voor afstand, verbruik en volume.</li>
+            </ul>
+            <div class="screenshots">
+                <figure>
+                    <img src="../addtripphoto.png" alt="Omslagfoto toevoegen">
+                    <figcaption>Voeg een omslagfoto toe voor je reis</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Valuta toevoegen -->
+        <div class="section" id="adding-currencies">
+            <h2>Valuta toevoegen</h2>
+
+            <h3>Hoofdvaluta</h3>
+            <p>Je kunt de hoofdvaluta voor de reis instellen. Eenmaal ingesteld, kan deze niet meer worden gewijzigd. De hoofdvaluta hoeft niet per se een valuta te zijn die je tijdens de reis gebruikt — het moet een valuta zijn die je vertrouwd is. Als je bijvoorbeeld in Europa woont en dagelijks met euro's werkt, en je maakt een roadtrip door Marokko, dan kun je euro's als hoofdvaluta blijven gebruiken voor een duidelijk overzicht van je uitgaven.</p>
+            <p>Als je door verschillende landen met verschillende valuta reist, kun je de reis instellen om meerdere valuta te ondersteunen.</p>
+            <ul>
+                <li>Tik op "Valuta toevoegen."</li>
+                <li>Tik op het valutasymbool links en selecteer de nieuwe valuta uit de lijst.</li>
+                <li>Als dit is ingeschakeld in Instellingen, wordt de wisselkoers automatisch opgehaald van het internet. Je kunt deze ook handmatig instellen.</li>
+                <li>Tik op "Toevoegen" om de valuta aan de reis toe te voegen.</li>
+            </ul>
+            <div class="screenshots">
+                <figure>
+                    <img src="../editTripSettings.png" alt="Reisinstelling bewerken">
+                    <figcaption>Tik op "Valuta toevoegen"</figcaption>
+                </figure>
+                <figure>
+                    <img src="../editTripaddCurrency.png" alt="Valuta toevoegen">
+                    <figcaption>Tik op het valutasymbool</figcaption>
+                </figure>
+                <figure>
+                    <img src="../currenciesList.png" alt="Valutalist">
+                    <figcaption>Selecteer de nieuwe valuta en tik op "Toevoegen"</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Kilometerteller -->
+        <div class="section" id="odometer">
+            <h2>Kilometerteller</h2>
+            <p>Het is belangrijk om de kilometerstand van je voertuig aan het begin van de reis in te voeren. Bij elke tankstop kun je de huidige kilometerstand invoeren om het brandstofverbruik van je voertuig te berekenen. Je kunt ook de kilometerstand aan het einde van elke dag registreren, zodat je een overzicht hebt van hoeveel je dagelijks en gedurende de hele reis hebt gereden.</p>
+            <div class="screenshots">
+                <figure>
+                    <img src="../readyTripBottom.png" alt="Kilometerteller instellen">
+                    <figcaption>Stel de beginkilometerstand in</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Reisinstelling bewerken -->
+        <div class="section" id="editing-trip">
+            <h2>Reisinstelling bewerken</h2>
+            <p>Je kunt op elk moment lang op de reiskaart drukken om de opties voor bewerken of verwijderen te openen. Let op: het verwijderen van een reis verwijdert de bijbehorende foto's niet. Deze blijven beschikbaar voor export in de Opslaggerij, te vinden in het gedeelte Instellingen van de app.</p>
+            <div class="screenshots">
+                <figure>
+                    <img src="../tripgrid.png" alt="Reisoverzicht">
+                    <figcaption>Lang indrukken op de reiskaart…</figcaption>
+                </figure>
+                <figure>
+                    <img src="../editTripMenu.png" alt="Reismenu bewerken">
+                    <figcaption>…om een reis te bewerken of verwijderen</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Een dag aanmaken -->
+        <div class="section" id="creating-a-day">
+            <h2>Een dag aanmaken</h2>
+            <p>Wanneer je een reis aanmaakt, wordt automatisch een eerste dag aangemaakt.</p>
+            <p>Wanneer een dag wordt aangemaakt, wordt de startlocatie overgenomen van je huidige positie (als locatietoegang is toegestaan), samen met de huidige datum en tijd.</p>
+            <p>Aan het einde van je rijdag kun je de dag bewerken door van links naar rechts te vegen, en je bestemming, aankomsttijd en kilometerstand toevoegen. Alle andere daginstellingen kunnen ook op elk gewenst moment worden bewerkt.</p>
+            <div class="note">
+                <p>Om een dag te verwijderen, veeg je van rechts naar links. Let op: het verwijderen van een dag is onomkeerbaar.</p>
+            </div>
+            <div class="screenshots">
+                <figure>
+                    <img src="../editDay.png" alt="Dag bewerken">
+                    <figcaption>Veeg naar rechts om te bewerken</figcaption>
+                </figure>
+                <figure>
+                    <img src="../daySettings.png" alt="Daginstellingen">
+                    <figcaption>Bewerk de daginstellingen</figcaption>
+                </figure>
+                <figure>
+                    <img src="../deleteDay.png" alt="Dag verwijderen">
+                    <figcaption>Veeg naar links om te verwijderen</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Vermeldingen toevoegen -->
+        <div class="section" id="adding-entries">
+            <h2>Vermeldingen toevoegen aan een dag</h2>
+            <p>Wanneer je een dag opent, kun je verschillende soorten vermeldingen toevoegen door op de "+"-knop rechtsboven in het scherm te tikken. De beschikbare typen zijn:</p>
+            <ul>
+                <li>Tankbeurt</li>
+                <li>Uitgave</li>
+                <li>Onderhoudsbeurt</li>
+                <li>Foto</li>
+                <li>Tussenstop</li>
+                <li>Dagboek</li>
+                <li>GPX</li>
+            </ul>
+            <div class="screenshots">
+                <figure>
+                    <img src="../emptyDay.png" alt="Lege dag">
+                    <figcaption>Tik op "+" om vermeldingen toe te voegen</figcaption>
+                </figure>
+                <figure>
+                    <img src="../entriesList.png" alt="Lijst met vermeldingen">
+                    <figcaption>Selecteer het type vermelding</figcaption>
+                </figure>
+            </div>
+
+            <div class="note">
+                <p>Net als dagen kunnen vermeldingen worden bewerkt of verwijderd met dezelfde veeggebaren — veeg naar rechts om te bewerken, veeg naar links om te verwijderen.</p>
+            </div>
+
+            <p>De meeste typen vermeldingen spreken voor zich, maar een paar details zijn het vermelden waard.</p>
+            <p>Tankbeurten, uitgaven en onderhoudsbeurten hebben allemaal een bijbehorende kostprijs. Het bedrag kan worden ingevoerd in elke valuta die je voor de reis hebt ingesteld — selecteer gewoon de valuta uit het menu.</p>
+            <p>De wisselkoers tussen je hoofdvaluta en eventuele secundaire valuta kan worden aangepast op het moment van invoer, maar kan niet meer worden bewerkt nadat de vermelding is opgeslagen.</p>
+            <p>Wisselkoersen kunnen automatisch worden bijgewerkt, of handmatig worden opgehaald door op de knop met het valutasymbool te tikken. Dit gedrag is instelbaar in de app-instellingen.</p>
+
+            <h3>Voorkeursvaluta</h3>
+            <p>Naast de hoofdvaluta beschikt de app over een voorkeursvaluta, die je kunt instellen door op de ster naast het valutasymbool te tikken. Deze valuta verschijnt als eerste in de valutalist. Dit is vooral handig op langere reizen waarbij je veel tijd in één land doorbrengt — door de voorkeursvaluta in te stellen op de lokale valuta, hoef je deze niet bij elke uitgave handmatig te selecteren. Je kunt de voorkeursvaluta op elk moment wijzigen.</p>
+            <div class="screenshots">
+                <figure>
+                    <img src="../fuelLog.png" alt="Tankbeurt">
+                    <figcaption>Tik op het valutatmenu</figcaption>
+                </figure>
+                <figure>
+                    <img src="../fuelLogCurrencies.png" alt="Valuta tankbeurt">
+                    <figcaption>Selecteer de valuta waarmee je betaalt</figcaption>
+                </figure>
+                <figure>
+                    <img src="../fuelLogCurrencyFavorite.png" alt="Voorkeursvaluta">
+                    <figcaption>Tik op de ster om een voorkeursvaluta in te stellen</figcaption>
+                </figure>
+            </div>
+
+            <div class="note">
+                <p>Voor consistente en betrouwbare verbruiksberekeningen is het belangrijk om bij elke tankstop de kilometerstand in te voeren. Inconsistente invoer leidt tot onbetrouwbare verbruikscijfers. Houd er rekening mee dat de meeste voertuigen ook hun eigen boordcomputer hebben voor brandstofverbruik, die kan afwijken van de waarden die door de app worden berekend.</p>
+            </div>
+
+            <h3>GPX-tracks</h3>
+            <p>Road Trip Journal neemt zelf geen GPX-tracks op. Het GPX-type stelt je echter in staat een GPX-bestand te uploaden dat is gegenereerd door een extern navigatieapparaat zoals een Garmin of TomTom.</p>
+        </div>
+
+        <!-- Een reis exporteren -->
+        <div class="section" id="exporting">
+            <h2>Een reis exporteren</h2>
+            <p>Het uiteindelijke doel van Road Trip Journal is je iets te geven wat je in handen kunt houden — een verslag van je reis waar je op terug kunt kijken. Er zijn drie exportopties:</p>
+            <div class="export-grid">
+                <div class="export-item">
+                    <strong>PDF met foto's</strong>
+                    <p>Een volledig PDF-overzicht van alle vermeldingen, met foto's aan het einde van elke dag.</p>
+                </div>
+                <div class="export-item">
+                    <strong>PDF zonder foto's</strong>
+                    <p>Dezelfde PDF, maar zonder foto's.</p>
+                </div>
+                <div class="export-item">
+                    <strong>Volledige gegevensexport</strong>
+                    <p>De PDF met foto's, plus alle foto's en GPX-tracks van de reis geëxporteerd in hun originele digitale formaat.</p>
+                </div>
+            </div>
+            <div class="screenshots">
+                <figure>
+                    <img src="../exportOptions.png" alt="Exportopties">
+                    <figcaption>Exporteer je reis</figcaption>
+                </figure>
+            </div>
+        </div>
+
+    </main>
+</div>
