@@ -16,8 +16,8 @@
   url: /erasmustracker
   status: published
 
-- name: Road Trip Journal
-  icon: /roadtripjournal/icon.png
+- name: Route Diary
+  icon: /routediary/icon.png
   description: Personal travel diary for motorcycle and road trips. Log daily entries, track fuel and expenses, record stops, and document your journey with photos and GPS tracks.
-  url: /roadtripjournal
+  url: /routediary
   status: published

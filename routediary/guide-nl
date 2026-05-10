@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Gebruikershandleiding - Road Trip Journal
+title: Gebruikershandleiding - Route Diary
 ---
 <style>
         * {
@@ -272,7 +272,7 @@ title: Gebruikershandleiding - Road Trip Journal
 
 <header>
     <h1>Gebruikershandleiding</h1>
-    <p>Road Trip Journal voor iPhone en iPad</p>
+    <p>Route Diary voor iPhone en iPad</p>
 </header>
 
 <div class="page-wrap">
@@ -297,7 +297,7 @@ title: Gebruikershandleiding - Road Trip Journal
         </div>
 
         <p style="font-size:1.1em; color:#5a6c7d; line-height:1.8; margin-bottom:60px;">
-            Road Trip Journal is ontworpen om eenvoudig te gebruiken, met de vertrouwde gebaren die je gewend bent in iOS en iPadOS.
+            Route Diary is ontworpen om eenvoudig te gebruiken, met de vertrouwde gebaren die je gewend bent in iOS en iPadOS.
         </p>
 
         <!-- Een reis aanmaken -->
@@ -454,13 +454,13 @@ title: Gebruikershandleiding - Road Trip Journal
             </div>
 
             <h3>GPX-tracks</h3>
-            <p>Road Trip Journal neemt zelf geen GPX-tracks op. Het GPX-type stelt je echter in staat een GPX-bestand te uploaden dat is gegenereerd door een extern navigatieapparaat zoals een Garmin of TomTom.</p>
+            <p>Route Diary neemt zelf geen GPX-tracks op. Het GPX-type stelt je echter in staat een GPX-bestand te uploaden dat is gegenereerd door een extern navigatieapparaat zoals een Garmin of TomTom.</p>
         </div>
 
         <!-- Een reis exporteren -->
         <div class="section" id="exporting">
             <h2>Een reis exporteren</h2>
-            <p>Het uiteindelijke doel van Road Trip Journal is je iets te geven wat je in handen kunt houden — een verslag van je reis waar je op terug kunt kijken. Er zijn drie exportopties:</p>
+            <p>Het uiteindelijke doel van Route Diary is je iets te geven wat je in handen kunt houden — een verslag van je reis waar je op terug kunt kijken. Er zijn drie exportopties:</p>
             <div class="export-grid">
                 <div class="export-item">
                     <strong>PDF met foto's</strong>
