@@ -1,1 +1,678 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Klassenarbeit planen</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --ink: #17202a;
+      --muted: #5d6d7e;
+      --line: #d6dde5;
+      --line-strong: #b8c2cc;
+      --primary: #1f5f8b;
+      --primary-dark: #164768;
+      --primary-soft: #e9f3fb;
+      --ok-bg: #eaf6ef;
+      --ok: #1f6f43;
+      --warn-bg: #fff5dc;
+      --warn: #8a5b00;
+      --error-bg: #fdecec;
+      --error: #9b1c1c;
+      --calc-bg: #f1f4f7;
+      --shadow: 0 8px 26px rgba(23,32,42,.08);
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, #eef4f8 0%, var(--bg) 210px);
+      font-size: 16px;
+      line-height: 1.35;
+    }
+    main {
+      width: min(1120px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 44px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(30px, 4vw, 44px);
+      letter-spacing: -0.035em;
+      line-height: 1.05;
+    }
+    .lead { margin: 0; color: var(--muted); max-width: 760px; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      color: white;
+      background: var(--primary);
+      box-shadow: 0 2px 8px rgba(31,95,139,.24);
+    }
+    button:hover { background: var(--primary-dark); }
+    button.secondary { color: var(--primary-dark); background: var(--primary-soft); box-shadow: none; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px 12px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+    h2 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -0.015em;
+    }
+    .small { font-size: 13px; color: var(--muted); }
+    .body { padding: 16px 18px 18px; }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 2fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .planner-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) minmax(280px, .92fr);
+      gap: 18px;
+      align-items: start;
+    }
+    .subcard {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: #fff;
+    }
+    .subcard.result { background: #f9fbfc; }
+    .subheading {
+      margin: 0 0 12px;
+      font-size: 15px;
+      font-weight: 800;
+      color: #263645;
+      letter-spacing: .01em;
+    }
+    .field { margin-bottom: 12px; }
+    .field:last-child { margin-bottom: 0; }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 800;
+      color: #34495e;
+      margin: 0 0 6px;
+    }
+    input, select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      padding: 9px 11px;
+      font: inherit;
+      background: white;
+      color: var(--ink);
+    }
+    input:focus, select:focus, button:focus {
+      outline: 3px solid rgba(31,95,139,.22);
+      outline-offset: 2px;
+    }
+    select:disabled, input[readonly] {
+      background: var(--calc-bg);
+      color: #34495e;
+      border-color: var(--line);
+      opacity: 1;
+      -webkit-text-fill-color: #34495e;
+    }
+    .hint { margin-top: 5px; font-size: 12px; color: var(--muted); }
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .metric {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      min-height: 68px;
+    }
+    .metric-label { font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 4px; }
+    .metric-value { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
+    .metric.full { grid-column: 1 / -1; }
+    .statusbar {
+      margin-top: 12px;
+      border-radius: 12px;
+      padding: 11px 12px;
+      font-weight: 700;
+      border: 1px solid var(--line);
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+    }
+    .statusbar.ok { background: var(--ok-bg); color: var(--ok); border-color: #bde2ca; }
+    .statusbar.warn { background: var(--warn-bg); color: var(--warn); border-color: #f3d893; }
+    .statusbar.error { background: var(--error-bg); color: var(--error); border-color: #f0b3b3; }
+    .schema-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+    th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: #50677c; background: #fbfcfd; }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    tr.major td { font-weight: 800; background: #fcfdfe; }
+    .indent-1 { padding-left: 24px; color: #263645; }
+    .indent-2 { padding-left: 42px; color: #4c5f70; }
+    .muted { color: var(--muted); }
+    .two-col { display: grid; grid-template-columns: 1.25fr .85fr; gap: 16px; align-items: start; }
+    .viewer-note {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border: 1px solid #d7e7f4;
+      background: #f4f9fd;
+      color: #31516a;
+      border-radius: 12px;
+      font-size: 13px;
+    }
+    .print-only { display: none; }
+    @media (max-width: 860px) {
+      main { width: min(100vw - 20px, 720px); padding-top: 18px; }
+      header { grid-template-columns: 1fr; align-items: start; }
+      .actions { justify-content: flex-start; }
+      .meta-grid, .planner-grid, .two-col { grid-template-columns: 1fr; }
+      .result-grid { grid-template-columns: 1fr; }
+      .card-header { align-items: flex-start; flex-direction: column; }
+    }
+    @media print {
+      @page { size: A4 portrait; margin: 10mm; }
+      body { background: white; font-size: 11px; color: #111; }
+      main { width: 100%; padding: 0; }
+      header { margin-bottom: 8px; }
+      h1 { font-size: 24px; margin-bottom: 2px; }
+      .lead, .actions, .viewer-note, .no-print, button { display: none !important; }
+      .print-only { display: block; }
+      .card { box-shadow: none; border-color: #b8c2cc; margin-bottom: 8px; break-inside: avoid; }
+      .card-header { padding: 8px 10px; background: #f8f8f8; }
+      .body { padding: 10px; }
+      .meta-grid { grid-template-columns: 1fr 1fr 2fr; gap: 8px; margin-bottom: 8px; }
+      .planner-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .two-col { grid-template-columns: 1.22fr .78fr; gap: 8px; }
+      .subcard, .metric { border-color: #d0d0d0; padding: 8px; }
+      input, select { min-height: 28px; padding: 4px 6px; border-color: #bbb; background: #fff; font-size: 11px; }
+      .hint { font-size: 10px; }
+      .metric { min-height: auto; }
+      .metric-label { font-size: 10px; }
+      .metric-value { font-size: 12px; }
+      h2 { font-size: 14px; }
+      table { font-size: 10.2px; }
+      th, td { padding: 4px 5px; }
+      .statusbar { padding: 7px 8px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Klassenarbeit planen</h1>
+      <p class="lead">Lokale Web-App für Safari auf dem iPad sowie moderne Browser auf macOS und Windows. Keine Installation, keine Makros, keine Drittanbieter-App.</p>
+    </div>
+    <div class="actions no-print">
+      <button type="button" id="calcBtn">Berechnen</button>
+      <button type="button" class="secondary" id="printBtn">Drucken / PDF sichern</button>
+    </div>
+  </header>
 
+  <section class="card">
+    <div class="card-header">
+      <h2>Klassenarbeit festlegen</h2>
+      <span id="schemaLabel" class="schema-pill">Standardschema</span>
+    </div>
+    <div class="body">
+      <div class="meta-grid">
+        <div class="field">
+          <label for="className">Klasse</label>
+          <input id="className" type="text" placeholder="z. B. 7a">
+        </div>
+        <div class="field">
+          <label for="dateText">Datum</label>
+          <input id="dateText" type="text" placeholder="TT.MM.JJJJ">
+        </div>
+        <div class="field">
+          <label for="topicText">Thema</label>
+          <input id="topicText" type="text" placeholder="Thema der Klassenarbeit">
+        </div>
+      </div>
+
+      <div class="planner-grid">
+        <div class="subcard">
+          <p class="subheading">Eingaben</p>
+          <div class="field">
+            <label for="yearSelect">Jahrgang</label>
+            <select id="yearSelect">
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7" selected>7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="courseSelect">Kursart</label>
+            <select id="courseSelect">
+              <option value="GK" selected>GK</option>
+              <option value="EK">EK</option>
+            </select>
+            <div id="courseHint" class="hint">GK und EK gibt es erst ab Jahrgang 7.</div>
+          </div>
+          <div class="field">
+            <label for="specSelect">Was möchten Sie vorgeben?</label>
+            <select id="specSelect">
+              <option value="total" selected>Gesamtpunktzahl</option>
+              <option value="k1">Kompetenz 1: Listening / Reading / Mediation</option>
+              <option value="k2">Kompetenz 2: Verfügen über sprachliche Mittel</option>
+              <option value="k3">Kompetenz 3: Schreiben</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="pointsInput">Punktzahl</label>
+            <input id="pointsInput" type="number" inputmode="numeric" min="0" step="1" value="50">
+            <div id="allowedHint" class="hint">Zulässig: ganze Zahl von 0 bis 150</div>
+          </div>
+        </div>
+
+        <div class="subcard result">
+          <p class="subheading">Ergebnis & Status</p>
+          <div class="result-grid">
+            <div class="metric">
+              <div class="metric-label">Gesamtpunktzahl</div>
+              <div id="totalOut" class="metric-value">50</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Zulässig</div>
+              <div id="allowedOut" class="metric-value">0–150</div>
+            </div>
+            <div class="metric full">
+              <div class="metric-label">Einschätzung</div>
+              <div id="assessmentOut" class="metric-value">Gut geeignet für differenzierte Bewertung.</div>
+            </div>
+          </div>
+          <div id="statusOut" class="statusbar ok">Die Eingabe ist gültig. Die Vorgaben werden exakt eingehalten.</div>
+          <div id="extraOut" class="hint"></div>
+        </div>
+      </div>
+      <div class="viewer-note no-print">Hinweis: Diese Datei rechnet direkt im Browser. Auf dem iPad bitte in Safari öffnen. Zum Sichern als PDF: „Drucken / PDF sichern“ verwenden.</div>
+    </div>
+  </section>
+
+  <div class="two-col">
+    <section class="card">
+      <div class="card-header"><h2>Punkteverteilung kompakt</h2></div>
+      <div class="body table-wrap">
+        <table aria-label="Punkteverteilung kompakt">
+          <thead><tr><th>Bereich</th><th class="num">Punkte</th></tr></thead>
+          <tbody id="distributionBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header"><h2>Notengrenzen kompakt</h2></div>
+      <div class="body table-wrap">
+        <table aria-label="Notengrenzen kompakt">
+          <thead><tr><th>Note</th><th class="num">Punktbereich</th></tr></thead>
+          <tbody id="gradesBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  const GRADE_LIMITS = [
+    {note:'sehr gut', pct:87},
+    {note:'gut', pct:73},
+    {note:'befriedigend', pct:59},
+    {note:'ausreichend', pct:45},
+    {note:'mangelhaft', pct:19},
+    {note:'ungenügend', pct:0}
+  ];
+
+  const els = {};
+  function $(id){ return document.getElementById(id); }
+
+  function isYearWithoutCourse(year){ return Number(year) <= 6; }
+
+  function normalizeCourse(year, course){
+    year = Number(year);
+    if (isYearWithoutCourse(year)) return 'NONE';
+    return (course === 'GK' || course === 'EK') ? course : '';
+  }
+
+  function isValidCourse(year, course){
+    year = Number(year);
+    if (isYearWithoutCourse(year)) return true;
+    return course === 'GK' || course === 'EK';
+  }
+
+  function isSpecialSchema(year, course){
+    year = Number(year);
+    return (year === 9 || year === 10) && course === 'EK';
+  }
+
+  function schemaName(year, course){
+    return isSpecialSchema(year, course) ? 'Sonderschema Jahrgang 9/10 EK' : 'Standardschema';
+  }
+
+  function mainWeights(year, course){
+    year = Number(year);
+    if (year === 5 || year === 6) return [30,25,45];
+    if (year === 7 || year === 8) return [25,25,50];
+    if ((year === 9 || year === 10) && course === 'EK') return [20,20,60];
+    if (year === 9 || year === 10) return [30,25,45];
+    return null;
+  }
+
+  function largestRemainder(total, parts){
+    const rows = parts.map((p, idx) => {
+      const num = total * p.weight;
+      const floor = Math.floor(num / 100);
+      const rem = num % 100;
+      return Object.assign({}, p, {ideal: num / 100, points: floor, remainder: rem, order: idx});
+    });
+    let missing = total - rows.reduce((s,r) => s + r.points, 0);
+    rows.slice().sort((a,b) => (b.remainder - a.remainder) || (a.order - b.order)).forEach(r => {
+      if (missing > 0) { rows[r.order].points += 1; missing -= 1; }
+    });
+    return rows;
+  }
+
+  function addDeviation(split){
+    return split.reduce((s,r) => s + Math.abs(r.points - r.ideal), 0);
+  }
+
+  function calculateDistribution(year, course, total){
+    year = Number(year); total = Number(total); course = normalizeCourse(year, course);
+    const weights = mainWeights(year, course);
+    if (!weights) return null;
+    const main = largestRemainder(total, [
+      {key:'k1', label:'Kompetenz 1: Listening / Reading / Mediation', weight:weights[0], level:0},
+      {key:'k2', label:'Kompetenz 2: Verfügen über sprachliche Mittel', weight:weights[1], level:0},
+      {key:'k3', label:'Kompetenz 3: Schreiben', weight:weights[2], level:0}
+    ]);
+    const k1 = main[0].points, k2 = main[1].points, k3 = main[2].points;
+    const write = largestRemainder(k3, [
+      {key:'content', label:'Inhaltliche Leistung', weight:40, level:1},
+      {key:'presentation', label:'Darstellungsleistung', weight:60, level:1}
+    ]);
+    const content = write[0].points, presentation = write[1].points;
+    const special = isSpecialSchema(year, course);
+    const presentationParts = special ? [
+      {key:'expression', label:'Ausdrucksvermögen', weight:35, level:2},
+      {key:'communication', label:'Kommunikative Textgestaltung', weight:30, level:2},
+      {key:'correctness', label:'Sprachliche Korrektheit', weight:35, level:2}
+    ] : [
+      {key:'exprcomm', label:'Ausdrucksvermögen und kommunikative Textgestaltung', weight:65, level:2},
+      {key:'correctness', label:'Sprachliche Korrektheit', weight:35, level:2}
+    ];
+    const pres = largestRemainder(presentation, presentationParts);
+    const correctness = pres.find(r => r.key === 'correctness').points;
+    const corr = largestRemainder(correctness, [
+      {key:'orthography', label:'Orthographie', weight:20, level:2},
+      {key:'grammar', label:'Grammatik', weight:40, level:2},
+      {key:'vocabulary', label:'Wortschatz', weight:40, level:2}
+    ]);
+    const rows = [];
+    function row(label, points, level, major){ rows.push({label, points, level, major: !!major}); }
+    row(main[0].label, k1, 0, true);
+    row(main[1].label, k2, 0, true);
+    row(main[2].label, k3, 0, true);
+    row('Inhaltliche Leistung', content, 1, false);
+    row('Darstellungsleistung', presentation, 1, false);
+    pres.forEach(r => row(r.label, r.points, 2, false));
+    corr.forEach(r => row(r.label, r.points, 2, false));
+    const dev = addDeviation(main) + addDeviation(write) + addDeviation(pres) + addDeviation(corr);
+    const values = {total, k1, k2, k3, content, presentation, correctness};
+    pres.forEach(r => values[r.key] = r.points);
+    corr.forEach(r => values[r.key] = r.points);
+    return {year, course, special, schema:schemaName(year, course), rows, values, aggregateDeviation:dev};
+  }
+
+  function componentValue(dist, spec){
+    if (spec === 'k1') return dist.values.k1;
+    if (spec === 'k2') return dist.values.k2;
+    if (spec === 'k3') return dist.values.k3;
+    return dist.values.total;
+  }
+
+  function specWeight(year, course, spec){
+    const weights = mainWeights(year, normalizeCourse(year, course));
+    if (!weights) return 100;
+    if (spec === 'k1') return weights[0];
+    if (spec === 'k2') return weights[1];
+    if (spec === 'k3') return weights[2];
+    return 100;
+  }
+
+  function getMaxAllowed(year, course, spec){
+    if (spec === 'total') return 150;
+    course = normalizeCourse(year, course);
+    if (!isValidCourse(year, course)) return 0;
+    let max = 0;
+    for (let total = 0; total <= 150; total++) {
+      const dist = calculateDistribution(year, course, total);
+      max = Math.max(max, componentValue(dist, spec));
+    }
+    return max;
+  }
+
+  function solveTotal(year, course, spec, inputPoints){
+    year = Number(year); inputPoints = Number(inputPoints); course = normalizeCourse(year, course);
+    if (!isValidCourse(year, course)) return {valid:false, reason:'course'};
+    if (!Number.isInteger(inputPoints) || inputPoints < 0) return {valid:false, reason:'integer'};
+    const maxAllowed = getMaxAllowed(year, course, spec);
+    if (inputPoints > maxAllowed) return {valid:false, reason:'tooHigh', maxAllowed};
+    if (spec === 'total') {
+      return {valid:true, exact:true, total:inputPoints, actual:inputPoints, maxAllowed, dist:calculateDistribution(year, course, inputPoints)};
+    }
+    const w = specWeight(year, course, spec);
+    const idealTotal = w === 0 ? 0 : inputPoints * 100 / w;
+    const candidates = [];
+    for (let total = 0; total <= 150; total++) {
+      const dist = calculateDistribution(year, course, total);
+      const actual = componentValue(dist, spec);
+      candidates.push({
+        total, actual, dist,
+        exact: actual === inputPoints,
+        pointDiff: Math.abs(actual - inputPoints),
+        idealDiff: Math.abs(total - idealTotal),
+        dev: dist.aggregateDeviation
+      });
+    }
+    const exacts = candidates.filter(c => c.exact);
+    const pool = exacts.length ? exacts : candidates;
+    pool.sort((a,b) => {
+      if (!exacts.length && a.pointDiff !== b.pointDiff) return a.pointDiff - b.pointDiff;
+      if (a.idealDiff !== b.idealDiff) return a.idealDiff - b.idealDiff;
+      if (Math.abs(a.dev - b.dev) > 1e-9) return a.dev - b.dev;
+      return a.total - b.total;
+    });
+    const best = pool[0];
+    return {valid:true, exact:best.exact, total:best.total, actual:best.actual, maxAllowed, dist:best.dist, pointDiff:best.pointDiff};
+  }
+
+  function roundHalfDownPercent(total, pct){
+    const num = Number(total) * pct;
+    const q = Math.floor(num / 100);
+    const r = num % 100;
+    return r > 50 ? q + 1 : q;
+  }
+
+  function gradeRows(total){
+    total = Number(total);
+    if (total === 0) return GRADE_LIMITS.map(g => ({note:g.note, min:0, range:'–'}));
+    const mins = GRADE_LIMITS.map(g => roundHalfDownPercent(total, g.pct));
+    const ranges = [];
+    for (let i = 0; i < GRADE_LIMITS.length; i++) {
+      let lo, hi;
+      if (i === 0) { lo = mins[i]; hi = total; }
+      else { lo = mins[i]; hi = mins[i-1] - 1; }
+      let range;
+      if (lo > hi) range = 'kein eigener Punktbereich';
+      else if (lo === hi) range = String(lo);
+      else range = lo + '–' + hi;
+      ranges.push({note:GRADE_LIMITS[i].note, min:mins[i], lo, hi, range});
+    }
+    return ranges;
+  }
+
+  function assessmentText(total){
+    total = Number(total);
+    if (total === 0) return '0 Punkte sind rechnerisch möglich, aber für eine Klassenarbeit nicht sinnvoll.';
+    if (total < 7) return 'Unter 7 Punkten können nicht alle Notenstufen abgebildet werden.';
+    if (total <= 29) return 'Formal abbildbar, aber geringe Aussagekraft.';
+    if (total <= 35) return 'Erste sinnvolle Aussagekraft; empfohlen ab 36 Punkten.';
+    if (total <= 49) return 'Empfehlenswerter Bereich.';
+    if (total <= 59) return 'Gut geeignet für differenzierte Bewertung.';
+    return 'Besonders geeignet für feine Unterkategorien.';
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  }
+
+  function updateCourseOptions(){
+    const year = Number(els.yearSelect.value);
+    const current = els.courseSelect.value;
+    els.courseSelect.innerHTML = '';
+    if (isYearWithoutCourse(year)) {
+      const opt = document.createElement('option');
+      opt.value = 'NONE';
+      opt.textContent = 'Keine Kursart erforderlich';
+      els.courseSelect.appendChild(opt);
+      els.courseSelect.value = 'NONE';
+      els.courseSelect.disabled = true;
+      els.courseHint.textContent = 'GK und EK gibt es erst ab Jahrgang 7.';
+    } else {
+      ['GK','EK'].forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = v;
+        els.courseSelect.appendChild(opt);
+      });
+      els.courseSelect.disabled = false;
+      els.courseSelect.value = (current === 'EK') ? 'EK' : 'GK';
+      els.courseHint.textContent = 'Wählen Sie GK oder EK.';
+    }
+  }
+
+  function setStatus(kind, text, extra){
+    els.statusOut.className = 'statusbar ' + kind;
+    els.statusOut.textContent = text;
+    els.extraOut.textContent = extra || '';
+  }
+
+  function renderDistribution(dist){
+    els.distributionBody.innerHTML = dist.rows.map(r => {
+      const cls = (r.major ? 'major ' : '') + (r.level ? 'indent-' + r.level : '');
+      return '<tr class="' + (r.major ? 'major' : '') + '"><td class="' + cls + '">' + escapeHtml(r.label) + '</td><td class="num">' + r.points + '</td></tr>';
+    }).join('');
+  }
+
+  function renderGrades(total){
+    els.gradesBody.innerHTML = gradeRows(total).map(r => '<tr><td>' + escapeHtml(r.note) + '</td><td class="num">' + escapeHtml(r.range) + '</td></tr>').join('');
+  }
+
+  function calculate(){
+    updateCourseOptions();
+    const year = Number(els.yearSelect.value);
+    const course = normalizeCourse(year, els.courseSelect.value);
+    const spec = els.specSelect.value;
+    const raw = els.pointsInput.value;
+    const points = Number(raw);
+    const maxAllowed = getMaxAllowed(year, course, spec);
+    els.allowedHint.textContent = 'Zulässig: ganze Zahl von 0 bis ' + maxAllowed;
+    els.allowedOut.textContent = '0–' + maxAllowed;
+    els.schemaLabel.textContent = schemaName(year, course);
+    if (raw === '' || !Number.isInteger(points) || points < 0) {
+      els.totalOut.textContent = '–';
+      els.assessmentOut.textContent = '–';
+      renderDistribution({rows:[]}); renderGrades(0);
+      setStatus('error', 'Bitte geben Sie eine ganze Punktzahl ein.');
+      return;
+    }
+    const solved = solveTotal(year, course, spec, points);
+    if (!solved.valid) {
+      els.totalOut.textContent = '–';
+      els.assessmentOut.textContent = '–';
+      renderDistribution({rows:[]}); renderGrades(0);
+      if (solved.reason === 'tooHigh') setStatus('error', 'Die Punktzahl ist zu hoch. Für diese Auswahl sind maximal ' + solved.maxAllowed + ' Punkte möglich.', 'Grund: Die Gesamtpunktzahl ist auf 150 begrenzt.');
+      else if (solved.reason === 'course') setStatus('error', 'Bitte wählen Sie eine Kursart aus.');
+      else setStatus('error', 'Bitte geben Sie eine gültige Punktzahl ein.');
+      return;
+    }
+    els.totalOut.textContent = solved.total;
+    els.assessmentOut.textContent = assessmentText(solved.total);
+    renderDistribution(solved.dist);
+    renderGrades(solved.total);
+    const extraParts = [];
+    if (spec !== 'total') extraParts.push('Tatsächlich erreicht: ' + solved.actual + ' Punkte in der gewählten Kompetenz.');
+    if (solved.total === 0) setStatus('warn', '0 Punkte sind rechnerisch möglich, aber für eine Klassenarbeit nicht sinnvoll.', extraParts.join(' '));
+    else if (solved.total < 7) setStatus('warn', 'Unter 7 Punkten können nicht alle Notenstufen abgebildet werden.', extraParts.join(' '));
+    else if (solved.exact) setStatus('ok', 'Die Eingabe ist gültig. Die Vorgaben werden exakt eingehalten.', extraParts.join(' '));
+    else setStatus('warn', 'Die Eingabe ist gültig, aber nicht exakt umsetzbar. Angezeigt wird die beste passende Gesamtpunktzahl.', extraParts.concat(['Abweichung: ' + solved.pointDiff + ' Punkt(e).']).join(' '));
+  }
+
+  function init(){
+    ['yearSelect','courseSelect','specSelect','pointsInput','allowedHint','allowedOut','totalOut','assessmentOut','statusOut','extraOut','distributionBody','gradesBody','schemaLabel','courseHint'].forEach(id => els[id] = $(id));
+    updateCourseOptions();
+    ['yearSelect','courseSelect','specSelect','pointsInput'].forEach(id => els[id].addEventListener('change', calculate));
+    els.pointsInput.addEventListener('input', calculate);
+    $('calcBtn').addEventListener('click', calculate);
+    $('printBtn').addEventListener('click', () => { calculate(); window.print(); });
+    calculate();
+  }
+
+  window.__plannerTest = {largestRemainder, calculateDistribution, solveTotal, gradeRows, getMaxAllowed, normalizeCourse, isSpecialSchema, mainWeights};
+  document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+</body>
+</html>
