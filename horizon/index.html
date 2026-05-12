@@ -196,6 +196,7 @@
     tr.major td { font-weight: 800; background: #fcfdfe; }
     .indent-1 { padding-left: 24px; color: #263645; }
     .indent-2 { padding-left: 42px; color: #4c5f70; }
+    .indent-3 { padding-left: 60px; color: #6b7f92; }
     .muted { color: var(--muted); }
     .two-col { display: grid; grid-template-columns: 1.25fr .85fr; gap: 16px; align-items: start; }
     .viewer-note {
@@ -241,12 +242,48 @@
       th, td { padding: 4px 5px; }
       .statusbar { padding: 7px 8px; font-size: 11px; }
     }
+    #loginOverlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.55);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    #loginCard {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: 0 20px 60px rgba(0,0,0,.3);
+      padding: 32px;
+      width: min(380px, calc(100vw - 40px));
+    }
+    #loginCard h2 { margin: 0 0 18px; }
+    #loginError { margin-top: 12px; font-size: 13px; font-weight: 700; color: var(--error); }
+    .logo-login { display: block; max-width: 100%; height: auto; margin: 0 auto 18px; }
+    .logo-header { display: block; height: 40px; width: auto; margin-bottom: 6px; }
   </style>
 </head>
 <body>
-<main>
+
+  <div id="loginOverlay">
+  <div id="loginCard">
+    <img src="logo" alt="" class="logo-login">
+    <h2>Anmelden</h2>
+    <div class="field">
+      <label for="loginUser">Benutzername</label>
+      <input id="loginUser" type="text" autocomplete="username">
+    </div>
+    <div class="field">
+      <label for="loginPass">Passwort</label>
+      <input id="loginPass" type="password" autocomplete="current-password">
+    </div>
+    <button type="button" id="loginBtn" style="width:100%">Anmelden</button>
+    <div id="loginError"></div>
+  </div>
+</div>
+
+<main style="display:none">
   <header>
     <div>
+      <img src="logo" alt="" class="logo-header">
       <h1>Klassenarbeit planen</h1>
       <p class="lead">Lokale Web-App für Safari auf dem iPad sowie moderne Browser auf macOS und Windows. Keine Installation, keine Makros, keine Drittanbieter-App.</p>
     </div>
@@ -467,7 +504,7 @@
     row('Inhaltliche Leistung', content, 1, false);
     row('Darstellungsleistung', presentation, 1, false);
     pres.forEach(r => row(r.label, r.points, 2, false));
-    corr.forEach(r => row(r.label, r.points, 2, false));
+    corr.forEach(r => row(r.label, r.points, 3, false));
     const dev = addDeviation(main) + addDeviation(write) + addDeviation(pres) + addDeviation(corr);
     const values = {total, k1, k2, k3, content, presentation, correctness};
     pres.forEach(r => values[r.key] = r.points);
@@ -653,11 +690,20 @@
     renderDistribution(solved.dist);
     renderGrades(solved.total);
     const extraParts = [];
-    if (spec !== 'total') extraParts.push('Tatsächlich erreicht: ' + solved.actual + ' Punkte in der gewählten Kompetenz.');
     if (solved.total === 0) setStatus('warn', '0 Punkte sind rechnerisch möglich, aber für eine Klassenarbeit nicht sinnvoll.', extraParts.join(' '));
     else if (solved.total < 7) setStatus('warn', 'Unter 7 Punkten können nicht alle Notenstufen abgebildet werden.', extraParts.join(' '));
     else if (solved.exact) setStatus('ok', 'Die Eingabe ist gültig. Die Vorgaben werden exakt eingehalten.', extraParts.join(' '));
     else setStatus('warn', 'Die Eingabe ist gültig, aber nicht exakt umsetzbar. Angezeigt wird die beste passende Gesamtpunktzahl.', extraParts.concat(['Abweichung: ' + solved.pointDiff + ' Punkt(e).']).join(' '));
+  }
+
+  function handleLogin(){
+    if ($('loginUser').value === 'lehrer' && $('loginPass').value === 'Lenkerbeck') {
+      $('loginOverlay').style.display = 'none';
+      document.querySelector('main').style.display = 'block';
+      init();
+    } else {
+      $('loginError').textContent = 'Benutzername oder Passwort falsch.';
+    }
   }
 
   function init(){
@@ -671,7 +717,11 @@
   }
 
   window.__plannerTest = {largestRemainder, calculateDistribution, solveTotal, gradeRows, getMaxAllowed, normalizeCourse, isSpecialSchema, mainWeights};
-  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('DOMContentLoaded', () => {
+    $('loginBtn').addEventListener('click', handleLogin);
+    $('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+    $('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginPass').focus(); });
+  });
 })();
 </script>
 </body>
