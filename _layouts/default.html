@@ -167,6 +167,7 @@
                         <a href="/purenmr">Pure NMR</a>
                         <a href="/erasmustracker">Erasmus Tracker</a>
                         <a href="/routediary">Route Diary</a>
+                        <a href="/sacore">Sacore</a>
                     </div>
                 </div>
 
@@ -182,6 +183,9 @@
                 {% if page.url contains '/routediary' %}
                 <a href="/routediary/privacy/">Privacy</a>
                 <a href="/routediary/guide/">User Guide</a>
+                {% endif %}
+                {% if page.url contains '/sacore' %}
+                <a href="/sacore/privacy.html">Privacy</a>
                 {% endif %}
                 {% if page.url contains '/routediary/guide' %}
                 <div class="dropdown">
