@@ -21,3 +21,9 @@
   description: Personal travel diary for motorcycle and road trips. Log daily entries, track fuel and expenses, record stops, and document your journey with photos and GPS tracks.
   url: /routediary
   status: published
+
+- name: Sacore
+  icon: /sacore/icon.png
+  description: Basketball stats and game tracker for coaches and parents. Manage rosters, record baskets and fouls in real time, and review season statistics per player.
+  url: /sacore
+  status: published
