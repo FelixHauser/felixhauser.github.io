@@ -1,0 +1,2 @@
+# Never commit Supabase credentials to git
+config.js

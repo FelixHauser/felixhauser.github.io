@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SchulAsset — Admin</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <div class="app-layout">
+
+    <!-- Sidebar overlay (mobile only — tap to close) -->
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-icon">🎒</span>
+        <span class="sidebar-title">SchulAsset</span>
+        <!-- Close button visible only on mobile -->
+        <button class="sidebar-close" onclick="closeSidebar()" aria-label="Menü schließen">✕</button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#dashboard" class="nav-item" data-view="dashboard" onclick="closeSidebar()">
+          <span class="nav-icon">📊</span> Dashboard
+        </a>
+        <a href="#ipads" class="nav-item" data-view="ipads" onclick="closeSidebar()">
+          <span class="nav-icon">📱</span> iPads
+        </a>
+        <a href="#pupils" class="nav-item" data-view="pupils" onclick="closeSidebar()">
+          <span class="nav-icon">👥</span> Schüler
+        </a>
+        <a href="#staff" class="nav-item" data-view="staff" onclick="closeSidebar()">
+          <span class="nav-icon">👩‍🏫</span> Lehrkräfte
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span id="user-email" class="user-email"></span>
+        <button onclick="logout()" class="logout-btn">Abmelden</button>
+      </div>
+    </aside>
+
+    <!-- Main content area -->
+    <main class="main-content">
+
+      <!-- Mobile top bar (hidden on desktop) -->
+      <div class="mobile-topbar">
+        <button class="hamburger" onclick="openSidebar()" aria-label="Menü öffnen">
+          <span></span><span></span><span></span>
+        </button>
+        <span class="mobile-title">SchulAsset</span>
+      </div>
+
+      <div id="view-container"></div>
+    </main>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="translations.js"></script>
+  <script src="admin.js"></script>
+  <script src="views/dashboard.js"></script>
+  <script src="views/ipad-list.js"></script>
+  <script src="views/ipad-detail.js"></script>
+  <script src="views/pupil-list.js"></script>
+  <script src="views/staff-list.js"></script>
+
+</body>
+</html>

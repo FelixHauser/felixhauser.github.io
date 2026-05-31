@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SchulAsset — Login</title>
+  <link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+  <div class="login-card">
+
+    <!-- App header -->
+    <div class="login-header">
+      <div class="app-icon">🎒</div>
+      <h1 class="app-title">SchulAsset</h1>
+      <p class="app-school">Martin Luther King Schule · Marl</p>
+      <p class="app-subtitle" data-i18n="login.subtitle">iPad-Verwaltung</p>
+    </div>
+
+    <!-- Language switcher -->
+    <div class="lang-switcher">
+      <button class="lang-btn" data-lang="de" onclick="setLang('de')">DE</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" data-lang="tr" onclick="setLang('tr')">TR</button>
+    </div>
+
+    <!-- Login form -->
+    <form id="login-form" onsubmit="handleLogin(event)" novalidate>
+
+      <div class="form-group">
+        <label for="username" data-i18n="login.usernameLabel">E-Mail oder Seriennummer</label>
+        <input
+          type="text"
+          id="username"
+          autocomplete="username"
+          spellcheck="false"
+          autocapitalize="none"
+          data-i18n-placeholder="login.usernamePlaceholder"
+          placeholder="E-Mail oder Seriennummer"
+          required
+        >
+        <p class="field-hint" data-i18n="login.usernameHint">
+          Lehrkräfte: E-Mail-Adresse · Schüler / Eltern: Seriennummer
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="password" data-i18n="login.passwordLabel">Passwort</label>
+        <input
+          type="password"
+          id="password"
+          autocomplete="current-password"
+          required
+        >
+      </div>
+
+      <!-- Error message (hidden until needed) -->
+      <div id="error-msg" class="error-msg" hidden></div>
+
+      <button type="submit" id="login-btn" class="login-btn">
+        <span data-i18n="login.loginButton">Anmelden</span>
+      </button>
+
+    </form>
+  </div>
+
+  <!-- Supabase JS client (CDN) — must come before our own scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <!-- Our files, in dependency order -->
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="translations.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    // Apply translations on first load (language is read from localStorage or defaults to 'de').
+    applyTranslations();
+  </script>
+
+</body>
+</html>
