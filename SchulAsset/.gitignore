@@ -1,2 +1,6 @@
 # Never commit Supabase credentials to git
 config.js
+
+# Documentation and session notes — synced via iCloud, not needed in the repo
+CLAUDE.md
+statusquo.md
