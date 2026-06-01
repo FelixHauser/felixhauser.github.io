@@ -33,18 +33,42 @@
         <h2 class="modal-title" data-i18n="portal.termsModalTitle">Nutzungsbedingungen</h2>
         <button class="modal-close" onclick="closeModal('terms-modal')">✕</button>
       </div>
-      <div class="modal-body terms-text">
-        <!-- PLACEHOLDER — replace with the school's official Nutzungsbedingungen -->
-        <p>Das iPad ist Eigentum der Stadt Marl und wird dem/der Schüler/in unentgeltlich zur Verfügung gestellt.</p>
-        <p>Mit der Nutzung des iPads erkenne ich folgende Bedingungen an:</p>
-        <ol>
-          <li><strong>Sorgfaltspflicht:</strong> Das Gerät ist pfleglich zu behandeln und vor Beschädigungen zu schützen.</li>
-          <li><strong>Haftung:</strong> Bei schuldhafter Beschädigung oder Verlust haftet der/die Schüler/in bzw. der/die Erziehungsberechtigte.</li>
-          <li><strong>Zweck:</strong> Das iPad darf vorrangig zu schulischen Zwecken genutzt werden.</li>
-          <li><strong>Rückgabe:</strong> Das iPad ist auf Anforderung der Schule oder bei Ende des Schülerverhältnisses zurückzugeben.</li>
-          <li><strong>Verlust / Diebstahl:</strong> Im Fall von Verlust oder Diebstahl ist die Schule unverzüglich zu informieren und Anzeige zu erstatten.</li>
-        </ol>
-        <p>Bei Fragen wenden Sie sich bitte an das Schulsekretariat.</p>
+      <div class="modal-body">
+        <div class="terms-text">
+          <!-- PLACEHOLDER — replace with the school's official Nutzungsbedingungen -->
+          <p>Das iPad ist Eigentum der Stadt Marl und wird dem/der Schüler/in unentgeltlich zur Verfügung gestellt.</p>
+          <p>Mit der Nutzung des iPads erkenne ich folgende Bedingungen an:</p>
+          <ol>
+            <li><strong>Sorgfaltspflicht:</strong> Das Gerät ist pfleglich zu behandeln und vor Beschädigungen zu schützen.</li>
+            <li><strong>Haftung:</strong> Bei schuldhafter Beschädigung oder Verlust haftet der/die Schüler/in bzw. der/die Erziehungsberechtigte.</li>
+            <li><strong>Zweck:</strong> Das iPad darf vorrangig zu schulischen Zwecken genutzt werden.</li>
+            <li><strong>Rückgabe:</strong> Das iPad ist auf Anforderung der Schule oder bei Ende des Schülerverhältnisses zurückzugeben.</li>
+            <li><strong>Verlust / Diebstahl:</strong> Im Fall von Verlust oder Diebstahl ist die Schule unverzüglich zu informieren und Anzeige zu erstatten.</li>
+          </ol>
+          <p>Bei Fragen wenden Sie sich bitte an das Schulsekretariat.</p>
+        </div>
+
+        <!-- Optional guardian data — only if different from the pupil -->
+        <div style="margin-top:1.1rem;padding-top:1rem;border-top:1px solid var(--border)">
+          <p class="section-label" data-i18n="portal.leihvertrag.guardianSection">Erziehungsberechtigte/r</p>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.75rem" data-i18n="portal.leihvertrag.guardianHint">
+            Nur ausfüllen, falls abweichend vom Schüler / der Schülerin.
+          </p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">
+            <div class="form-group" style="margin-bottom:0">
+              <label data-i18n="portal.leihvertrag.erzFirstName">Vorname</label>
+              <input type="text" id="erz-first-name" autocomplete="given-name">
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label data-i18n="portal.leihvertrag.erzLastName">Nachname</label>
+              <input type="text" id="erz-last-name" autocomplete="family-name">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:0.5rem;margin-bottom:0">
+            <label data-i18n="portal.leihvertrag.erzAddress">Anschrift</label>
+            <input type="text" id="erz-address" autocomplete="street-address">
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn-secondary" onclick="closeModal('terms-modal')" data-i18n="portal.cancel">Abbrechen</button>
@@ -92,6 +116,25 @@
               required
             ></textarea>
           </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">
+            <div class="form-group" style="margin-bottom:0">
+              <label for="schaden-datum-eingetreten" data-i18n="portal.schaden.datumEingetretenLabel">Schaden eingetreten am</label>
+              <input type="date" id="schaden-datum-eingetreten">
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label for="schaden-datum-entdeckt" data-i18n="portal.schaden.datumEntdecktLabel">Entdeckt am (falls abw.)</label>
+              <input type="date" id="schaden-datum-entdeckt">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:0.5rem">
+            <label for="schaden-perpetrator" data-i18n="portal.schaden.perpetratorLabel">Schadensverursacher/in (falls abweichend)</label>
+            <input
+              type="text"
+              id="schaden-perpetrator"
+              data-i18n-placeholder="portal.schaden.perpetratorPlaceholder"
+              placeholder="Name der Person, falls nicht du selbst"
+            >
+          </div>
           <div id="schaden-error" class="error-msg" hidden></div>
           <div class="modal-footer">
             <button type="button" class="btn-secondary" onclick="closeModal('schaden-modal')" data-i18n="portal.cancel">Abbrechen</button>
@@ -127,6 +170,19 @@
             ></textarea>
           </div>
           <div class="form-group">
+            <label for="verlust-ort" data-i18n="portal.verlust.ortLabel">Ort des letzten bekannten Verbleibs</label>
+            <input
+              type="text"
+              id="verlust-ort"
+              data-i18n-placeholder="portal.verlust.ortPlaceholder"
+              placeholder="z. B. Schulhof, Schulweg, zu Hause"
+            >
+          </div>
+          <div class="form-group">
+            <label for="verlust-datum-bemerkt" data-i18n="portal.verlust.datumBemerktLabel">Verlust bemerkt am</label>
+            <input type="date" id="verlust-datum-bemerkt">
+          </div>
+          <div class="form-group">
             <label for="verlust-police" data-i18n="portal.verlust.policeLabel">Aktenzeichen (falls Anzeige erstattet)</label>
             <input
               type="text"
@@ -134,6 +190,15 @@
               data-i18n-placeholder="portal.verlust.policePlaceholder"
               placeholder="z. B. AZ 2024/12345"
             >
+          </div>
+          <div class="form-group">
+            <label for="verlust-notitzen" data-i18n="portal.verlust.notitzenLabel">Notizen (optional)</label>
+            <textarea
+              id="verlust-notitzen"
+              rows="2"
+              data-i18n-placeholder="portal.verlust.notitzenPlaceholder"
+              placeholder="Weitere Hinweise…"
+            ></textarea>
           </div>
           <div id="verlust-error" class="error-msg" hidden></div>
           <div class="modal-footer">
@@ -146,8 +211,12 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.7/dist/pizzip.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docxtemplater@3.44.0/build/docxtemplater.js"></script>
+  <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="supabase-client.js"></script>
   <script src="translations.js"></script>
+  <script src="doc-generator.js"></script>
   <script src="portal.js"></script>
   <script>
     applyTranslations();
