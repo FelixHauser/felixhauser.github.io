@@ -45,7 +45,7 @@ async function initAdmin() {
   document.getElementById('user-email').textContent = session.user.email;
 
   // Route to the view matching the URL hash, or default to iPads.
-  routeToHash(window.location.hash.slice(1) || 'ipads');
+  routeToHash(window.location.hash.slice(1) || 'schnellsuche');
 }
 
 // ---- View router ----
@@ -53,6 +53,7 @@ async function initAdmin() {
 // Arrow functions are used so the renderer names are looked up at call time,
 // not at parse time — views/ipad-list.js and future view files load after admin.js.
 const VIEW_RENDERERS = {
+  schnellsuche:  () => renderSchnellsuche(),
   dashboard:     () => renderDashboard(),
   ipads:         () => renderIpadList(),
   pupils:        () => renderPupilList(),
@@ -119,5 +120,4 @@ function assignedName(ipad) {
   return '—';
 }
 
-// ---- Start ----
-initAdmin();
+// initAdmin() is called from admin.html after all view scripts have loaded.

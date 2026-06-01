@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SchulAsset — Schülerportal</title>
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="portal-header">
+    <img src="mlks_logo.png" class="portal-logo" alt="Martin-Luther-King-Schule">
+    <div class="header-right">
+      <div class="lang-switcher">
+        <button class="lang-btn" data-lang="de" onclick="setLang('de')">DE</button>
+        <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" data-lang="tr" onclick="setLang('tr')">TR</button>
+      </div>
+      <button class="btn-logout" onclick="portalLogout()" data-i18n="portal.logout">Abmelden</button>
+    </div>
+  </header>
+
+  <!-- Main content (filled by portal.js) -->
+  <main class="portal-main" id="portal-content">
+    <p class="loading-msg" data-i18n="portal.loading">Wird geladen…</p>
+  </main>
+
+  <!-- ── Nutzungsbedingungen modal ── -->
+  <div id="terms-modal" class="modal-backdrop" hidden>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title" data-i18n="portal.termsModalTitle">Nutzungsbedingungen</h2>
+        <button class="modal-close" onclick="closeModal('terms-modal')">✕</button>
+      </div>
+      <div class="modal-body terms-text">
+        <!-- PLACEHOLDER — replace with the school's official Nutzungsbedingungen -->
+        <p>Das iPad ist Eigentum der Stadt Marl und wird dem/der Schüler/in unentgeltlich zur Verfügung gestellt.</p>
+        <p>Mit der Nutzung des iPads erkenne ich folgende Bedingungen an:</p>
+        <ol>
+          <li><strong>Sorgfaltspflicht:</strong> Das Gerät ist pfleglich zu behandeln und vor Beschädigungen zu schützen.</li>
+          <li><strong>Haftung:</strong> Bei schuldhafter Beschädigung oder Verlust haftet der/die Schüler/in bzw. der/die Erziehungsberechtigte.</li>
+          <li><strong>Zweck:</strong> Das iPad darf vorrangig zu schulischen Zwecken genutzt werden.</li>
+          <li><strong>Rückgabe:</strong> Das iPad ist auf Anforderung der Schule oder bei Ende des Schülerverhältnisses zurückzugeben.</li>
+          <li><strong>Verlust / Diebstahl:</strong> Im Fall von Verlust oder Diebstahl ist die Schule unverzüglich zu informieren und Anzeige zu erstatten.</li>
+        </ol>
+        <p>Bei Fragen wenden Sie sich bitte an das Schulsekretariat.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('terms-modal')" data-i18n="portal.cancel">Abbrechen</button>
+        <button class="btn-primary" id="terms-accept-btn" onclick="acceptTerms()" data-i18n="portal.termsAcceptBtn">
+          Ich akzeptiere die Nutzungsbedingungen
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Schadenmeldung modal ── -->
+  <div id="schaden-modal" class="modal-backdrop" hidden>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title" data-i18n="portal.schaden.title">Schadenmeldung</h2>
+        <button class="modal-close" onclick="closeModal('schaden-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="schaden-success" class="success-msg" hidden></div>
+        <form id="schaden-form" onsubmit="submitSchaden(event)" novalidate>
+          <div class="form-group">
+            <label data-i18n="portal.schaden.typeLabel">Art des Schadens</label>
+            <div class="radio-group">
+              <label class="radio-option">
+                <input type="radio" name="damage-type" value="screen" required>
+                <span data-i18n="portal.schaden.screen">Display</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="damage-type" value="water">
+                <span data-i18n="portal.schaden.water">Wasserschaden</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="damage-type" value="other">
+                <span data-i18n="portal.schaden.other">Sonstiges</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="schaden-desc" data-i18n="portal.schaden.descLabel">Beschreibung</label>
+            <textarea
+              id="schaden-desc"
+              rows="4"
+              data-i18n-placeholder="portal.schaden.descPlaceholder"
+              placeholder="Bitte beschreibe den Schaden genau…"
+              required
+            ></textarea>
+          </div>
+          <div id="schaden-error" class="error-msg" hidden></div>
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="closeModal('schaden-modal')" data-i18n="portal.cancel">Abbrechen</button>
+            <button type="submit" id="schaden-submit-btn" class="btn-primary" data-i18n="portal.schaden.submit">Meldung abschicken</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Verlustmeldung modal ── -->
+  <div id="verlust-modal" class="modal-backdrop" hidden>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title" data-i18n="portal.verlust.title">Verlust- / Diebstahlmeldung</h2>
+        <button class="modal-close" onclick="closeModal('verlust-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="verlust-success" class="success-msg" hidden></div>
+        <form id="verlust-form" onsubmit="submitVerlust(event)" novalidate>
+          <div class="form-group">
+            <label for="verlust-date" data-i18n="portal.verlust.dateLabel">Datum des Vorfalls</label>
+            <input type="date" id="verlust-date" required>
+          </div>
+          <div class="form-group">
+            <label for="verlust-circ" data-i18n="portal.verlust.circLabel">Wie ist es passiert?</label>
+            <textarea
+              id="verlust-circ"
+              rows="4"
+              data-i18n-placeholder="portal.verlust.circPlaceholder"
+              placeholder="Bitte beschreibe die Umstände genau…"
+              required
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label for="verlust-police" data-i18n="portal.verlust.policeLabel">Aktenzeichen (falls Anzeige erstattet)</label>
+            <input
+              type="text"
+              id="verlust-police"
+              data-i18n-placeholder="portal.verlust.policePlaceholder"
+              placeholder="z. B. AZ 2024/12345"
+            >
+          </div>
+          <div id="verlust-error" class="error-msg" hidden></div>
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="closeModal('verlust-modal')" data-i18n="portal.cancel">Abbrechen</button>
+            <button type="submit" id="verlust-submit-btn" class="btn-primary" data-i18n="portal.verlust.submit">Meldung abschicken</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="translations.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    applyTranslations();
+    initPortal();
+  </script>
+
+</body>
+</html>

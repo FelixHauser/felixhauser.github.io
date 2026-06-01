@@ -18,7 +18,7 @@ async function handleLogin(event) {
   // The @ check lets us distinguish the two without a separate toggle.
   const email = usernameRaw.includes('@')
     ? usernameRaw
-    : `${usernameRaw}@schulasset.local`;
+    : `${usernameRaw.toUpperCase()}@schulasset.local`;
 
   // Attempt sign-in.
   const { data: authData, error: authError } =

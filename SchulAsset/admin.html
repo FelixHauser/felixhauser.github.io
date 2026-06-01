@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SchulAsset — Admin</title>
   <link rel="stylesheet" href="admin.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 
@@ -16,24 +17,33 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <span class="sidebar-icon">🎒</span>
+        <div class="brand-mark">
+          <span class="dot dot-teal"></span>
+          <span class="dot dot-orange"></span>
+          <span class="dot dot-navy"></span>
+        </div>
         <span class="sidebar-title">SchulAsset</span>
         <!-- Close button visible only on mobile -->
-        <button class="sidebar-close" onclick="closeSidebar()" aria-label="Menü schließen">✕</button>
+        <button class="sidebar-close" onclick="closeSidebar()" aria-label="Menü schließen">
+          <i data-lucide="x" style="width:18px;height:18px;"></i>
+        </button>
       </div>
 
       <nav class="sidebar-nav">
+        <a href="#schnellsuche" class="nav-item" data-view="schnellsuche" onclick="closeSidebar()">
+          <i data-lucide="search" class="nav-icon"></i> Schnellsuche
+        </a>
         <a href="#dashboard" class="nav-item" data-view="dashboard" onclick="closeSidebar()">
-          <span class="nav-icon">📊</span> Dashboard
+          <i data-lucide="layout-dashboard" class="nav-icon"></i> Dashboard
         </a>
         <a href="#ipads" class="nav-item" data-view="ipads" onclick="closeSidebar()">
-          <span class="nav-icon">📱</span> iPads
+          <i data-lucide="tablet" class="nav-icon"></i> iPads
         </a>
         <a href="#pupils" class="nav-item" data-view="pupils" onclick="closeSidebar()">
-          <span class="nav-icon">👥</span> Schüler
+          <i data-lucide="users" class="nav-icon"></i> Schüler
         </a>
         <a href="#staff" class="nav-item" data-view="staff" onclick="closeSidebar()">
-          <span class="nav-icon">👩‍🏫</span> Lehrkräfte
+          <i data-lucide="user-check" class="nav-icon"></i> Lehrkräfte
         </a>
       </nav>
 
@@ -68,7 +78,9 @@
   <script src="views/ipad-list.js"></script>
   <script src="views/ipad-detail.js"></script>
   <script src="views/pupil-list.js"></script>
+  <script src="views/schnellsuche.js"></script>
   <script src="views/staff-list.js"></script>
+  <script>lucide.createIcons(); initAdmin();</script>
 
 </body>
 </html>
