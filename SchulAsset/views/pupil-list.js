@@ -17,7 +17,7 @@ async function renderPupilList() {
 
   const { data: pupils, error } = await supabase
     .from('pupils')
-    .select('id, first_name, last_name, address, intune_login, created_at')
+    .select('id, first_name, last_name, address, created_at')
     .order('last_name')
     .order('first_name');
 
@@ -39,7 +39,7 @@ function applyPupilFilter() {
   const filtered = (window._allPupils || []).filter(p => {
     if (!search) return true;
     const full = `${p.last_name} ${p.first_name}`.toLowerCase();
-    return full.includes(search) || (p.intune_login ?? '').toLowerCase().includes(search);
+    return full.includes(search);
   });
 
   renderPupilTable(filtered);
@@ -60,7 +60,6 @@ function renderPupilTable(pupils) {
       <td>${p.last_name}</td>
       <td>${p.first_name}</td>
       <td>${p.address ?? '—'}</td>
-      <td class="mono">${p.intune_login ?? '—'}</td>
     </tr>
   `).join('');
 
@@ -72,7 +71,6 @@ function renderPupilTable(pupils) {
             <th>Nachname</th>
             <th>Vorname</th>
             <th>Adresse</th>
-            <th>Intune-Login</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
