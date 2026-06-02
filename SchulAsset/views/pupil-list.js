@@ -10,6 +10,7 @@ async function renderPupilList() {
     <div class="toolbar">
       <input type="search" id="pupil-search" class="search-input"
              placeholder="Name suchen…">
+      <button class="btn-action-detail" onclick="openNewPupilModal()">+ Neuer Schüler</button>
     </div>
     <div id="pupil-count" class="result-count"></div>
     <div id="pupil-table-wrap"><p class="loading-msg">Wird geladen…</p></div>
@@ -43,6 +44,43 @@ function applyPupilFilter() {
   });
 
   renderPupilTable(filtered);
+}
+
+function openNewPupilModal() {
+  _openModal('Neuen Schüler anlegen', `
+    <div class="admin-form-group">
+      <label>Vorname</label>
+      <input type="text" id="np-first" placeholder="Vorname">
+    </div>
+    <div class="admin-form-group">
+      <label>Nachname</label>
+      <input type="text" id="np-last" placeholder="Nachname">
+    </div>
+    <div class="admin-form-group">
+      <label>Adresse (optional)</label>
+      <input type="text" id="np-address" placeholder="Straße, PLZ Ort">
+    </div>
+  `, 'Anlegen', submitNewPupil);
+}
+
+async function submitNewPupil() {
+  const firstName = document.getElementById('np-first')?.value.trim();
+  const lastName  = document.getElementById('np-last')?.value.trim();
+  if (!firstName || !lastName) { _modalError('Vor- und Nachname sind Pflichtfelder.'); return; }
+
+  _setBusy(true, 'Anlegen');
+
+  const { data, error } = await supabase
+    .from('pupils')
+    .insert({ first_name: firstName, last_name: lastName,
+              address: document.getElementById('np-address')?.value.trim() || null })
+    .select('id')
+    .single();
+
+  if (error) { _setBusy(false, 'Anlegen'); _modalError('Fehler: ' + error.message); return; }
+
+  closeAdminModal();
+  showPupilDetail(data.id);
 }
 
 function renderPupilTable(pupils) {

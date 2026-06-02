@@ -349,15 +349,59 @@ async function openAssignModal() {
         <option value="staff">Lehrkraft</option>
       </select>
     </div>
-    <div class="admin-form-group">
-      <label>Person</label>
-      <select id="md-person"><option value="">Wird geladen…</option></select>
+    <div id="md-existing-section">
+      <div class="admin-form-group">
+        <label>Person</label>
+        <select id="md-person"><option value="">Wird geladen…</option></select>
+      </div>
+      <div style="margin-top:-0.4rem;text-align:right;margin-bottom:0.75rem">
+        <button type="button" class="btn-link" style="font-size:0.8rem"
+          onclick="_showNewPersonFields(true)">+ Neu anlegen</button>
+      </div>
+    </div>
+    <div id="md-new-section" hidden>
+      <div style="margin-bottom:0.75rem">
+        <button type="button" class="btn-link" style="font-size:0.8rem"
+          onclick="_showNewPersonFields(false)">← Aus Liste wählen</button>
+      </div>
+      <div class="admin-form-group">
+        <label>Vorname</label>
+        <input type="text" id="md-new-first" placeholder="Vorname">
+      </div>
+      <div class="admin-form-group">
+        <label>Nachname</label>
+        <input type="text" id="md-new-last" placeholder="Nachname">
+      </div>
+      <div class="admin-form-group" id="md-new-address-row">
+        <label>Adresse (optional)</label>
+        <input type="text" id="md-new-address" placeholder="Straße, PLZ Ort">
+      </div>
+      <div class="admin-form-group" id="md-new-kuerzel-row" hidden>
+        <label>Kürzel</label>
+        <input type="text" id="md-new-kuerzel" placeholder="z. B. MUS">
+      </div>
     </div>
   `, 'Zuweisen', submitAssign);
   await _loadPersonList();
 }
 
+function _showNewPersonFields(show) {
+  document.getElementById('md-existing-section').hidden = show;
+  document.getElementById('md-new-section').hidden      = !show;
+  const type = document.getElementById('md-type')?.value;
+  const addrRow   = document.getElementById('md-new-address-row');
+  const kuerzelRow = document.getElementById('md-new-kuerzel-row');
+  if (addrRow)    addrRow.hidden    = (type !== 'pupil');
+  if (kuerzelRow) kuerzelRow.hidden = (type !== 'staff');
+}
+
 async function _loadPersonList() {
+  // Reset to existing-person view when type changes.
+  const existSection = document.getElementById('md-existing-section');
+  const newSection   = document.getElementById('md-new-section');
+  if (existSection) existSection.hidden = false;
+  if (newSection)   newSection.hidden   = true;
+
   const type      = document.getElementById('md-type')?.value;
   const personSel = document.getElementById('md-person');
   const section   = document.getElementById('md-uebergabe-section');
@@ -392,11 +436,29 @@ function _toggleRow(selectId, showValue, rowId, showValue2) {
 }
 
 async function submitAssign() {
-  const type     = document.getElementById('md-type')?.value;
-  const personId = document.getElementById('md-person')?.value;
-  if (!personId) { _modalError('Bitte eine Person auswählen.'); return; }
+  const type  = document.getElementById('md-type')?.value;
+  const isNew = !document.getElementById('md-new-section')?.hidden;
 
-  _setBusy(true, 'Zuweisen');
+  let personId;
+
+  if (isNew) {
+    const firstName = document.getElementById('md-new-first')?.value.trim();
+    const lastName  = document.getElementById('md-new-last')?.value.trim();
+    if (!firstName || !lastName) { _modalError('Vor- und Nachname sind Pflichtfelder.'); return; }
+    _setBusy(true, 'Zuweisen');
+    const newRow = { first_name: firstName, last_name: lastName };
+    if (type === 'pupil') newRow.address = document.getElementById('md-new-address')?.value.trim() || null;
+    else newRow.kuerzel = document.getElementById('md-new-kuerzel')?.value.trim() || null;
+    const { data: created, error: ce } = await supabase
+      .from(type === 'pupil' ? 'pupils' : 'staff')
+      .insert(newRow).select('id').single();
+    if (ce) { _setBusy(false, 'Zuweisen'); _modalError('Fehler beim Anlegen: ' + ce.message); return; }
+    personId = created.id;
+  } else {
+    personId = document.getElementById('md-person')?.value;
+    if (!personId) { _modalError('Bitte eine Person auswählen.'); return; }
+    _setBusy(true, 'Zuweisen');
+  }
 
   const ipad      = window._detailIpad;
   const now       = new Date().toISOString();

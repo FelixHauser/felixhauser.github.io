@@ -1004,6 +1004,20 @@ body {
   color: var(--blue);
 }
 
+.btn-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--blue);
+  font-size: inherit;
+  font-weight: inherit;
+  cursor: pointer;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
 .edit-input {
   padding: 0.3rem 0.6rem;
   border: 1.5px solid var(--border);

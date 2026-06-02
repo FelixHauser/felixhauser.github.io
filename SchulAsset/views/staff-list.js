@@ -10,6 +10,7 @@ async function renderStaffList() {
     <div class="toolbar">
       <input type="search" id="staff-search" class="search-input"
              placeholder="Name oder Kürzel suchen…">
+      <button class="btn-action-detail" onclick="openNewStaffModal()">+ Neue Lehrkraft</button>
     </div>
     <div id="staff-count" class="result-count"></div>
     <div id="staff-table-wrap"><p class="loading-msg">Wird geladen…</p></div>
@@ -43,6 +44,43 @@ function applyStaffFilter() {
   });
 
   renderStaffTable(filtered);
+}
+
+function openNewStaffModal() {
+  _openModal('Neue Lehrkraft anlegen', `
+    <div class="admin-form-group">
+      <label>Vorname</label>
+      <input type="text" id="ns-first" placeholder="Vorname">
+    </div>
+    <div class="admin-form-group">
+      <label>Nachname</label>
+      <input type="text" id="ns-last" placeholder="Nachname">
+    </div>
+    <div class="admin-form-group">
+      <label>Kürzel</label>
+      <input type="text" id="ns-kuerzel" placeholder="z. B. MUS">
+    </div>
+  `, 'Anlegen', submitNewStaff);
+}
+
+async function submitNewStaff() {
+  const firstName = document.getElementById('ns-first')?.value.trim();
+  const lastName  = document.getElementById('ns-last')?.value.trim();
+  if (!firstName || !lastName) { _modalError('Vor- und Nachname sind Pflichtfelder.'); return; }
+
+  _setBusy(true, 'Anlegen');
+
+  const { data, error } = await supabase
+    .from('staff')
+    .insert({ first_name: firstName, last_name: lastName,
+              kuerzel: document.getElementById('ns-kuerzel')?.value.trim() || null })
+    .select('id')
+    .single();
+
+  if (error) { _setBusy(false, 'Anlegen'); _modalError('Fehler: ' + error.message); return; }
+
+  closeAdminModal();
+  showStaffDetail(data.id);
 }
 
 function renderStaffTable(staff) {
