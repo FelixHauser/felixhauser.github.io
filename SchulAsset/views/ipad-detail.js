@@ -660,28 +660,7 @@ async function submitAssign() {
       return;
     }
 
-    // Show the password prominently — admin must note it down for the family.
-    document.getElementById('admin-modal-title').textContent = 'Zugang für Schülerportal';
-    document.getElementById('admin-modal-body').innerHTML = `
-      <p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:1.25rem">
-        Das iPad wurde <strong>${personName}</strong> zugewiesen.
-        Gib dem/der Schüler/in folgende Zugangsdaten für das Schülerportal:
-      </p>
-      <div style="background:#F6F9FC;border:1.5px solid var(--border);border-radius:8px;padding:1rem;margin-bottom:0.75rem">
-        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.4rem">Benutzername (Seriennummer)</div>
-        <div style="font-family:monospace;font-size:1rem;font-weight:700;color:var(--text-primary)">${ipad.serial_number}</div>
-      </div>
-      <div style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:8px;padding:1rem">
-        <div style="font-size:0.72rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.4rem">Passwort (einmalig anzeigen)</div>
-        <div style="font-family:monospace;font-size:1.4rem;font-weight:700;color:#15803d;letter-spacing:1px">${fnData.password}</div>
-      </div>
-      <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.85rem">
-        Das Passwort wird nicht gespeichert. Notiere es jetzt und gib es an die Familie weiter.
-      </p>
-    `;
-    document.getElementById('admin-modal-error').hidden = true;
-    const footer = document.querySelector('.admin-modal-footer');
-    footer.innerHTML = `<button class="btn-primary" onclick="closeAdminModal(); renderIpadDetail()">Verstanden — Fenster schließen</button>`;
+    _showPasswordCard(ipad, fnData.password, personName, () => { closeAdminModal(); renderIpadDetail(); });
     return;
   }
 
@@ -1097,27 +1076,7 @@ async function submitResetPortalPassword() {
     return;
   }
 
-  document.getElementById('admin-modal-title').textContent = 'Neues Portalpasswort';
-  document.getElementById('admin-modal-body').innerHTML = `
-    <p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:1.25rem">
-      Das Passwort für <strong>${assignedName(ipad)}</strong> wurde zurückgesetzt.
-      Gib dem/der Schüler/in das neue Passwort weiter:
-    </p>
-    <div style="background:#F6F9FC;border:1.5px solid var(--border);border-radius:8px;padding:1rem;margin-bottom:0.75rem">
-      <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.4rem">Benutzername (Seriennummer)</div>
-      <div style="font-family:monospace;font-size:1rem;font-weight:700;color:var(--text-primary)">${ipad.serial_number}</div>
-    </div>
-    <div style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:8px;padding:1rem">
-      <div style="font-size:0.72rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.4rem">Neues Passwort (einmalig anzeigen)</div>
-      <div style="font-family:monospace;font-size:1.4rem;font-weight:700;color:#15803d;letter-spacing:1px">${fnData.password}</div>
-    </div>
-    <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.85rem">
-      Das Passwort wird nicht gespeichert. Notiere es jetzt.
-    </p>
-  `;
-  document.getElementById('admin-modal-error').hidden = true;
-  const footer = document.querySelector('.admin-modal-footer');
-  footer.innerHTML = `<button class="btn-primary" onclick="closeAdminModal()">Verstanden — Fenster schließen</button>`;
+  _showPasswordCard(ipad, fnData.password, assignedName(ipad), () => closeAdminModal());
 }
 
 // ─── 8. Admin Verlustmeldung ──────────────────────────────────
@@ -1192,4 +1151,62 @@ async function submitAdminVerlust() {
 
   closeAdminModal();
   renderIpadDetail();
+}
+
+// ─── Password card helper ─────────────────────────────────────────
+// Shows credentials in the modal + populates the print card.
+
+function _showPasswordCard(ipad, password, pupilName, onClose) {
+  const base     = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
+  const loginUrl = `${base}login.html?sn=${encodeURIComponent(ipad.serial_number)}&pw=${encodeURIComponent(password)}`;
+
+  document.getElementById('admin-modal-title').textContent = 'Zugangsdaten Schülerportal';
+  document.getElementById('admin-modal-body').innerHTML = `
+    <p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:1rem">
+      Zugangsdaten für <strong>${pupilName}</strong>:
+    </p>
+    <div style="background:#F6F9FC;border:1.5px solid var(--border);border-radius:8px;padding:0.9rem;margin-bottom:0.6rem">
+      <div style="font-size:0.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.3rem">Benutzername (Seriennummer)</div>
+      <div style="font-family:monospace;font-size:1rem;font-weight:700;color:var(--text-primary)">${ipad.serial_number}</div>
+    </div>
+    <div style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:8px;padding:0.9rem;margin-bottom:0.75rem">
+      <div style="font-size:0.7rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.3rem">Passwort</div>
+      <div style="font-family:monospace;font-size:1.4rem;font-weight:700;color:#15803d;letter-spacing:1px">${password}</div>
+    </div>
+    <div style="text-align:center;margin-bottom:0.5rem">
+      <div id="modal-qr-code" style="display:inline-block"></div>
+      <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.4rem">QR-Code zum direkten Einloggen</p>
+    </div>
+    <p style="font-size:0.75rem;color:var(--text-muted)">Das Passwort wird nicht gespeichert.</p>
+  `;
+  document.getElementById('admin-modal-error').hidden = true;
+  document.querySelector('.admin-modal-footer').innerHTML = `
+    <button class="btn-secondary" onclick="window.print()">🖨 Drucken</button>
+    <button class="btn-primary"   onclick="(${onClose.toString()})()">Verstanden</button>
+  `;
+
+  // Generate QR code inside modal
+  setTimeout(() => {
+    if (window.QRCode) {
+      new QRCode(document.getElementById('modal-qr-code'), {
+        text: loginUrl, width: 140, height: 140, correctLevel: QRCode.CorrectLevel.M,
+      });
+    }
+  }, 50);
+
+  // Populate print card
+  document.getElementById('print-pupil-name').textContent = pupilName;
+  document.getElementById('print-serial').textContent     = ipad.serial_number;
+  document.getElementById('print-password').textContent   = password;
+  document.getElementById('print-url').textContent        = loginUrl;
+
+  const printQrEl = document.getElementById('print-qr-code');
+  printQrEl.innerHTML = '';
+  setTimeout(() => {
+    if (window.QRCode) {
+      new QRCode(printQrEl, {
+        text: loginUrl, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M,
+      });
+    }
+  }, 50);
 }

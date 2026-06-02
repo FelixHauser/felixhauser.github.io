@@ -2,6 +2,43 @@
    SchulAsset — Admin interface styles
    ========================================================= */
 
+/* ── Print card (A5 login handout) ──────────────────────── */
+
+#print-card { display: none; }
+
+@media print {
+  @page { size: A5 portrait; margin: 12mm; }
+
+  body * { visibility: hidden !important; }
+  #print-card, #print-card * { visibility: visible !important; }
+  #print-card {
+    display:        flex !important;
+    flex-direction: column;
+    align-items:    center;
+    text-align:     center;
+    position:       fixed;
+    inset:          0;
+    font-family:    -apple-system, Helvetica, Arial, sans-serif;
+    color:          #000;
+    background:     #fff;
+    padding:        0;
+  }
+}
+
+.print-logo       { width: 72px; height: 72px; object-fit: contain; margin-bottom: 6px; }
+.print-school     { font-size: 13px; font-weight: 700; margin: 0 0 4px; }
+.print-rule       { width: 100%; border: none; border-top: 1px solid #ccc; margin: 10px 0; }
+.print-title      { font-size: 16px; font-weight: 800; margin: 0 0 2px; }
+.print-name       { font-size: 14px; color: #444; margin: 0 0 12px; }
+.print-qr         { margin: 6px 0; line-height: 0; }
+.print-scan-hint  { font-size: 11px; color: #555; margin: 6px 0 0; }
+.print-creds      { width: 100%; border-collapse: collapse; margin-top: 4px; text-align: left; }
+.print-cred-label { font-size: 11px; color: #666; padding: 4px 8px 4px 0; white-space: nowrap; vertical-align: middle; }
+.print-cred-value { font-size: 13px; font-weight: 600; padding: 4px 0; vertical-align: middle; }
+.print-cred-value.mono { font-family: monospace; }
+.print-cred-value.big  { font-size: 18px; letter-spacing: 1px; color: #1a6b2a; }
+.print-footer     { font-size: 10px; color: #888; margin-top: auto; padding-top: 12px; }
+
 :root {
   /* Sidebar (light theme) */
   --sidebar-bg:      #F2F5FB;

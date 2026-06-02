@@ -61,10 +61,44 @@ async function handleLogin(event) {
 // On page load: if the URL contains a recovery token (user clicked the reset email link),
 // skip the login form and show the new-password form instead.
 window.addEventListener('load', () => {
+  // QR code auto-login: ?sn=SERIAL&pw=PASSWORD
+  const params = new URLSearchParams(window.location.search);
+  const sn = params.get('sn');
+  const pw = params.get('pw');
+  if (sn && pw) {
+    document.getElementById('login-form').hidden     = true;
+    document.getElementById('autologin-msg').hidden  = false;
+    _autoLogin(sn, pw);
+    return;
+  }
+
   if (window.location.hash.includes('type=recovery')) {
     showNewPasswordForm();
   }
 });
+
+async function _autoLogin(sn, pw) {
+  const email = `${sn.toUpperCase()}@schulasset.local`;
+  const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password: pw });
+
+  if (error || !authData?.user) {
+    document.getElementById('login-form').hidden = false;
+    showError(t('login.errorInvalidCredentials'));
+    return;
+  }
+
+  const { data: roleRow } = await supabase
+    .from('user_roles').select('role').eq('user_id', authData.user.id).single();
+
+  if (!roleRow) {
+    await supabase.auth.signOut();
+    document.getElementById('login-form').hidden = false;
+    showError(t('login.errorNoRole'));
+    return;
+  }
+
+  window.location.href = roleRow.role === 'admin' ? 'admin.html' : 'portal.html';
+}
 
 function showForgotForm() {
   document.getElementById('login-form').hidden    = true;

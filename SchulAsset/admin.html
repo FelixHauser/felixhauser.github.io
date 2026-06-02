@@ -74,6 +74,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <script src="supabase-client.js"></script>
@@ -90,6 +91,24 @@
   <script src="views/pupil-detail.js"></script>
   <script src="views/staff-detail.js"></script>
   <script>lucide.createIcons(); initAdmin();</script>
+
+  <!-- Print card — hidden on screen, shown only when printing -->
+  <div id="print-card">
+    <img src="mlks_logo.png" class="print-logo" alt="MLKS">
+    <h1 class="print-school">Martin-Luther-King-Schule Marl</h1>
+    <div class="print-rule"></div>
+    <h2 class="print-title">Zugangsdaten SchulAsset-Portal</h2>
+    <p class="print-name" id="print-pupil-name"></p>
+    <div id="print-qr-code" class="print-qr"></div>
+    <p class="print-scan-hint">QR-Code scannen — oder manuell anmelden:</p>
+    <div class="print-rule"></div>
+    <table class="print-creds">
+      <tr><td class="print-cred-label">Webseite</td><td class="print-cred-value" id="print-url"></td></tr>
+      <tr><td class="print-cred-label">Benutzername</td><td class="print-cred-value mono" id="print-serial"></td></tr>
+      <tr><td class="print-cred-label">Passwort</td><td class="print-cred-value mono big" id="print-password"></td></tr>
+    </table>
+    <p class="print-footer">Bei Fragen wenden Sie sich bitte an das Schulsekretariat.</p>
+  </div>
 
 </body>
 </html>
