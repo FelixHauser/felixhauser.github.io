@@ -1,6 +1,6 @@
 # SchulAsset — Status Quo & Road Map
 
-Last updated: 2026-06-02 (session 8 — full session committed & pushed to GitHub)
+Last updated: 2026-06-03 (session 8 — full session committed & pushed to GitHub)
 
 ---
 
@@ -213,7 +213,7 @@ Recent activity is covered by the dedicated **Last activity** nav item (clock ic
 - **Student portal password reset** — "Passwort zurücksetzen" button on iPad detail (shown when assigned to pupil); calls `create-ipad-account` Edge Function; shows new password in modal
 - **Admin forgot password** — "Passwort vergessen?" link on login page; sends Supabase reset email; recovery token detected on return → new password form shown inline
 
-### ~~Session 8 — New statuses, timeline portal, QR login~~ ✅ Done
+### ~~Session 8 — New statuses, timeline portal, QR login~~ ✅ Done (+ session 8c bug fix)
 
 - **New iPad statuses** — `terms_pending` (assigned, Leihvertrag not yet signed) and `handover_pending` (Übergabeprotokoll created, not yet signed by student); assignment now sets `terms_pending` instead of `in_use`
 - **Automatic status flow** — DB triggers handle status transitions: Übergabeprotokoll accepted → `in_use`; Zuweisung aufheben → `available`
@@ -224,6 +224,7 @@ Recent activity is covered by the dedicated **Last activity** nav item (clock ic
 - **Refresh button** on iPad detail view
 - **DB triggers** — `on_ipad_auth_user` upserts `user_roles` on auth account create/update; `on_uebergabe_accepted` flips iPad to `in_use` when student signs; `unique constraint` on `user_roles.user_id`
 - **History entries** written when student accepts Übergabe/Rückgabeprotokoll
+- **Bug fix** — `_showPasswordCard` was corrupting the admin modal footer (removing `id="admin-modal-submit"`), causing all subsequent modal opens to crash silently. `closeAdminModal()` now restores the default footer on every close.
 
 ### ~~Session 7b — iPad detail redesign + Eigenreparatur~~ ✅ Done
 
