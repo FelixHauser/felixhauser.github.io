@@ -317,23 +317,36 @@ function _adminName() {
 // ─── Action buttons ──────────────────────────────────────────
 
 function buildDetailActions(ipad) {
-  const isAssigned      = ipad.assigned_pupil_id || ipad.assigned_staff_id;
+  const isAssigned      = !!(ipad.assigned_pupil_id || ipad.assigned_staff_id);
   const isAssignedPupil = !!ipad.assigned_pupil_id;
+  const s = ipad.status;
+
+  const canAssign    = !isAssigned && !['lost', 'stolen', 'decommissioned'].includes(s);
+  const canProtocol  = isAssignedPupil && s === 'in_use';
+  const canSchaden   = s !== 'decommissioned';
+  const canVerlust   = !['lost', 'stolen', 'decommissioned'].includes(s);
+
   return `
     <div class="detail-actions">
-      <button class="btn-action-detail" onclick="openAssignModal()">Zuweisen</button>
+      ${canAssign
+        ? `<button class="btn-action-detail" onclick="openAssignModal()">Zuweisen</button>`
+        : ''}
       ${isAssigned
         ? `<button class="btn-action-detail btn-action-return" onclick="openRemoveOwnerModal()">Zuweisung aufheben</button>`
         : ''}
-      ${isAssignedPupil
+      ${canProtocol
         ? `<button class="btn-action-detail" onclick="openUebergabeModal()">Übergabeprotokoll</button>`
         : ''}
-      ${isAssignedPupil
+      ${canProtocol
         ? `<button class="btn-action-detail" onclick="openRueckgabeModal()">Rückgabeprotokoll</button>`
         : ''}
       <button class="btn-action-detail" onclick="openStatusModal()">Status ändern</button>
-      <button class="btn-action-detail btn-action-damage" onclick="openAdminSchadenModal()">Schadenmeldung</button>
-      <button class="btn-action-detail btn-action-loss" onclick="openAdminVerlustModal()">Verlustmeldung</button>
+      ${canSchaden
+        ? `<button class="btn-action-detail btn-action-damage" onclick="openAdminSchadenModal()">Schadenmeldung</button>`
+        : ''}
+      ${canVerlust
+        ? `<button class="btn-action-detail btn-action-loss" onclick="openAdminVerlustModal()">Verlustmeldung</button>`
+        : ''}
     </div>
   `;
 }
