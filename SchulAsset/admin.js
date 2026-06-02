@@ -83,7 +83,12 @@ function routeToHash(hash) {
 
 // Re-route whenever the user clicks a sidebar link.
 window.addEventListener('hashchange', () => {
+  if (typeof closeQrScanner === 'function') closeQrScanner();
   routeToHash(window.location.hash.slice(1));
+});
+
+window.addEventListener('beforeunload', () => {
+  if (typeof closeQrScanner === 'function') closeQrScanner();
 });
 
 // ---- Sidebar (mobile) ----
