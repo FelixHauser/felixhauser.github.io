@@ -28,7 +28,10 @@ const TRANSLATIONS = {
       errorGeneric:     'Ein Fehler ist aufgetreten. Bitte erneut versuchen.',
       statuses: {
         available:           'Verfügbar',
+        terms_pending:       'Leihvertrag ausstehend',
+        handover_pending:    'Übergabe ausstehend',
         in_use:              'In Verwendung',
+        eigenreparatur:      'Eigenreparatur',
         prepared_for_repair: 'Reparatur vorbereitet',
         shipped_for_repair:  'Zur Reparatur',
         back_from_repair:    'Zurück aus Reparatur',
@@ -140,7 +143,10 @@ const TRANSLATIONS = {
       errorGeneric:     'An error occurred. Please try again.',
       statuses: {
         available:           'Available',
+        terms_pending:       'Terms Pending',
+        handover_pending:    'Handover Pending',
         in_use:              'In Use',
+        eigenreparatur:      'In-House Repair',
         prepared_for_repair: 'Prepared for Repair',
         shipped_for_repair:  'Sent for Repair',
         back_from_repair:    'Back from Repair',
@@ -252,7 +258,10 @@ const TRANSLATIONS = {
       errorGeneric:     'Bir hata oluştu. Lütfen tekrar deneyin.',
       statuses: {
         available:           'Mevcut',
+        terms_pending:       'Sözleşme Bekliyor',
+        handover_pending:    'Teslim Bekliyor',
         in_use:              'Kullanımda',
+        eigenreparatur:      'Dahili Onarım',
         prepared_for_repair: 'Onarım Hazırlığı',
         shipped_for_repair:  'Onarıma Gönderildi',
         back_from_repair:    'Onarımdan Döndü',

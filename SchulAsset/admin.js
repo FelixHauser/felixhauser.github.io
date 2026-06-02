@@ -5,8 +5,10 @@
 // Display config for each iPad status value.
 const STATUS_CONFIG = {
   available:            { label: 'Verfügbar',              color: '#34c759' },
+  terms_pending:        { label: 'Leihvertrag ausstehend', color: '#ff9f0a', auto: true },
+  handover_pending:     { label: 'Übergabe ausstehend',    color: '#ff9f0a', auto: true },
   in_use:               { label: 'In Verwendung',          color: '#007aff' },
-  eigenreparatur:       { label: 'Eigenreparatur',          color: '#5856d6' },
+  eigenreparatur:       { label: 'Eigenreparatur',         color: '#5856d6' },
   prepared_for_repair:  { label: 'Reparatur vorbereitet',  color: '#ff9500' },
   shipped_for_repair:   { label: 'Eingeschickt',           color: '#ff9500' },
   back_from_repair:     { label: 'Zurück aus Reparatur',   color: '#ff9500' },

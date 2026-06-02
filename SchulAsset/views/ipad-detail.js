@@ -21,6 +21,7 @@ async function renderIpadDetail() {
     <div class="view-header detail-header">
       <button class="btn-back" onclick="history.back()">← Zurück</button>
       <h2 id="detail-title">iPad</h2>
+      <button class="btn-back" onclick="renderIpadDetail()" style="margin-left:auto">↻ Aktualisieren</button>
     </div>
     <div id="detail-body"><p class="loading-msg">Wird geladen…</p></div>
   `;
@@ -89,6 +90,7 @@ async function renderIpadDetail() {
   window._detailRueckgabe = rueckgabe;
 
   const uebergabeAccepted = !!(uebergabe?.accepted_at);
+  const termsAccepted     = !!(terms?.accepted_at);
 
   const historyHtml = buildHistoryHtml(history, histError);
 
@@ -126,7 +128,7 @@ async function renderIpadDetail() {
     </div>
 
     <!-- Action buttons -->
-    ${buildDetailActions(ipad, { uebergabeAccepted })}
+    ${buildDetailActions(ipad, { uebergabeAccepted, termsAccepted })}
 
     <!-- Current documents -->
     ${buildDocumentsSection(ipad, { terms, uebergabe, rueckgabe })}
@@ -434,8 +436,8 @@ function buildDetailActions(ipad, flags = {}) {
   const s = ipad.status;
 
   const canAssign    = !isAssigned && !['lost', 'stolen', 'decommissioned'].includes(s);
+  const canUebergabe = isAssignedPupil && s === 'terms_pending' && flags.termsAccepted && !flags.uebergabeAccepted;
   const canProtocol  = isAssignedPupil && s === 'in_use';
-  const canUebergabe = canProtocol && !flags.uebergabeAccepted;
   const canSchaden   = s !== 'decommissioned';
   const canVerlust   = !['lost', 'stolen', 'decommissioned'].includes(s);
 
@@ -464,11 +466,11 @@ function buildDetailActions(ipad, flags = {}) {
   const flowRows = isAssigned
     ? [
         _row('Zuweisung aufheben', 'openRemoveOwnerModal()', 'action-row-destructive'),
-        canProtocol ? _row('Rückgabeprotokoll', 'openRueckgabeModal()') : '',
+        canUebergabe ? _row('Übergabeprotokoll',  'openUebergabeModal()') : '',
+        canProtocol  ? _row('Rückgabeprotokoll',  'openRueckgabeModal()') : '',
       ]
     : [
-        canAssign    ? _row('Zuweisen',           'openAssignModal()')    : '',
-        canUebergabe ? _row('Übergabeprotokoll',  'openUebergabeModal()') : '',
+        canAssign ? _row('Zuweisen', 'openAssignModal()') : '',
       ];
   const sectionAktionen = _section('Aktionen', flowRows);
 
@@ -627,7 +629,7 @@ async function submitAssign() {
   const personName = person ? `${person.first_name} ${person.last_name}` : personId;
 
   const update = type === 'pupil'
-    ? { assigned_pupil_id: personId, assigned_staff_id: null, assigned_date: now, status: 'in_use' }
+    ? { assigned_pupil_id: personId, assigned_staff_id: null, assigned_date: now, status: 'terms_pending' }
     : { assigned_staff_id: personId, assigned_pupil_id: null, assigned_date: now, status: 'in_use' };
 
   const { error } = await supabase.from('ipads').update(update).eq('id', ipad.id);
@@ -636,7 +638,7 @@ async function submitAssign() {
   await _invalidateTerms(ipad.id, now);
 
   await supabase.from('ipad_history').insert({
-    ipad_id: ipad.id, event_type: 'assignment', status: 'in_use',
+    ipad_id: ipad.id, event_type: 'assignment', status: 'terms_pending',
     assigned_to: personName, changed_by: adminName, changed_at: now,
     notes: `Zugewiesen an: ${personName}`,
   });
@@ -791,7 +793,7 @@ function openUebergabeModal() {
     </div>
     <div class="admin-form-group">
       <label>Ausgehändigt von (Kürzel)</label>
-      <input type="text" id="md-ue-kurzel" value="${adminName.split('@')[0]}">
+      <input type="text" id="md-ue-kurzel" value="${localStorage.getItem('schulasset_kurzel') || adminName.split('@')[0]}">
     </div>
   `, 'Protokoll erstellen', submitUebergabe);
 }
@@ -809,7 +811,7 @@ async function submitUebergabe() {
     ipad_id:       ipad.id,
     serial_number: ipad.serial_number,
     pupil_name:    pupilName,
-    kurzel:        document.getElementById('md-ue-kurzel')?.value.trim() || adminName.split('@')[0],
+    kurzel:        (() => { const k = document.getElementById('md-ue-kurzel')?.value.trim() || adminName.split('@')[0]; localStorage.setItem('schulasset_kurzel', k); return k; })(),
     condition,
     maengel:       condition === 'mit_maengeln' ? (document.getElementById('md-ue-maengel')?.value.trim() || null) : null,
     notes:         document.getElementById('md-ue-notes')?.value.trim() || null,
@@ -817,8 +819,10 @@ async function submitUebergabe() {
 
   if (error) { _setBusy(false, 'Protokoll erstellen'); _modalError('Fehler: ' + error.message); return; }
 
+  await supabase.from('ipads').update({ status: 'handover_pending' }).eq('id', ipad.id);
+
   await supabase.from('ipad_history').insert({
-    ipad_id: ipad.id, event_type: 'assignment', status: ipad.status,
+    ipad_id: ipad.id, event_type: 'assignment', status: 'handover_pending',
     assigned_to: pupilName, changed_by: adminName, changed_at: now,
     notes: `Übergabeprotokoll erstellt — wartet auf Bestätigung durch Schüler/in`,
   });
@@ -856,7 +860,7 @@ function openRueckgabeModal() {
     </div>
     <div class="admin-form-group">
       <label>Abgenommen von (Kürzel)</label>
-      <input type="text" id="md-rg-kurzel" value="${adminName.split('@')[0]}">
+      <input type="text" id="md-rg-kurzel" value="${localStorage.getItem('schulasset_kurzel') || adminName.split('@')[0]}">
     </div>
   `, 'Protokoll erstellen', submitRueckgabe);
 }
@@ -882,7 +886,7 @@ async function submitRueckgabe() {
     ipad_id:             ipad.id,
     serial_number:       ipad.serial_number,
     pupil_name:          pupilName,
-    kurzel:              document.getElementById('md-rg-kurzel')?.value.trim() || adminName.split('@')[0],
+    kurzel:              (() => { const k = document.getElementById('md-rg-kurzel')?.value.trim() || adminName.split('@')[0]; localStorage.setItem('schulasset_kurzel', k); return k; })(),
     condition,
     maengel:             condition !== 'ohne_maengel' ? (document.getElementById('md-rg-maengel')?.value.trim() || null) : null,
     defekt_beschreibung: condition === 'defekt'       ? (document.getElementById('md-rg-defekt')?.value.trim()  || null) : null,
@@ -906,6 +910,7 @@ async function submitRueckgabe() {
 function openStatusModal() {
   const ipad    = window._detailIpad;
   const options = Object.entries(STATUS_CONFIG)
+    .filter(([, c]) => !c.auto)
     .map(([v, c]) => `<option value="${v}" ${v === ipad.status ? 'selected' : ''}>${c.label}</option>`)
     .join('');
 

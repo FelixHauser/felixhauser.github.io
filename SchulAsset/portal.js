@@ -10,6 +10,8 @@ let _lastVerlustData = null;
 
 const STATUS_COLORS = {
   available:           '#34c759',
+  terms_pending:       '#ff9f0a',
+  handover_pending:    '#ff9f0a',
   in_use:              '#007aff',
   prepared_for_repair: '#ff9500',
   shipped_for_repair:  '#ff9500',
@@ -557,8 +559,28 @@ async function acceptProtocol(type, id) {
 
   if (type === 'uebergabe') {
     _uebergabe = { ..._uebergabe, accepted_at: now, accepted_by: _pupilName };
+    // DB trigger updates iPad status to in_use; mirror it locally for display.
+    _ipad = { ..._ipad, status: 'in_use' };
+    await supabase.from('ipad_history').insert({
+      ipad_id:     _ipad.id,
+      event_type:  'status_change',
+      status:      'in_use',
+      assigned_to: _pupilName,
+      changed_by:  _pupilName,
+      changed_at:  now,
+      notes:       'Übergabeprotokoll bestätigt',
+    });
   } else {
     _rueckgabe = { ..._rueckgabe, accepted_at: now, accepted_by: _pupilName };
+    await supabase.from('ipad_history').insert({
+      ipad_id:     _ipad.id,
+      event_type:  'returned',
+      status:      _ipad.status,
+      assigned_to: _pupilName,
+      changed_by:  _pupilName,
+      changed_at:  now,
+      notes:       'Rückgabeprotokoll bestätigt',
+    });
   }
 
   renderPortal(_termsRow);
