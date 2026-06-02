@@ -539,3 +539,299 @@ body {
 .radio-option input {
   display: none;
 }
+/* portal2.css — Timeline portal UI */
+
+/* ── Page layout ─────────────────────────────────────── */
+
+.v2-page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 3rem;
+}
+
+/* ── Top bar: greeting + info button ─────────────────── */
+
+.v2-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+}
+
+.v2-greeting {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.v2-info-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.v2-info-btn:active {
+  opacity: 0.7;
+}
+
+/* ── Timeline ────────────────────────────────────────── */
+
+.v2-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.v2-step {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+}
+
+/* Left column: circle + connector line */
+.v2-step-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 40px;
+}
+
+.v2-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.v2-circle.done {
+  background: #34c759;
+  color: #fff;
+}
+
+.v2-circle.active {
+  background: #007aff;
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(0,122,255,0.15);
+}
+
+.v2-circle.waiting {
+  background: #ff9f0a;
+  color: #fff;
+}
+
+.v2-circle.locked {
+  background: #fff;
+  color: #c7c7cc;
+  border: 2px solid #e5e5ea;
+}
+
+.v2-line {
+  width: 2px;
+  flex: 1;
+  min-height: 1.5rem;
+  margin: 4px 0;
+}
+
+.v2-step.done    .v2-line { background: #34c759; }
+.v2-step.active  .v2-line { background: #e5e5ea; }
+.v2-step.waiting .v2-line { background: #e5e5ea; }
+.v2-step.locked  .v2-line { background: #e5e5ea; }
+
+/* No line after the last step */
+.v2-step:last-child .v2-line {
+  display: none;
+}
+
+/* Right column: content card */
+.v2-step-body {
+  flex: 1;
+  padding-bottom: 1.5rem;
+}
+
+.v2-step-card {
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  margin-bottom: 0;
+}
+
+.v2-step.done    .v2-step-card { background: #f0fdf4; border: 1.5px solid #bbf7d0; }
+.v2-step.active  .v2-step-card { background: #fff;    border: 1.5px solid #007aff; box-shadow: 0 2px 12px rgba(0,122,255,0.1); }
+.v2-step.waiting .v2-step-card { background: #fffbf0; border: 1.5px solid #ffd580; }
+.v2-step.locked  .v2-step-card { background: #fafafa; border: 1.5px solid #e5e5ea; opacity: 0.6; }
+
+.v2-step-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.v2-step.locked .v2-step-title {
+  color: var(--text-muted);
+}
+
+.v2-step-sub {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.v2-step.locked .v2-step-sub {
+  margin-bottom: 0;
+}
+
+/* Buttons inside steps */
+.v2-btn-primary {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #007aff;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 0.25rem;
+}
+
+.v2-btn-primary:active {
+  background: #0062cc;
+}
+
+.v2-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem 0.9rem;
+  background: transparent;
+  color: #007aff;
+  border: 1.5px solid #007aff;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.1rem;
+}
+
+.v2-btn-secondary:active {
+  opacity: 0.7;
+}
+
+/* ── Emergency section (damage / loss) ───────────────── */
+
+.v2-emergency {
+  margin-top: 0.5rem;
+  padding: 1rem 1.1rem;
+  background: #fff8f0;
+  border: 1.5px solid #ffe0b2;
+  border-radius: 14px;
+}
+
+.v2-emergency-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #e65100;
+  margin: 0 0 0.75rem;
+}
+
+.v2-emergency-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.v2-btn-damage,
+.v2-btn-loss {
+  padding: 0.7rem 0.5rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.v2-btn-damage {
+  background: #fff3e0;
+  color: #e65100;
+  border: 1.5px solid #ffcc80;
+}
+
+.v2-btn-loss {
+  background: #ffeaea;
+  color: #c62828;
+  border: 1.5px solid #ef9a9a;
+}
+
+.v2-btn-damage:active { opacity: 0.7; }
+.v2-btn-loss:active   { opacity: 0.7; }
+
+/* ── Protocol details (condition, accessories) ───────── */
+
+.v2-protocol-details {
+  background: rgba(0,0,0,0.03);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.v2-protocol-details .info-row {
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  padding: 0.35rem 0;
+}
+
+.v2-protocol-details .info-row:last-child {
+  border-bottom: none;
+}
+
+/* ── iPad info modal content ─────────────────────────── */
+
+.v2-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.v2-info-row:last-child {
+  border-bottom: none;
+}
+
+.v2-info-key {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.v2-info-val {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: monospace;
+}
+
+.v2-info-val.normal {
+  font-family: inherit;
+}

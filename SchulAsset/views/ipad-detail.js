@@ -749,7 +749,7 @@ async function submitRemoveOwner() {
   const prevName  = assignedName(ipad);
 
   const { error } = await supabase.from('ipads')
-    .update({ assigned_pupil_id: null, assigned_staff_id: null })
+    .update({ assigned_pupil_id: null, assigned_staff_id: null, assigned_date: null, status: 'available' })
     .eq('id', ipad.id);
   if (error) { _setBusy(false, 'Zuweisung aufheben'); _modalError('Fehler: ' + error.message); return; }
 

@@ -168,116 +168,114 @@ function _protocolDetails(record, type) {
 }
 
 function renderPortal(termsRow) {
-  const ipad        = _ipad;
-  const typeKey     = ipad.ipad_type === 'staff' ? 'portal.typeStaff' : 'portal.typeStudent';
-  const statusLabel = t(`portal.statuses.${ipad.status}`) || ipad.status;
-  const statusColor = STATUS_COLORS[ipad.status] || '#8e8e93';
+  const ipad = _ipad;
 
-  // Terms / Leihvertrag card
-  const termsSection = termsRow
-    ? `<div class="terms-card">
-         <p class="section-label">${t('portal.terms')}</p>
-         <p class="terms-status accepted">✓ ${t('portal.termsAcceptedOn')} ${formatDate(termsRow.accepted_at)}</p>
-         <button class="btn-secondary" style="margin-top:0.6rem;width:100%" onclick="downloadLeihvertrag()">
-           ↓ ${t('portal.leihvertrag.downloadBtn')}
-         </button>
-       </div>`
-    : `<div class="terms-card">
-         <p class="section-label">${t('portal.terms')}</p>
-         <p class="terms-status">${t('portal.termsNotAccepted')}</p>
-         <button class="btn-primary" style="margin-top:0.75rem;width:100%"
-           onclick="openModal('terms-modal')">
-           ${t('portal.termsViewBtn')}
-         </button>
-       </div>`;
+  const infoBody = document.getElementById('ipad-info-body');
+  if (infoBody) {
+    infoBody.innerHTML = `
+      <div class="v2-info-row">
+        <span class="v2-info-key">Seriennummer</span>
+        <span class="v2-info-val">${ipad.serial_number}</span>
+      </div>
+      <div class="v2-info-row">
+        <span class="v2-info-key">Speicher</span>
+        <span class="v2-info-val normal">${ipad.storage_capacity ?? '—'}</span>
+      </div>
+      <div class="v2-info-row">
+        <span class="v2-info-key">Typ</span>
+        <span class="v2-info-val normal">${ipad.ipad_type === 'staff' ? 'Lehrkraft' : 'Schüler/in'}</span>
+      </div>
+      <div class="v2-info-row">
+        <span class="v2-info-key">Zugewiesen seit</span>
+        <span class="v2-info-val normal">${formatDate(ipad.assigned_date)}</span>
+      </div>
+    `;
+  }
 
-  // Übergabeprotokoll card (only if one exists)
-  const uebergabeSection = _uebergabe
-    ? _uebergabe.accepted_at
-      ? `<div class="terms-card">
-           <p class="section-label">${t('portal.uebergabe.title')}</p>
-           <p class="terms-status accepted">✓ ${t('portal.uebergabe.acceptedOn')} ${formatDate(_uebergabe.accepted_at)}</p>
-           <button class="btn-secondary" style="margin-top:0.6rem;width:100%" onclick="downloadUebergabe()">
-             ↓ ${t('portal.uebergabe.downloadBtn')}
-           </button>
-         </div>`
-      : `<div class="terms-card">
-           <p class="section-label">${t('portal.uebergabe.title')}</p>
-           ${_protocolDetails(_uebergabe, 'uebergabe')}
-           <button class="btn-primary" style="margin-top:0.75rem;width:100%"
-             onclick="acceptProtocol('uebergabe', '${_uebergabe.id}')">
-             ${t('portal.uebergabe.acceptBtn')}
-           </button>
-         </div>`
-    : '';
-
-  // Rückgabeprotokoll card (only if one exists)
-  const rueckgabeSection = _rueckgabe
-    ? _rueckgabe.accepted_at
-      ? `<div class="terms-card">
-           <p class="section-label">${t('portal.rueckgabe.title')}</p>
-           <p class="terms-status accepted">✓ ${t('portal.rueckgabe.acceptedOn')} ${formatDate(_rueckgabe.accepted_at)}</p>
-           <button class="btn-secondary" style="margin-top:0.6rem;width:100%" onclick="downloadRueckgabe()">
-             ↓ ${t('portal.rueckgabe.downloadBtn')}
-           </button>
-         </div>`
-      : `<div class="terms-card">
-           <p class="section-label">${t('portal.rueckgabe.title')}</p>
-           ${_protocolDetails(_rueckgabe, 'rueckgabe')}
-           <button class="btn-primary" style="margin-top:0.75rem;width:100%"
-             onclick="acceptProtocol('rueckgabe', '${_rueckgabe.id}')">
-             ${t('portal.rueckgabe.acceptBtn')}
-           </button>
-         </div>`
-    : '';
+  const steps = _buildSteps(termsRow);
+  const inUse = ipad.status === 'in_use';
 
   document.getElementById('portal-content').innerHTML = `
-    <p class="portal-greeting">${t('portal.greeting')} ${_pupilName.split(' ')[0]}</p>
-
-    <p class="section-label">${t('portal.myIpad')}</p>
-    <div class="info-card">
-      <div class="info-row">
-        <span class="info-key">${t('portal.serialNumber')}</span>
-        <span class="info-value mono">${ipad.serial_number}</span>
+    <div class="v2-page">
+      <div class="v2-topbar">
+        <p class="v2-greeting">Hallo, ${_pupilName.split(' ')[0]}!</p>
+        <button class="v2-info-btn" onclick="document.getElementById('ipad-info-modal').hidden=false">
+          ℹ︎ iPad-Details
+        </button>
       </div>
-      <div class="info-row">
-        <span class="info-key">${t('portal.status')}</span>
-        <span class="info-value">
-          <span class="badge" style="background:${statusColor};color:#fff">${statusLabel}</span>
-        </span>
+      <div class="v2-timeline">
+        ${steps.map(_renderStep).join('')}
       </div>
-      <div class="info-row">
-        <span class="info-key">${t('portal.type')}</span>
-        <span class="info-value">${t(typeKey)}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-key">${t('portal.storage')}</span>
-        <span class="info-value">${ipad.storage_capacity ?? '—'}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-key">${t('portal.assignedSince')}</span>
-        <span class="info-value">${formatDate(ipad.assigned_date)}</span>
-      </div>
-    </div>
-
-    ${termsSection}
-    ${uebergabeSection}
-    ${rueckgabeSection}
-
-    <p class="section-label" style="margin-top:0.25rem"></p>
-    <div class="action-buttons">
-      <button class="btn-action btn-action-damage" onclick="openModal('schaden-modal')">
-        <span style="font-size:1.1rem">⚠️</span>
-        ${t('portal.reportDamage')}
-      </button>
-      <button class="btn-action btn-action-loss" onclick="openModal('verlust-modal')">
-        <span style="font-size:1.1rem">❗</span>
-        ${t('portal.reportLoss')}
-      </button>
+      ${inUse ? `
+        <div class="v2-emergency">
+          <p class="v2-emergency-label">Problem mit dem iPad?</p>
+          <div class="v2-emergency-buttons">
+            <button class="v2-btn-damage" onclick="openModal('schaden-modal')">⚠️ Schaden<br>melden</button>
+            <button class="v2-btn-loss"   onclick="openModal('verlust-modal')">❗ Verlust /<br>Diebstahl melden</button>
+          </div>
+        </div>
+      ` : ''}
     </div>
   `;
 
   applyTranslations();
+}
+
+function _buildSteps(termsRow) {
+  const steps = [];
+
+  // Step 1: Leihvertrag
+  if (termsRow) {
+    steps.push({ state: 'done', number: '✓', title: 'Leihvertrag', subtitle: `Akzeptiert am ${formatDate(termsRow.accepted_at)}`, download: { label: '↓ Leihvertrag herunterladen', onclick: 'downloadLeihvertrag()' } });
+  } else {
+    steps.push({ state: 'active', number: '1', title: 'Leihvertrag lesen & bestätigen', subtitle: 'Bitte lesen Sie den Leihvertrag und bestätigen Sie ihn.', action: { label: 'Leihvertrag öffnen', onclick: "openModal('terms-modal')" } });
+  }
+
+  // Step 2: Übergabeprotokoll
+  if (!termsRow) {
+    steps.push({ state: 'locked', number: '2', title: 'iPad erhalten' });
+  } else if (!_uebergabe) {
+    steps.push({ state: 'waiting', number: '⏳', title: 'iPad erhalten', subtitle: 'Die Schule bereitet die Übergabe vor. Sie müssen hier nichts tun.' });
+  } else if (_uebergabe.accepted_at) {
+    steps.push({ state: 'done', number: '✓', title: 'iPad erhalten', subtitle: `Bestätigt am ${formatDate(_uebergabe.accepted_at)}`, download: { label: '↓ Übergabeprotokoll herunterladen', onclick: 'downloadUebergabe()' } });
+  } else {
+    steps.push({ state: 'active', number: '2', title: 'iPad erhalten bestätigen', subtitle: 'Bitte prüfen Sie den Zustand des iPads und bestätigen Sie den Erhalt.', details: _protocolDetails(_uebergabe, 'uebergabe'), action: { label: 'Erhalt bestätigen', onclick: `acceptProtocol('uebergabe', '${_uebergabe.id}')` } });
+  }
+
+  // Step 3: In Verwendung
+  const isActive = _ipad.status === 'in_use';
+  steps.push({ state: isActive ? 'done' : 'locked', number: isActive ? '✓' : '3', title: 'iPad in Verwendung', subtitle: isActive ? 'Das iPad wird aktiv genutzt.' : '' });
+
+  // Step 4: Rückgabeprotokoll
+  if (!_rueckgabe) {
+    steps.push({ state: 'locked', number: '4', title: 'iPad zurückgeben' });
+  } else if (_rueckgabe.accepted_at) {
+    steps.push({ state: 'done', number: '✓', title: 'iPad zurückgegeben', subtitle: `Bestätigt am ${formatDate(_rueckgabe.accepted_at)}`, download: { label: '↓ Rückgabeprotokoll herunterladen', onclick: 'downloadRueckgabe()' } });
+  } else {
+    steps.push({ state: 'active', number: '4', title: 'Rückgabe bestätigen', subtitle: 'Bitte prüfen Sie den Zustand des iPads und bestätigen Sie die Rückgabe.', details: _protocolDetails(_rueckgabe, 'rueckgabe'), action: { label: 'Rückgabe bestätigen', onclick: `acceptProtocol('rueckgabe', '${_rueckgabe.id}')` } });
+  }
+
+  return steps;
+}
+
+function _renderStep(step) {
+  const actionHtml   = step.action   ? `<button class="v2-btn-primary" onclick="${step.action.onclick}">${step.action.label}</button>`         : '';
+  const downloadHtml = step.download ? `<button class="v2-btn-secondary" onclick="${step.download.onclick}">${step.download.label}</button>`   : '';
+  const subHtml      = step.subtitle ? `<p class="v2-step-sub">${step.subtitle}</p>`                                                           : '';
+  const detailsHtml  = step.details  ? `<div class="v2-protocol-details">${step.details}</div>`                                               : '';
+  return `
+    <div class="v2-step ${step.state}">
+      <div class="v2-step-left">
+        <div class="v2-circle ${step.state}">${step.number}</div>
+        <div class="v2-line"></div>
+      </div>
+      <div class="v2-step-body">
+        <div class="v2-step-card">
+          <p class="v2-step-title">${step.title}</p>
+          ${subHtml}${detailsHtml}${actionHtml}${downloadHtml}
+        </div>
+      </div>
+    </div>`;
 }
 
 // ── Terms / Leihvertrag ───────────────────────────────────────────

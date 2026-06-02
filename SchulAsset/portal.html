@@ -26,6 +26,20 @@
     <p class="loading-msg" data-i18n="portal.loading">Wird geladen…</p>
   </main>
 
+  <!-- ── iPad info modal ── -->
+  <div id="ipad-info-modal" class="modal-backdrop" hidden>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title">Mein iPad</h2>
+        <button class="modal-close" onclick="document.getElementById('ipad-info-modal').hidden=true">✕</button>
+      </div>
+      <div class="modal-body" id="ipad-info-body"></div>
+      <div class="modal-footer">
+        <button class="btn-primary" onclick="document.getElementById('ipad-info-modal').hidden=true">Schließen</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ── Nutzungsbedingungen modal ── -->
   <div id="terms-modal" class="modal-backdrop" hidden>
     <div class="modal-card">
