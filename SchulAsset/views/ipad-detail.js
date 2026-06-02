@@ -46,12 +46,49 @@ async function renderIpadDetail() {
   document.getElementById('detail-title').textContent = ipad.serial_number;
   window._detailIpad = ipad; // stored for document downloads
 
-  // Fetch history (newest first)
-  const { data: history, error: histError } = await supabase
-    .from('ipad_history')
-    .select('id, event_type, status, assigned_to, changed_by, changed_at, notes')
-    .eq('ipad_id', id)
-    .order('changed_at', { ascending: false });
+  // Fetch history, protocols, and active terms in parallel.
+  const since = ipad.assigned_date || '1970-01-01';
+  const [
+    { data: history, error: histError },
+    { data: uebergabe },
+    { data: rueckgabe },
+    { data: terms },
+  ] = await Promise.all([
+    supabase
+      .from('ipad_history')
+      .select('id, event_type, status, assigned_to, changed_by, changed_at, notes')
+      .eq('ipad_id', id)
+      .order('changed_at', { ascending: false }),
+    supabase
+      .from('uebergabeprotokoll')
+      .select('*')
+      .eq('ipad_id', id)
+      .gte('created_at', since)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from('rueckgabeprotokoll')
+      .select('*')
+      .eq('ipad_id', id)
+      .gte('created_at', since)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from('terms_acceptance')
+      .select('*')
+      .eq('ipad_id', id)
+      .is('invalidated_at', null)
+      .maybeSingle(),
+  ]);
+
+  // Store for document download functions.
+  window._detailTerms     = terms;
+  window._detailUebergabe = uebergabe;
+  window._detailRueckgabe = rueckgabe;
+
+  const uebergabeAccepted = !!(uebergabe?.accepted_at);
 
   const historyHtml = buildHistoryHtml(history, histError);
 
@@ -89,7 +126,10 @@ async function renderIpadDetail() {
     </div>
 
     <!-- Action buttons -->
-    ${buildDetailActions(ipad)}
+    ${buildDetailActions(ipad, { uebergabeAccepted })}
+
+    <!-- Current documents -->
+    ${buildDocumentsSection(ipad, { terms, uebergabe, rueckgabe })}
 
     <!-- History -->
     <h3 class="section-title" style="margin: 1.5rem 0 0.75rem">Verlauf</h3>
@@ -314,42 +354,142 @@ function _adminName() {
   return document.getElementById('user-email')?.textContent || 'Admin';
 }
 
+// ─── Documents section ───────────────────────────────────────
+
+function buildDocumentsSection(ipad, { terms, uebergabe, rueckgabe }) {
+  const items = [];
+
+  if (terms?.accepted_at) {
+    items.push(`
+      <div class="doc-item">
+        <div class="doc-item-name">Leihvertrag</div>
+        <div class="doc-item-date">${formatDate(terms.accepted_at)}</div>
+        <button class="btn-doc-download" onclick="downloadCurrentLeihvertrag()">↓ Herunterladen</button>
+      </div>`);
+  }
+
+  if (uebergabe?.accepted_at) {
+    items.push(`
+      <div class="doc-item">
+        <div class="doc-item-name">Übergabeprotokoll</div>
+        <div class="doc-item-date">${formatDate(uebergabe.accepted_at)}</div>
+        <button class="btn-doc-download" onclick="downloadCurrentUebergabe()">↓ Herunterladen</button>
+      </div>`);
+  }
+
+  if (rueckgabe) {
+    const dateHtml = rueckgabe.accepted_at
+      ? formatDate(rueckgabe.accepted_at)
+      : '<span class="doc-pending">Ausstehend</span>';
+    items.push(`
+      <div class="doc-item">
+        <div class="doc-item-name">Rückgabeprotokoll</div>
+        <div class="doc-item-date">${dateHtml}</div>
+        <button class="btn-doc-download" onclick="downloadCurrentRueckgabe()">↓ Herunterladen</button>
+      </div>`);
+  }
+
+  if (items.length === 0) return '';
+
+  return `
+    <h3 class="section-title" style="margin: 1.5rem 0 0.75rem">Dokumente</h3>
+    <div class="doc-grid">${items.join('')}</div>
+  `;
+}
+
+async function downloadCurrentLeihvertrag() {
+  const ipad  = window._detailIpad;
+  const terms = window._detailTerms;
+  if (!terms) return;
+  try {
+    await generateLeihvertrag({
+      first_name:     ipad.pupils?.first_name,
+      last_name:      ipad.pupils?.last_name,
+      address:        ipad.pupils?.address,
+      serial_number:  ipad.serial_number,
+      erz_first_name: terms.erz_first_name,
+      erz_last_name:  terms.erz_last_name,
+      erz_address:    terms.erz_address,
+      accepted_at:    terms.accepted_at,
+      terms_version:  terms.terms_version,
+    });
+  } catch (e) { alert('Download fehlgeschlagen: ' + (e.message || e)); }
+}
+
+function downloadCurrentUebergabe() {
+  const ue = window._detailUebergabe;
+  if (ue) generateUebergabeprotokoll(ue);
+}
+
+function downloadCurrentRueckgabe() {
+  const rg = window._detailRueckgabe;
+  if (rg) generateRueckgabeprotokoll(rg);
+}
+
 // ─── Action buttons ──────────────────────────────────────────
 
-function buildDetailActions(ipad) {
+function buildDetailActions(ipad, flags = {}) {
   const isAssigned      = !!(ipad.assigned_pupil_id || ipad.assigned_staff_id);
   const isAssignedPupil = !!ipad.assigned_pupil_id;
   const s = ipad.status;
 
   const canAssign    = !isAssigned && !['lost', 'stolen', 'decommissioned'].includes(s);
   const canProtocol  = isAssignedPupil && s === 'in_use';
+  const canUebergabe = canProtocol && !flags.uebergabeAccepted;
   const canSchaden   = s !== 'decommissioned';
   const canVerlust   = !['lost', 'stolen', 'decommissioned'].includes(s);
 
+  const _row = (label, onclick, mod = '') =>
+    `<button class="action-row ${mod}" onclick="${onclick}">
+       <span class="action-row-label">${label}</span>
+       <span class="action-row-chevron">›</span>
+     </button>`;
+
+  const _section = (label, rows) => {
+    const content = rows.filter(Boolean).join('');
+    if (!content) return '';
+    return `
+      <div class="action-group">
+        ${label ? `<div class="action-group-label">${label}</div>` : ''}
+        <div class="action-group-rows">${content}</div>
+      </div>`;
+  };
+
+  // Section 1 — Status (no label, prominent).
+  const sectionStatus = _section('',
+    [_row('Status ändern', 'openStatusModal()', 'action-row-primary')]
+  );
+
+  // Section 2 — Aktionen: assign side OR return side.
+  const flowRows = isAssigned
+    ? [
+        _row('Zuweisung aufheben', 'openRemoveOwnerModal()', 'action-row-destructive'),
+        canProtocol ? _row('Rückgabeprotokoll', 'openRueckgabeModal()') : '',
+      ]
+    : [
+        canAssign    ? _row('Zuweisen',           'openAssignModal()')    : '',
+        canUebergabe ? _row('Übergabeprotokoll',  'openUebergabeModal()') : '',
+      ];
+  const sectionAktionen = _section('Aktionen', flowRows);
+
+  // Section 3 — Meldungen.
+  const sectionMeldungen = _section('Meldungen', [
+    canSchaden ? _row('Schadenmeldung', 'openAdminSchadenModal()', 'action-row-warning')     : '',
+    canVerlust ? _row('Verlustmeldung', 'openAdminVerlustModal()', 'action-row-destructive') : '',
+  ]);
+
+  // Section 4 — Sicherheit.
+  const sectionSicherheit = _section('Sicherheit', [
+    isAssignedPupil ? _row('Passwort zurücksetzen', 'openResetPortalPasswordModal()') : '',
+  ]);
+
   return `
-    <div class="detail-actions">
-      ${canAssign
-        ? `<button class="btn-action-detail" onclick="openAssignModal()">Zuweisen</button>`
-        : ''}
-      ${isAssigned
-        ? `<button class="btn-action-detail btn-action-return" onclick="openRemoveOwnerModal()">Zuweisung aufheben</button>`
-        : ''}
-      ${canProtocol
-        ? `<button class="btn-action-detail" onclick="openUebergabeModal()">Übergabeprotokoll</button>`
-        : ''}
-      ${canProtocol
-        ? `<button class="btn-action-detail" onclick="openRueckgabeModal()">Rückgabeprotokoll</button>`
-        : ''}
-      <button class="btn-action-detail" onclick="openStatusModal()">Status ändern</button>
-      ${canSchaden
-        ? `<button class="btn-action-detail btn-action-damage" onclick="openAdminSchadenModal()">Schadenmeldung</button>`
-        : ''}
-      ${canVerlust
-        ? `<button class="btn-action-detail btn-action-loss" onclick="openAdminVerlustModal()">Verlustmeldung</button>`
-        : ''}
-      ${isAssignedPupil
-        ? `<button class="btn-action-detail btn-action-secondary" onclick="openResetPortalPasswordModal()">Passwort zurücksetzen</button>`
-        : ''}
+    <h3 class="section-title" style="margin: 1.5rem 0 0.75rem">Aktionen</h3>
+    <div class="action-table">
+      ${sectionStatus}
+      ${sectionMeldungen}
+      ${sectionAktionen}
+      ${sectionSicherheit}
     </div>
   `;
 }
@@ -772,9 +912,33 @@ function openStatusModal() {
   _openModal('Status ändern', `
     <div class="admin-form-group">
       <label>Neuer Status</label>
-      <select id="md-status">${options}</select>
+      <select id="md-status" onchange="_toggleEigenreparaturFields()">${options}</select>
+    </div>
+    <div id="md-eigenreparatur-fields" hidden>
+      <div class="admin-form-group">
+        <label>Durchgeführte Maßnahmen</label>
+        <div class="admin-check-group">
+          <label><input type="checkbox" name="md-eigen" value="Software-Update"> Software-Update</label>
+          <label><input type="checkbox" name="md-eigen" value="Zurücksetzen"> Zurücksetzen</label>
+          <label><input type="checkbox" name="md-eigen" value="Datenlöschung (Wipe)"> Datenlöschung (Wipe)</label>
+          <label><input type="checkbox" name="md-eigen" value="Intune-Anmeldung"> Intune-Anmeldung</label>
+        </div>
+      </div>
+      <div class="admin-form-group">
+        <label>Sonstiges</label>
+        <input type="text" id="md-eigen-other" placeholder="Weitere Maßnahmen…">
+      </div>
     </div>
   `, 'Speichern', submitStatusChange);
+
+  // Show fields immediately if eigenreparatur is already the current status.
+  _toggleEigenreparaturFields();
+}
+
+function _toggleEigenreparaturFields() {
+  const val    = document.getElementById('md-status')?.value;
+  const fields = document.getElementById('md-eigenreparatur-fields');
+  if (fields) fields.hidden = (val !== 'eigenreparatur');
 }
 
 // Statuses that sever the pupil/staff assignment.
@@ -800,10 +964,18 @@ async function submitStatusChange() {
   const { error } = await supabase.from('ipads').update(update).eq('id', ipad.id);
   if (error) { _setBusy(false, 'Speichern'); _modalError('Fehler: ' + error.message); return; }
 
+  let statusNote = `Status: "${STATUS_CONFIG[ipad.status]?.label}" → "${STATUS_CONFIG[newStatus]?.label}"`;
+  if (newStatus === 'eigenreparatur') {
+    const checked = [...document.querySelectorAll('input[name="md-eigen"]:checked')].map(el => el.value);
+    const other   = document.getElementById('md-eigen-other')?.value.trim();
+    if (other) checked.push(other);
+    if (checked.length > 0) statusNote += ` — ${checked.join(', ')}`;
+  }
+
   await supabase.from('ipad_history').insert({
     ipad_id: ipad.id, event_type: 'status_change', status: newStatus,
     changed_by: adminName, changed_at: now,
-    notes: `Status: "${STATUS_CONFIG[ipad.status]?.label}" → "${STATUS_CONFIG[newStatus]?.label}"`,
+    notes: statusNote,
   });
 
   if (shouldSever) {

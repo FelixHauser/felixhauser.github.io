@@ -747,32 +747,120 @@ body {
    Detail action buttons
    ========================================================= */
 
-.detail-actions {
+/* ---- iOS-style action table ---- */
+
+.action-table {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 1.25rem;
   margin-bottom: 1.5rem;
 }
 
-.btn-action-detail {
-  padding: 0.45rem 0.9rem;
-  border-radius: 7px;
-  border: 1.5px solid var(--border);
-  background: var(--surface);
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+.action-group-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  padding: 0 0.25rem;
+  margin-bottom: 0.3rem;
 }
 
-.btn-action-detail:hover        { border-color: var(--navy); color: var(--navy); }
-.btn-action-return              { border-color: #BBF7D0; color: #16a34a; background: #F0FDF4; }
-.btn-action-return:hover        { border-color: #16a34a; }
-.btn-action-damage              { border-color: #FED7AA; color: #C2410C; background: #FFF7ED; }
-.btn-action-damage:hover        { border-color: #C2410C; }
-.btn-action-loss                { border-color: #FECACA; color: #B91C1C; background: #FEF2F2; }
-.btn-action-loss:hover          { border-color: #B91C1C; }
+.action-group-rows {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.action-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+
+.action-row:last-child   { border-bottom: none; }
+.action-row:hover        { background: var(--hover, #f0f4fa); }
+
+.action-row-label {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.action-row-chevron {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.action-row-primary   .action-row-label { color: var(--navy); font-weight: 700; }
+.action-row-warning   .action-row-label { color: #C2410C; }
+.action-row-destructive .action-row-label { color: #B91C1C; }
+
+/* ---- Documents section ---- */
+
+.doc-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.doc-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  padding: 0.75rem 1rem;
+  min-width: 175px;
+}
+
+.doc-item-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.doc-item-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.doc-pending {
+  color: #D97706;
+  font-weight: 600;
+}
+
+.btn-doc-download {
+  margin-top: 0.4rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--navy);
+  cursor: pointer;
+  align-self: flex-start;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.btn-doc-download:hover {
+  border-color: var(--navy);
+  background: var(--navy);
+  color: #fff;
+}
 
 /* =========================================================
    Admin modal
@@ -936,6 +1024,23 @@ body {
   display: flex;
   align-items: center;
   gap: 0.35rem;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+.admin-check-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-check-group label {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   cursor: pointer;
   margin-bottom: 0;
 }
