@@ -62,7 +62,47 @@
         <span data-i18n="login.loginButton">Anmelden</span>
       </button>
 
+      <div style="text-align:center;margin-top:0.75rem">
+        <button type="button" class="btn-forgot-link" onclick="showForgotForm()">
+          Passwort vergessen?
+        </button>
+      </div>
+
     </form>
+
+    <!-- Forgot password form (admin only) -->
+    <div id="forgot-section" hidden>
+      <p style="font-size:0.85rem;color:var(--text-secondary,#6b7280);margin-bottom:1.25rem;text-align:center">
+        Gib deine Admin-E-Mail-Adresse ein. Du erhältst einen Reset-Link.
+      </p>
+      <div class="form-group">
+        <label for="reset-email">E-Mail-Adresse</label>
+        <input type="email" id="reset-email" autocomplete="email" placeholder="admin@schule.de">
+      </div>
+      <div id="reset-msg" class="error-msg" hidden></div>
+      <button type="button" class="login-btn" onclick="handleForgotPassword()">
+        Reset-Link senden
+      </button>
+      <div style="text-align:center;margin-top:0.75rem">
+        <button type="button" class="btn-forgot-link" onclick="showLoginForm()">← Zurück zum Login</button>
+      </div>
+    </div>
+
+    <!-- New password form (shown after clicking the email reset link) -->
+    <div id="new-password-section" hidden>
+      <p style="font-size:0.85rem;color:var(--text-secondary,#6b7280);margin-bottom:1.25rem;text-align:center">
+        Wähle ein neues Passwort für deinen Admin-Account.
+      </p>
+      <div class="form-group">
+        <label for="new-password">Neues Passwort</label>
+        <input type="password" id="new-password" autocomplete="new-password">
+      </div>
+      <div id="new-pw-msg" class="error-msg" hidden></div>
+      <button type="button" class="login-btn" onclick="handleNewPassword()">
+        Passwort speichern
+      </button>
+    </div>
+
   </div>
 
   <!-- Supabase JS client (CDN) — must come before our own scripts -->

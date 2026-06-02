@@ -56,6 +56,85 @@ async function handleLogin(event) {
   }
 }
 
+// --- Forgot / reset password ---
+
+// On page load: if the URL contains a recovery token (user clicked the reset email link),
+// skip the login form and show the new-password form instead.
+window.addEventListener('load', () => {
+  if (window.location.hash.includes('type=recovery')) {
+    showNewPasswordForm();
+  }
+});
+
+function showForgotForm() {
+  document.getElementById('login-form').hidden    = true;
+  document.getElementById('forgot-section').hidden = false;
+  document.getElementById('new-password-section').hidden = true;
+  document.getElementById('reset-msg').hidden = true;
+}
+
+function showLoginForm() {
+  document.getElementById('login-form').hidden    = false;
+  document.getElementById('forgot-section').hidden = true;
+  document.getElementById('new-password-section').hidden = true;
+}
+
+function showNewPasswordForm() {
+  document.getElementById('login-form').hidden    = true;
+  document.getElementById('forgot-section').hidden = true;
+  document.getElementById('new-password-section').hidden = false;
+}
+
+async function handleForgotPassword() {
+  const email   = document.getElementById('reset-email').value.trim();
+  const msgEl   = document.getElementById('reset-msg');
+  msgEl.hidden  = true;
+
+  if (!email) {
+    msgEl.textContent = 'Bitte eine E-Mail-Adresse eingeben.';
+    msgEl.hidden = false;
+    return;
+  }
+
+  const redirectTo = window.location.href.split('#')[0];
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+
+  if (error) {
+    msgEl.textContent = 'Fehler: ' + error.message;
+    msgEl.className   = 'error-msg';
+    msgEl.hidden      = false;
+    return;
+  }
+
+  msgEl.textContent = 'Reset-Link gesendet. Bitte prüfe dein E-Mail-Postfach.';
+  msgEl.className   = 'success-msg';
+  msgEl.hidden      = false;
+}
+
+async function handleNewPassword() {
+  const password = document.getElementById('new-password').value;
+  const msgEl    = document.getElementById('new-pw-msg');
+  msgEl.hidden   = true;
+
+  if (password.length < 6) {
+    msgEl.textContent = 'Das Passwort muss mindestens 6 Zeichen lang sein.';
+    msgEl.hidden = false;
+    return;
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    msgEl.textContent = 'Fehler: ' + error.message;
+    msgEl.hidden = false;
+    return;
+  }
+
+  msgEl.textContent = 'Passwort gespeichert. Du wirst weitergeleitet…';
+  msgEl.hidden = false;
+  setTimeout(() => { window.location.href = 'admin.html'; }, 1500);
+}
+
 // --- Helper functions ---
 
 function showError(message) {

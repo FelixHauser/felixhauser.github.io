@@ -1,12 +1,9 @@
 // doc-generator.js
 //
-// Three portal documents (Leihvertrag, Schadenmeldung, Verlustmeldung) are filled
-// by fetching the real .docx template from document_templates/ and using
-// docxtemplater + PizZip to replace the placeholders, then downloading as .docx.
+// Leihvertrag + Schadenmeldung: pdf-lib fills named form fields in a PDF template
+// and downloads as .pdf.
 //
-// Übergabeprotokoll / Rückgabeprotokoll are admin-side documents (Priority 2).
-// Their templates need to be restructured for checkbox placeholders before switching
-// to the same approach. Until then they use jsPDF as a stopgap.
+// Verlustmeldung, Übergabeprotokoll, Rückgabeprotokoll: generated in-browser with jsPDF.
 
 // ── Shared helpers ────────────────────────────────────────────────
 
@@ -21,48 +18,47 @@ function _dt(iso) {
   return _d(iso) + ' · ' + d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr';
 }
 
-// Fetches a .docx template, fills all {placeholders}, triggers download.
-// Placeholders in the templates use { tag } syntax — docxtemplater trims whitespace
-// from tag names automatically, so { last_name } resolves to key 'last_name'.
-// Exception: { erz_ last_name } trims to 'erz_ last_name' (space in middle) — pass
-// the key with the space in the data object.
-async function _fillTemplate(templateFilename, data, outputFilename) {
-  // 1 — Fetch the .docx template
+
+// ── Leihvertrag ───────────────────────────────────────────────────
+// Template: document_templates/Leihvertrag_2.1_fillable.pdf (pdf-lib)
+// Form field names:
+//   last_name, first_name, address, school_name (hardcoded),
+//   erz_last_name, erz_first_name, erz_address,
+//   seriual_number (typo in PDF), accepted_at, text_12ihoi (Marl, den date)
+
+async function generateLeihvertrag(data) {
+  const { PDFDocument } = window.PDFLib;
+
   let buffer;
   try {
-    const response = await fetch(`document_templates/${templateFilename}`);
-    if (!response.ok) throw new Error(`HTTP ${response.status} — ${templateFilename}`);
+    const response = await fetch('document_templates/Leihvertrag_2.1_fillable.pdf');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     buffer = await response.arrayBuffer();
   } catch (e) {
     console.error('[doc-generator] fetch failed:', e);
     throw e;
   }
 
-  // 2 — Fill placeholders with docxtemplater
-  let filledBuffer;
-  try {
-    const DocxCtor = window.Docxtemplater || window.docxtemplater;
-    if (!DocxCtor) throw new Error('docxtemplater library not loaded');
-    const zip = new PizZip(buffer);
-    const doc = new DocxCtor(zip, { paragraphLoop: true, linebreaks: true });
-    doc.setData(data);
-    doc.render();
-    filledBuffer = doc.getZip().generate({ type: 'arraybuffer' });
-  } catch (e) {
-    console.error('[doc-generator] render failed:', e);
-    if (e.properties && e.properties.errors) {
-      console.error('[doc-generator] template errors:', JSON.stringify(e.properties.errors));
-    }
-    throw e;
-  }
+  const pdfDoc = await PDFDocument.load(buffer);
+  const form   = pdfDoc.getForm();
 
-  // 3 — Download as .docx
-  const blob = new Blob([filledBuffer], {
-    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  });
+  form.getTextField('last_name').setText(data.last_name       || '');
+  form.getTextField('first_name').setText(data.first_name     || '');
+  form.getTextField('address').setText(data.address           || '');
+  form.getTextField('school_name').setText('Martin Luther King Schule');
+  form.getTextField('erz_last_name').setText(data.erz_last_name  || '');
+  form.getTextField('erz_first_name').setText(data.erz_first_name || '');
+  form.getTextField('erz_address').setText(data.erz_address    || '');
+  form.getTextField('seriual_number').setText(data.serial_number || '');
+  form.getTextField('accepted_at').setText(_d(data.accepted_at));
+  // text_12ihoi = "Dieses Dokument wurde digital erstellt..." — keep pre-filled text, do not overwrite
+
+  form.flatten();
+  const pdfBytes = await pdfDoc.save();
+  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
   const a    = document.createElement('a');
   a.href     = URL.createObjectURL(blob);
-  a.download = outputFilename;
+  a.download = `Leihvertrag_${data.serial_number}.pdf`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -70,49 +66,57 @@ async function _fillTemplate(templateFilename, data, outputFilename) {
 }
 
 
-// ── Leihvertrag ───────────────────────────────────────────────────
-// Template: document_templates/Leihvertrag.docx
-// Placeholders (as they appear in the file, spaces included):
-//   { last_name }  { first_name }  { address }
-//   { erz_ last_name }  { erz_ first_name }  { erz_ address }
-//   { seriennummer }  {date}
-
-async function generateLeihvertrag(data) {
-  await _fillTemplate('Leihvertrag.docx', {
-    'last_name':       data.last_name      || '',
-    'first_name':      data.first_name     || '',
-    'address':         data.address        || '',
-    'erz_ last_name':  data.erz_last_name  || '',
-    'erz_ first_name': data.erz_first_name || '',
-    'erz_ address':    data.erz_address    || '',
-    'seriennummer':    data.serial_number  || '',
-    'date':            _d(data.accepted_at),
-  }, `Leihvertrag_${data.serial_number}.docx`);
-}
-
-
 // ── Schadenmeldung ────────────────────────────────────────────────
-// Template: document_templates/Schadensmeldung.docx
-// Placeholders:
-//   { serial_number }  { description }
-//   { datum_eingetreten }  { datum_entdeckt }
-//   { last_name }  { first_name }  { perpretator }  (note: typo in template)
-//   { first_name_erz }  { last_name_erz }  { address }  {date}
+// Template: document_templates/Schadensmeldung_fillable.pdf (pdf-lib)
+// Form field names:
+//   serial_number, text_1agbk (Geräteart), date, description,
+//   datum_eingetreten, datum_entdeckt,
+//   "last_name, first_name", perpetrator,
+//   "first_name_erz, last_name_erz; address_erz"
 
 async function generateSchadenmeldung(data) {
-  await _fillTemplate('Schadensmeldung.docx', {
-    'serial_number':    data.serial_number      || '',
-    'description':      data.description        || '',
-    'datum_eingetreten':_d(data.datum_eingetreten),
-    'datum_entdeckt':   _d(data.datum_entdeckt),
-    'last_name':        data.last_name          || '',
-    'first_name':       data.first_name         || '',
-    'perpretator':      data.perpetrator        || '',
-    'first_name_erz':   data.erz_first_name     || '',
-    'last_name_erz':    data.erz_last_name      || '',
-    'address':          data.erz_address        || '',
-    'date':             _d(data.filed_at),
-  }, `Schadenmeldung_${data.serial_number}.docx`);
+  const { PDFDocument } = window.PDFLib;
+
+  let buffer;
+  try {
+    const response = await fetch('document_templates/Schadensmeldung_fillable.pdf');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    buffer = await response.arrayBuffer();
+  } catch (e) {
+    console.error('[doc-generator] fetch failed:', e);
+    throw e;
+  }
+
+  const pdfDoc = await PDFDocument.load(buffer);
+  const form   = pdfDoc.getForm();
+
+  const guardian = [
+    [data.erz_first_name, data.erz_last_name].filter(Boolean).join(' '),
+    data.erz_address || '',
+  ].filter(Boolean).join('\n');
+
+  form.getTextField('serial_number').setText(data.serial_number || '');
+  form.getTextField('text_1agbk').setText('iPad');
+  form.getTextField('date').setText(_d(data.filed_at));
+  form.getTextField('description').setText(data.description || '');
+  form.getTextField('datum_eingetreten').setText(_d(data.datum_eingetreten));
+  form.getTextField('datum_entdeckt').setText(_d(data.datum_entdeckt));
+  form.getTextField('last_name, first_name').setText(
+    [data.last_name, data.first_name].filter(Boolean).join(', ')
+  );
+  form.getTextField('perpetrator').setText(data.perpetrator || '');
+  form.getTextField('first_name_erz, last_name_erz; address_erz').setText(guardian);
+
+  form.flatten();
+  const pdfBytes = await pdfDoc.save();
+  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `Schadenmeldung_${data.serial_number}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
 }
 
 

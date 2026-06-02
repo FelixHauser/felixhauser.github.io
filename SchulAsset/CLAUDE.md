@@ -1,5 +1,15 @@
 # CLAUDE.md — SchulAsset Coding Agent Instructions
 
+> **At the start of every session, read `statusquo.md` before doing anything else.**
+> It contains the current build status, what works, known gotchas, and the prioritised road map.
+> Update it at the end of each session to reflect what was done and what comes next.
+
+**Then initiate a local server**
+> The developement of the project must be tested from the local computer. So it needs a simulated environment.
+
+**Commit and push to GitHub**
+> never without the explicitly OK from the user
+
 ---
 
 ## Project overview

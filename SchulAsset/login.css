@@ -198,6 +198,36 @@ body {
   cursor: not-allowed;
 }
 
+/* ---- Forgot password link ---- */
+
+.btn-forgot-link {
+  background: none;
+  border: none;
+  color: var(--grey-500);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.btn-forgot-link:hover {
+  color: var(--navy);
+}
+
+/* ---- Success message ---- */
+
+.success-msg {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  border-radius: 8px;
+  color: #15803d;
+  font-size: 0.82rem;
+  padding: 0.6rem 0.85rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
 /* ---- Responsive ---- */
 
 @media (max-width: 440px) {

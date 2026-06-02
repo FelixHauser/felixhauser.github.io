@@ -347,6 +347,9 @@ function buildDetailActions(ipad) {
       ${canVerlust
         ? `<button class="btn-action-detail btn-action-loss" onclick="openAdminVerlustModal()">Verlustmeldung</button>`
         : ''}
+      ${isAssignedPupil
+        ? `<button class="btn-action-detail btn-action-secondary" onclick="openResetPortalPasswordModal()">Passwort zurücksetzen</button>`
+        : ''}
     </div>
   `;
 }
@@ -884,6 +887,60 @@ async function submitAdminSchaden() {
 
   closeAdminModal();
   renderIpadDetail();
+}
+
+// ─── 5. Reset portal password ────────────────────────────────
+
+async function openResetPortalPasswordModal() {
+  const ipad = window._detailIpad;
+  _openModal('Portalpasswort zurücksetzen', `
+    <p style="font-size:0.9rem;color:var(--text-secondary)">
+      Ein neues Passwort für den Portalzugang von
+      <strong>${assignedName(ipad)}</strong> generieren?<br>
+      <span style="color:var(--text-muted);font-size:0.82rem">
+        Das alte Passwort wird sofort ungültig.
+      </span>
+    </p>
+  `, 'Neues Passwort generieren', submitResetPortalPassword);
+}
+
+async function submitResetPortalPassword() {
+  _setBusy(true, 'Neues Passwort generieren');
+
+  const ipad = window._detailIpad;
+
+  const { data: fnData, error: fnError } = await supabase.functions.invoke(
+    'create-ipad-account',
+    { body: { serial_number: ipad.serial_number } }
+  );
+
+  if (fnError || !fnData?.password) {
+    _setBusy(false, 'Neues Passwort generieren');
+    _modalError('Fehler beim Zurücksetzen des Passworts. Bitte in Supabase Auth nachsehen.');
+    return;
+  }
+
+  document.getElementById('admin-modal-title').textContent = 'Neues Portalpasswort';
+  document.getElementById('admin-modal-body').innerHTML = `
+    <p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:1.25rem">
+      Das Passwort für <strong>${assignedName(ipad)}</strong> wurde zurückgesetzt.
+      Gib dem/der Schüler/in das neue Passwort weiter:
+    </p>
+    <div style="background:#F6F9FC;border:1.5px solid var(--border);border-radius:8px;padding:1rem;margin-bottom:0.75rem">
+      <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.4rem">Benutzername (Seriennummer)</div>
+      <div style="font-family:monospace;font-size:1rem;font-weight:700;color:var(--text-primary)">${ipad.serial_number}</div>
+    </div>
+    <div style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:8px;padding:1rem">
+      <div style="font-size:0.72rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.4rem">Neues Passwort (einmalig anzeigen)</div>
+      <div style="font-family:monospace;font-size:1.4rem;font-weight:700;color:#15803d;letter-spacing:1px">${fnData.password}</div>
+    </div>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.85rem">
+      Das Passwort wird nicht gespeichert. Notiere es jetzt.
+    </p>
+  `;
+  document.getElementById('admin-modal-error').hidden = true;
+  const footer = document.querySelector('.admin-modal-footer');
+  footer.innerHTML = `<button class="btn-primary" onclick="closeAdminModal()">Verstanden — Fenster schließen</button>`;
 }
 
 // ─── 8. Admin Verlustmeldung ──────────────────────────────────
