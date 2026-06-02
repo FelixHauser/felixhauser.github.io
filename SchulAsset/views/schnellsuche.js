@@ -96,19 +96,10 @@ async function schnellsucheSearch() {
 function openQrScanner() {
   document.getElementById('qr-modal').hidden = false;
 
-  if (window.Html5Qrcode) {
-    _startScanner();
-  } else {
-    const s = document.createElement('script');
-    s.src = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
-    s.onload = _startScanner;
-    document.head.appendChild(s);
-  }
-}
-
-function _startScanner() {
   _qrScanner = new Html5Qrcode('qr-reader');
+
   const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
   _qrScanner.start({ facingMode: 'environment' }, config, onQrSuccess, () => {})
     .catch(() => {
       _qrScanner.start({ facingMode: 'user' }, config, onQrSuccess, () => {});
