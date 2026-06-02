@@ -1004,6 +1004,22 @@ body {
   color: var(--blue);
 }
 
+.edit-input {
+  padding: 0.3rem 0.6rem;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.855rem;
+  background: var(--surface);
+  color: var(--text-primary);
+  outline: none;
+  width: 200px;
+  transition: border-color 0.15s;
+}
+
+.edit-input:focus {
+  border-color: var(--blue);
+}
+
 .activity-badge {
   display: inline-block;
   padding: 0.2rem 0.55rem;

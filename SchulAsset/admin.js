@@ -53,13 +53,15 @@ async function initAdmin() {
 // Arrow functions are used so the renderer names are looked up at call time,
 // not at parse time — views/ipad-list.js and future view files load after admin.js.
 const VIEW_RENDERERS = {
-  schnellsuche:  () => renderSchnellsuche(),
-  ipads:         () => renderIpadList(),
-  pupils:        () => renderPupilList(),
-  staff:         () => renderStaffList(),
-  meldungen:     () => renderMeldungen(),
-  activity:      () => renderActivity(),
-  'ipad-detail': () => renderIpadDetail(),
+  schnellsuche:   () => renderSchnellsuche(),
+  ipads:          () => renderIpadList(),
+  pupils:         () => renderPupilList(),
+  staff:          () => renderStaffList(),
+  meldungen:      () => renderMeldungen(),
+  activity:       () => renderActivity(),
+  'ipad-detail':  () => renderIpadDetail(),
+  'pupil-detail': () => renderPupilDetail(),
+  'staff-detail': () => renderStaffDetail(),
 };
 
 function routeToHash(hash) {
@@ -104,6 +106,21 @@ async function logout() {
 function showIpadDetail(id) {
   window._currentIpadId = id;
   window.location.hash = 'ipad-detail';
+}
+
+function showPupilDetail(id) {
+  window._currentPupilId = id;
+  window.location.hash = 'pupil-detail';
+}
+
+function showStaffDetail(id) {
+  window._currentStaffId = id;
+  window.location.hash = 'staff-detail';
+}
+
+// Escapes a string for safe insertion into HTML attributes and text.
+function _htmlEsc(str) {
+  return (str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 // ---- Shared rendering helpers (used across views) ----

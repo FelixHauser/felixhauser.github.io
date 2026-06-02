@@ -56,7 +56,7 @@ function renderPupilTable(pupils) {
   }
 
   const rows = pupils.map(p => `
-    <tr>
+    <tr onclick="showPupilDetail('${p.id}')">
       <td>${p.last_name}</td>
       <td>${p.first_name}</td>
       <td>${p.address ?? '—'}</td>

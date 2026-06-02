@@ -56,7 +56,7 @@ function renderStaffTable(staff) {
   }
 
   const rows = staff.map(s => `
-    <tr>
+    <tr onclick="showStaffDetail('${s.id}')">
       <td>${s.last_name}</td>
       <td>${s.first_name}</td>
       <td class="mono">${s.kuerzel ?? '—'}</td>
