@@ -58,6 +58,7 @@ const VIEW_RENDERERS = {
   pupils:        () => renderPupilList(),
   staff:         () => renderStaffList(),
   meldungen:     () => renderMeldungen(),
+  activity:      () => renderActivity(),
   'ipad-detail': () => renderIpadDetail(),
 };
 
