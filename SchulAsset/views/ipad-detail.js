@@ -338,6 +338,11 @@ function _openModal(title, bodyHtml, submitLabel, submitFn) {
 
 function closeAdminModal() {
   document.getElementById('admin-modal').hidden = true;
+  // Restore default footer in case _showPasswordCard replaced it.
+  document.querySelector('.admin-modal-footer').innerHTML = `
+    <button class="btn-secondary" onclick="closeAdminModal()">Abbrechen</button>
+    <button class="btn-primary" id="admin-modal-submit">Bestätigen</button>
+  `;
 }
 
 function _modalError(msg) {
