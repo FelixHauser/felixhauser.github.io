@@ -54,7 +54,6 @@ async function initAdmin() {
 // not at parse time — views/ipad-list.js and future view files load after admin.js.
 const VIEW_RENDERERS = {
   schnellsuche:  () => renderSchnellsuche(),
-  dashboard:     () => renderDashboard(),
   ipads:         () => renderIpadList(),
   pupils:        () => renderPupilList(),
   staff:         () => renderStaffList(),

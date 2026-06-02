@@ -1,10 +1,9 @@
-// iPad list view — searchable and filterable table of all iPads.
-// Fetches once, then filters in-memory so the UI stays fast.
+// iPad view — dashboard overview + searchable/filterable list.
+// Single data fetch; dashboard cards filter the list when clicked.
 
 async function renderIpadList() {
   const container = document.getElementById('view-container');
 
-  // Build status filter options from the shared STATUS_CONFIG.
   const statusOptions = Object.entries(STATUS_CONFIG)
     .map(([key, cfg]) => `<option value="${key}">${cfg.label}</option>`)
     .join('');
@@ -13,6 +12,9 @@ async function renderIpadList() {
     <div class="view-header">
       <h2>iPads</h2>
     </div>
+
+    <h3 class="section-title">Dashboard</h3>
+    <div id="overview-area"><p class="loading-msg">Wird geladen…</p></div>
 
     <div class="toolbar">
       <input type="search" id="ipad-search" class="search-input"
@@ -32,7 +34,6 @@ async function renderIpadList() {
     <div id="ipad-table-wrap"><p class="loading-msg">Wird geladen…</p></div>
   `;
 
-  // Fetch all iPads, joining pupil and staff tables to get the assigned name.
   const { data: ipads, error } = await supabase
     .from('ipads')
     .select(`
@@ -43,30 +44,74 @@ async function renderIpadList() {
     .order('serial_number');
 
   if (error) {
-    document.getElementById('ipad-table-wrap').innerHTML =
-      `<p class="error-inline">Fehler beim Laden der iPads: ${error.message}</p>`;
+    document.getElementById('overview-area').innerHTML =
+      `<p class="error-inline">Fehler beim Laden: ${error.message}</p>`;
+    document.getElementById('ipad-table-wrap').innerHTML = '';
     return;
   }
 
-  // Store the full list so the filter function can always access it.
   window._allIpads = ipads;
 
-  document.getElementById('ipad-search').addEventListener('input',  applyIpadFilters);
+  _renderIpadOverview();
+
+  document.getElementById('ipad-search').addEventListener('input',   applyIpadFilters);
   document.getElementById('filter-status').addEventListener('change', applyIpadFilters);
-  document.getElementById('filter-type').addEventListener('change',  applyIpadFilters);
+  document.getElementById('filter-type').addEventListener('change',   applyIpadFilters);
 
   applyIpadFilters();
 }
 
-// Reads the current filter values and re-renders the table.
-function applyIpadFilters() {
+function _renderIpadOverview() {
+  const ipads = window._allIpads || [];
+  const counts = {};
+  for (const ipad of ipads) {
+    counts[ipad.status] = (counts[ipad.status] || 0) + 1;
+  }
+
+  const cards = Object.entries(STATUS_CONFIG).map(([key, cfg]) => `
+    <div class="stat-card" data-status="${key}" onclick="filterByStatus('${key}')">
+      <div class="stat-bar" style="background:${cfg.color}"></div>
+      <div class="stat-count">${counts[key] ?? 0}</div>
+      <div class="stat-label">${cfg.label}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('overview-area').innerHTML = `
+    <div class="total-banner" style="cursor:pointer" title="Alle anzeigen"
+         onclick="filterByStatus('')">
+      <span class="total-number">${ipads.length}</span>
+      <span class="total-text">iPads gesamt</span>
+    </div>
+    <div class="stat-grid">${cards}</div>
+  `;
+}
+
+// Sets the status dropdown and re-filters the list; updates card active state.
+function filterByStatus(status) {
+  const sel = document.getElementById('filter-status');
+  if (!sel) return;
+  sel.value = status;
+  _syncCardActiveState(status);
+  applyIpadFilters(true); // skip syncing cards again
+}
+
+function _syncCardActiveState(status) {
+  document.querySelectorAll('.stat-card[data-status]').forEach(card => {
+    card.classList.toggle('active', card.dataset.status === status && status !== '');
+  });
+}
+
+// Reads current filter values, re-renders table, keeps card active state in sync.
+function applyIpadFilters(skipCardSync) {
   const search = document.getElementById('ipad-search').value.trim().toLowerCase();
   const status = document.getElementById('filter-status').value;
   const type   = document.getElementById('filter-type').value;
 
+  if (!skipCardSync) _syncCardActiveState(status);
+
   const filtered = (window._allIpads || []).filter(ipad => {
-    if (status && ipad.status !== status)       return false;
-    if (type   && ipad.ipad_type !== type)      return false;
+    if (status && ipad.status !== status)  return false;
+    if (type   && ipad.ipad_type !== type) return false;
     if (search) {
       const serial = ipad.serial_number.toLowerCase();
       const name   = assignedName(ipad).toLowerCase();
@@ -78,7 +123,6 @@ function applyIpadFilters() {
   renderIpadTable(filtered);
 }
 
-// Renders the table (or an empty state) from a filtered array of iPads.
 function renderIpadTable(ipads) {
   const countEl = document.getElementById('ipad-count');
   const wrapEl  = document.getElementById('ipad-table-wrap');

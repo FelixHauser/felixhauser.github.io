@@ -393,6 +393,18 @@ body {
   border: 1px solid var(--border);
   overflow: hidden;
   padding-bottom: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.stat-card:hover {
+  border-color: var(--blue);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.stat-card.active {
+  border-color: var(--navy);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .stat-bar {
@@ -930,6 +942,7 @@ body {
 
 .meldungen-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 1.25rem;
 }
@@ -989,6 +1002,39 @@ body {
 .btn-history-download:hover {
   border-color: var(--blue);
   color: var(--blue);
+}
+
+.btn-resolve {
+  background: none;
+  border: 1.5px solid #BBF7D0;
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #16a34a;
+  background: #F0FDF4;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.btn-resolve:hover {
+  border-color: #16a34a;
+}
+
+.btn-goto {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--navy);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-goto:hover {
+  border-color: var(--navy);
 }
 
 /* =========================================================
