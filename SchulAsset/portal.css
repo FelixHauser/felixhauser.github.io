@@ -835,3 +835,70 @@ body {
 .v2-info-val.normal {
   font-family: inherit;
 }
+
+/* =========================================================
+   Signature pad
+   ========================================================= */
+
+.sig-section {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.sig-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.2px;
+}
+
+.sig-desc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.sig-wrapper {
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.sig-canvas {
+  display: block;
+  width: 100%;
+  height: 150px;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.sig-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.35rem;
+}
+
+.sig-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.sig-clear-btn {
+  background: none;
+  border: none;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.2rem 0;
+  font-family: inherit;
+}
+
+.sig-clear-btn:hover {
+  color: var(--red-text);
+}

@@ -1,6 +1,6 @@
 # SchulAsset — Status Quo & Road Map
 
-Last updated: 2026-06-03 (session 8 — full session committed & pushed to GitHub)
+Last updated: 2026-06-08 (session 9 planned — digital signatures feature scoped)
 
 ---
 
@@ -246,3 +246,33 @@ Recent activity is covered by the dedicated **Last activity** nav item (clock ic
 - **Document download (Word template)**: `generateLeihvertrag(data)` and `generateSchadenmeldung(data)` are **async** — fetch the .docx from `document_templates/`, fill with docxtemplater, download as .docx. Always `await` them and wrap in try/catch.
 - **Document download (jsPDF)**: `generateVerlustmeldung(data)`, `generateUebergabeprotokoll(data)`, `generateRueckgabeprotokoll(data)` are **synchronous** — generate PDF in-browser and save directly.
 - **Global state in portal.js**: `_ipad`, `_pupilName`, `_termsRow`, `_uebergabe`, `_rueckgabe` — use these to build data objects for document generation.
+
+---
+
+## Session 9 — Digital signatures (planned, not yet built)
+
+### Feature
+Parents/students can draw their signature with a mouse (desktop) or finger (iPad/smartphone) when accepting the Leihvertrag, Übergabeprotokoll, and Rückgabeprotokoll. The signature is stored as a PNG in Supabase Storage and embedded into the generated PDF.
+
+### Approach
+- **Library:** `signature_pad` by Szymon Nowak — MIT, CDN-loadable, ~5 KB, handles mouse + touch natively
+- **Storage:** Supabase Storage bucket `signatures` — files saved as `{ipad_id}/{document_type}.png`
+- **DB:** `signature_url text` (nullable) column added to `uebergabeprotokoll`, `rueckgabeprotokoll`, and `terms_acceptance`
+- **PDF:** pdf-lib embeds the signature PNG image into the generated document before download
+- **Admin:** "Unterschrift anzeigen" link on iPad detail when `signature_url` is present
+
+### DB changes (run in Supabase SQL editor before building)
+```sql
+ALTER TABLE uebergabeprotokoll ADD COLUMN signature_url text;
+ALTER TABLE rueckgabeprotokoll ADD COLUMN signature_url text;
+ALTER TABLE terms_acceptance    ADD COLUMN signature_url text;
+```
+
+### Supabase Storage
+- Create bucket `signatures`
+- RLS: students can upload to their own iPad's path; admins can read all
+
+### Integration points
+- Portal acceptance modal (Übergabe + Rückgabe): signature canvas above confirm button
+- Leihvertrag acceptance (terms modal): signature canvas above accept button
+- `doc-generator.js`: `generateLeihvertrag()`, `generateUebergabeprotokoll()`, `generateRueckgabeprotokoll()` updated to embed signature image via pdf-lib

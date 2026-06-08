@@ -204,7 +204,7 @@ async function downloadHistoryDoc(type, changedAt) {
       // Use the specific terms row that matches this history entry.
       const { data: row } = await supabase
         .from('terms_acceptance')
-        .select('accepted_at, terms_version, erz_first_name, erz_last_name, erz_address')
+        .select('accepted_at, terms_version, erz_first_name, erz_last_name, erz_address, signature_url')
         .eq('ipad_id', ipad.id)
         .eq('accepted_at', changedAt)
         .maybeSingle();
@@ -220,6 +220,7 @@ async function downloadHistoryDoc(type, changedAt) {
         erz_address:    t?.erz_address,
         accepted_at:    t?.accepted_at,
         terms_version:  t?.terms_version,
+        signature_url:  t?.signature_url,
       });
 
     } else if (type === 'schadenmeldung') {
@@ -419,6 +420,7 @@ async function downloadCurrentLeihvertrag() {
       erz_address:    terms.erz_address,
       accepted_at:    terms.accepted_at,
       terms_version:  terms.terms_version,
+      signature_url:  terms.signature_url,
     });
   } catch (e) { alert('Download fehlgeschlagen: ' + (e.message || e)); }
 }

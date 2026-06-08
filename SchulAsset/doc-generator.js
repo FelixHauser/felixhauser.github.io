@@ -54,6 +54,19 @@ async function generateLeihvertrag(data) {
   // text_12ihoi = "Dieses Dokument wurde digital erstellt..." — keep pre-filled text, do not overwrite
 
   form.flatten();
+
+  if (data.signature_url) {
+    try {
+      const base64   = data.signature_url.split(',')[1];
+      const pngBytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+      const sigImage = await pdfDoc.embedPng(pngBytes);
+      const lastPage = pdfDoc.getPages().at(-1);
+      lastPage.drawImage(sigImage, { x: 30, y: 50, width: 140, height: 45 });
+    } catch (e) {
+      console.warn('[doc-generator] signature embed failed:', e);
+    }
+  }
+
   const pdfBytes = await pdfDoc.save();
   const blob = new Blob([pdfBytes], { type: 'application/pdf' });
   const a    = document.createElement('a');
@@ -302,6 +315,12 @@ function generateUebergabeprotokoll(data) {
     doc.text(ml, 27, y);
     y += ml.length * 4.5 + 3;
   }
+  y += 4;
+  y = _section(doc, 'Unterschrift', y);
+  if (data.signature_url) {
+    try { doc.addImage(data.signature_url, 'PNG', 20, y, 100, 33); }
+    catch (e) { console.warn('[doc-generator] signature embed failed:', e); }
+  }
   _footer(doc, data.accepted_at || data.created_at);
   doc.save(`Übergabeprotokoll_${data.serial_number}.pdf`);
 }
@@ -351,6 +370,13 @@ function generateRueckgabeprotokoll(data) {
     doc.setTextColor(60, 60, 60);
     const dl = doc.splitTextToSize(data.defekt_beschreibung, 170);
     doc.text(dl, 20, y);
+    y += dl.length * 4.5 + 3;
+  }
+  y += 4;
+  y = _section(doc, 'Unterschrift', y);
+  if (data.signature_url) {
+    try { doc.addImage(data.signature_url, 'PNG', 20, y, 100, 33); }
+    catch (e) { console.warn('[doc-generator] signature embed failed:', e); }
   }
   _footer(doc, data.accepted_at || data.created_at);
   doc.save(`Rückgabeprotokoll_${data.serial_number}.pdf`);

@@ -7,6 +7,8 @@ let _uebergabe       = null;
 let _rueckgabe       = null;
 let _lastSchadenData = null;
 let _lastVerlustData = null;
+let _sigPads         = {};
+let _pendingAccept   = null;
 
 const STATUS_COLORS = {
   available:           '#34c759',
@@ -21,6 +23,34 @@ const STATUS_COLORS = {
   stolen:              '#ff3b30',
   decommissioned:      '#8e8e93',
 };
+
+// ── Signature pad ─────────────────────────────────────────────────
+
+function _openSigPad(canvasId, padKey) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  if (_sigPads[padKey]) { _sigPads[padKey].off(); _sigPads[padKey] = null; }
+  const ratio = Math.max(window.devicePixelRatio || 1, 1);
+  canvas.width  = canvas.offsetWidth  * ratio;
+  canvas.height = canvas.offsetHeight * ratio;
+  canvas.getContext('2d').scale(ratio, ratio);
+  _sigPads[padKey] = new SignaturePad(canvas, {
+    backgroundColor: 'rgb(255,255,255)',
+    penColor: '#1a202c',
+    minWidth: 0.8,
+    maxWidth: 2.5,
+  });
+}
+
+function clearSig(padKey) {
+  _sigPads[padKey]?.clear();
+}
+
+function _getSigDataUrl(padKey) {
+  const pad = _sigPads[padKey];
+  if (!pad || pad.isEmpty()) return null;
+  return pad.toDataURL('image/png');
+}
 
 // ── Init ──────────────────────────────────────────────────────────
 
@@ -67,10 +97,10 @@ async function initPortal() {
     ? `${ipad.pupils.first_name} ${ipad.pupils.last_name}`
     : sn;
 
-  // Fetch terms acceptance (includes guardian fields).
+  // Fetch terms acceptance (includes guardian fields and signature).
   const { data: termsRow } = await supabase
     .from('terms_acceptance')
-    .select('accepted_at, terms_version, erz_first_name, erz_last_name, erz_address')
+    .select('accepted_at, terms_version, erz_first_name, erz_last_name, erz_address, signature_url')
     .eq('ipad_id', ipad.id)
     .is('invalidated_at', null)
     .order('accepted_at', { ascending: false })
@@ -239,7 +269,7 @@ function _buildSteps(termsRow) {
   } else if (_uebergabe.accepted_at) {
     steps.push({ state: 'done', number: '✓', title: 'iPad erhalten', subtitle: `Bestätigt am ${formatDate(_uebergabe.accepted_at)}`, download: { label: '↓ Übergabeprotokoll herunterladen', onclick: 'downloadUebergabe()' } });
   } else {
-    steps.push({ state: 'active', number: '2', title: 'iPad erhalten bestätigen', subtitle: 'Bitte prüfen Sie den Zustand des iPads und bestätigen Sie den Erhalt.', details: _protocolDetails(_uebergabe, 'uebergabe'), action: { label: 'Erhalt bestätigen', onclick: `acceptProtocol('uebergabe', '${_uebergabe.id}')` } });
+    steps.push({ state: 'active', number: '2', title: 'iPad erhalten bestätigen', subtitle: 'Bitte prüfen Sie den Zustand des iPads und bestätigen Sie den Erhalt.', details: _protocolDetails(_uebergabe, 'uebergabe'), action: { label: 'Erhalt bestätigen', onclick: `openAcceptModal('uebergabe', '${_uebergabe.id}')` } });
   }
 
   // Step 3: In Verwendung
@@ -252,7 +282,7 @@ function _buildSteps(termsRow) {
   } else if (_rueckgabe.accepted_at) {
     steps.push({ state: 'done', number: '✓', title: 'iPad zurückgegeben', subtitle: `Bestätigt am ${formatDate(_rueckgabe.accepted_at)}`, download: { label: '↓ Rückgabeprotokoll herunterladen', onclick: 'downloadRueckgabe()' } });
   } else {
-    steps.push({ state: 'active', number: '4', title: 'Rückgabe bestätigen', subtitle: 'Bitte prüfen Sie den Zustand des iPads und bestätigen Sie die Rückgabe.', details: _protocolDetails(_rueckgabe, 'rueckgabe'), action: { label: 'Rückgabe bestätigen', onclick: `acceptProtocol('rueckgabe', '${_rueckgabe.id}')` } });
+    steps.push({ state: 'active', number: '4', title: 'Rückgabe bestätigen', subtitle: 'Bitte prüfen Sie den Zustand des iPads und bestätigen Sie die Rückgabe.', details: _protocolDetails(_rueckgabe, 'rueckgabe'), action: { label: 'Rückgabe bestätigen', onclick: `openAcceptModal('rueckgabe', '${_rueckgabe.id}')` } });
   }
 
   return steps;
@@ -281,9 +311,18 @@ function _renderStep(step) {
 // ── Terms / Leihvertrag ───────────────────────────────────────────
 
 async function acceptTerms() {
+  const sigDataUrl = _getSigDataUrl('terms');
+  const sigErrorEl = document.getElementById('terms-sig-error');
+  if (!sigDataUrl) {
+    sigErrorEl.textContent = t('portal.sig.required');
+    sigErrorEl.hidden = false;
+    return;
+  }
+  sigErrorEl.hidden = true;
+
   const btn = document.getElementById('terms-accept-btn');
   btn.disabled    = true;
-  btn.textContent = t('portal.schaden.submitting');
+  btn.textContent = t('portal.sig.saving');
 
   const erzFirst = document.getElementById('erz-first-name').value.trim();
   const erzLast  = document.getElementById('erz-last-name').value.trim();
@@ -297,15 +336,17 @@ async function acceptTerms() {
       ipad_id:        _ipad.id,
       accepted_at:    now,
       terms_version:  '1.0',
-      erz_first_name: erzFirst || null,
-      erz_last_name:  erzLast  || null,
-      erz_address:    erzAddr  || null,
+      erz_first_name: erzFirst    || null,
+      erz_last_name:  erzLast     || null,
+      erz_address:    erzAddr     || null,
+      signature_url:  sigDataUrl,
     });
 
   if (termsError) {
     btn.disabled    = false;
     btn.textContent = t('portal.termsAcceptBtn');
-    alert(t('portal.errorGeneric'));
+    sigErrorEl.textContent = t('portal.errorGeneric');
+    sigErrorEl.hidden = false;
     return;
   }
 
@@ -322,9 +363,10 @@ async function acceptTerms() {
   _termsRow = {
     accepted_at:    now,
     terms_version:  '1.0',
-    erz_first_name: erzFirst || null,
-    erz_last_name:  erzLast  || null,
-    erz_address:    erzAddr  || null,
+    erz_first_name: erzFirst    || null,
+    erz_last_name:  erzLast     || null,
+    erz_address:    erzAddr     || null,
+    signature_url:  sigDataUrl,
   };
 
   closeModal('terms-modal');
@@ -344,6 +386,7 @@ async function downloadLeihvertrag() {
       erz_address:    _termsRow?.erz_address,
       accepted_at:    _termsRow?.accepted_at,
       terms_version:  _termsRow?.terms_version,
+      signature_url:  _termsRow?.signature_url,
     });
   } catch (e) {
     console.error('Download error:', e);
@@ -541,22 +584,53 @@ function downloadLastVerlust() {
 
 // ── Übergabeprotokoll / Rückgabeprotokoll ────────────────────────
 
-async function acceptProtocol(type, id) {
+function openAcceptModal(type, id) {
+  _pendingAccept = { type, id };
+  document.getElementById('accept-sig-title').textContent = t(`portal.sig.${type}Title`);
+  document.getElementById('accept-sig-desc').textContent  = t(`portal.sig.${type}Desc`);
+  document.getElementById('accept-sig-error').hidden      = true;
+  const btn = document.getElementById('accept-sig-btn');
+  btn.disabled    = false;
+  btn.textContent = t('portal.sig.confirm');
+  document.getElementById('accept-sig-modal').hidden = false;
+  setTimeout(() => _openSigPad('accept-sig-canvas', 'accept'), 50);
+}
+
+async function confirmAcceptProtocol() {
+  const sigDataUrl = _getSigDataUrl('accept');
+  const errorEl   = document.getElementById('accept-sig-error');
+  if (!sigDataUrl) {
+    errorEl.textContent = t('portal.sig.required');
+    errorEl.hidden = false;
+    return;
+  }
+  errorEl.hidden = true;
+
+  const { type, id } = _pendingAccept;
+  const btn = document.getElementById('accept-sig-btn');
+  btn.disabled    = true;
+  btn.textContent = t('portal.sig.saving');
+
   const table = type === 'uebergabe' ? 'uebergabeprotokoll' : 'rueckgabeprotokoll';
   const now   = new Date().toISOString();
 
   const { error } = await supabase
     .from(table)
-    .update({ accepted_at: now, accepted_by: _pupilName })
+    .update({ accepted_at: now, accepted_by: _pupilName, signature_url: sigDataUrl })
     .eq('id', id);
 
   if (error) {
-    alert(t('portal.errorGeneric'));
+    btn.disabled    = false;
+    btn.textContent = t('portal.sig.confirm');
+    errorEl.textContent = t('portal.errorGeneric');
+    errorEl.hidden = false;
     return;
   }
 
+  closeModal('accept-sig-modal');
+
   if (type === 'uebergabe') {
-    _uebergabe = { ..._uebergabe, accepted_at: now, accepted_by: _pupilName };
+    _uebergabe = { ..._uebergabe, accepted_at: now, accepted_by: _pupilName, signature_url: sigDataUrl };
     // DB trigger updates iPad status to in_use; mirror it locally for display.
     _ipad = { ..._ipad, status: 'in_use' };
     await supabase.from('ipad_history').insert({
@@ -569,7 +643,7 @@ async function acceptProtocol(type, id) {
       notes:       'Übergabeprotokoll bestätigt',
     });
   } else {
-    _rueckgabe = { ..._rueckgabe, accepted_at: now, accepted_by: _pupilName };
+    _rueckgabe = { ..._rueckgabe, accepted_at: now, accepted_by: _pupilName, signature_url: sigDataUrl };
     await supabase.from('ipad_history').insert({
       ipad_id:     _ipad.id,
       event_type:  'returned',
@@ -619,6 +693,9 @@ function openModal(id) {
   });
   modal.hidden = false;
   applyTranslations();
+  if (id === 'terms-modal') {
+    setTimeout(() => _openSigPad('terms-sig-canvas', 'terms'), 50);
+  }
 }
 
 function closeModal(id) {

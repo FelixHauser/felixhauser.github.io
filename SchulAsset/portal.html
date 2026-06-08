@@ -83,6 +83,19 @@
             <input type="text" id="erz-address" autocomplete="street-address">
           </div>
         </div>
+
+        <!-- Signature -->
+        <div class="sig-section">
+          <label class="sig-label" data-i18n="portal.sig.label">Unterschrift</label>
+          <div class="sig-wrapper">
+            <canvas id="terms-sig-canvas" class="sig-canvas"></canvas>
+          </div>
+          <div class="sig-controls">
+            <p class="sig-hint" data-i18n="portal.sig.hint">Mit Maus oder Finger unterschreiben</p>
+            <button type="button" class="sig-clear-btn" onclick="clearSig('terms')" data-i18n="portal.sig.clear">Löschen</button>
+          </div>
+          <div id="terms-sig-error" class="error-msg" hidden></div>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn-secondary" onclick="closeModal('terms-modal')" data-i18n="portal.cancel">Abbrechen</button>
@@ -224,6 +237,33 @@
     </div>
   </div>
 
+  <!-- ── Accept protocol signature modal ── -->
+  <div id="accept-sig-modal" class="modal-backdrop" hidden>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title" id="accept-sig-title">Bestätigen</h2>
+        <button class="modal-close" onclick="closeModal('accept-sig-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p id="accept-sig-desc" class="sig-desc"></p>
+        <label class="sig-label" data-i18n="portal.sig.label">Unterschrift</label>
+        <div class="sig-wrapper">
+          <canvas id="accept-sig-canvas" class="sig-canvas"></canvas>
+        </div>
+        <div class="sig-controls">
+          <p class="sig-hint" data-i18n="portal.sig.hint">Mit Maus oder Finger unterschreiben</p>
+          <button type="button" class="sig-clear-btn" onclick="clearSig('accept')" data-i18n="portal.sig.clear">Löschen</button>
+        </div>
+        <div id="accept-sig-error" class="error-msg" hidden></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('accept-sig-modal')" data-i18n="portal.cancel">Abbrechen</button>
+        <button class="btn-primary" id="accept-sig-btn" onclick="confirmAcceptProtocol()" data-i18n="portal.sig.confirm">Bestätigen</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
