@@ -99,19 +99,12 @@
       gap: 12px;
       margin-bottom: 14px;
     }
-    .planner-grid {
-      display: grid;
-      grid-template-columns: minmax(280px, 1fr) minmax(280px, .92fr);
-      gap: 18px;
-      align-items: start;
-    }
     .subcard {
       border: 1px solid var(--line);
       border-radius: 14px;
       padding: 14px;
       background: #fff;
     }
-    .subcard.result { background: #f9fbfc; }
     .subheading {
       margin: 0 0 12px;
       font-size: 15px;
@@ -150,33 +143,6 @@
       -webkit-text-fill-color: #34495e;
     }
     .hint { margin-top: 5px; font-size: 12px; color: var(--muted); }
-    .result-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .metric {
-      background: white;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 10px;
-      min-height: 68px;
-    }
-    .metric-label { font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 4px; }
-    .metric-value { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
-    .metric.full { grid-column: 1 / -1; }
-    .statusbar {
-      margin-top: 12px;
-      border-radius: 12px;
-      padding: 11px 12px;
-      font-weight: 700;
-      border: 1px solid var(--line);
-      background: var(--primary-soft);
-      color: var(--primary-dark);
-    }
-    .statusbar.ok { background: var(--ok-bg); color: var(--ok); border-color: #bde2ca; }
-    .statusbar.warn { background: var(--warn-bg); color: var(--warn); border-color: #f3d893; }
-    .statusbar.error { background: var(--error-bg); color: var(--error); border-color: #f0b3b3; }
     .schema-pill {
       display: inline-flex;
       align-items: center;
@@ -213,8 +179,7 @@
       main { width: min(100vw - 20px, 720px); padding-top: 18px; }
       header { grid-template-columns: 1fr; align-items: start; }
       .actions { justify-content: flex-start; }
-      .meta-grid, .planner-grid, .two-col { grid-template-columns: 1fr; }
-      .result-grid { grid-template-columns: 1fr; }
+      .meta-grid, .two-col { grid-template-columns: 1fr; }
       .card-header { align-items: flex-start; flex-direction: column; }
     }
     @media print {
@@ -229,18 +194,13 @@
       .card-header { padding: 8px 10px; background: #f8f8f8; }
       .body { padding: 10px; }
       .meta-grid { grid-template-columns: 1fr 1fr 2fr; gap: 8px; margin-bottom: 8px; }
-      .planner-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
       .two-col { grid-template-columns: 1.22fr .78fr; gap: 8px; }
-      .subcard, .metric { border-color: #d0d0d0; padding: 8px; }
+      .subcard { border-color: #d0d0d0; padding: 8px; }
       input, select { min-height: 28px; padding: 4px 6px; border-color: #bbb; background: #fff; font-size: 11px; }
       .hint { font-size: 10px; }
-      .metric { min-height: auto; }
-      .metric-label { font-size: 10px; }
-      .metric-value { font-size: 12px; }
       h2 { font-size: 14px; }
       table { font-size: 10.2px; }
       th, td { padding: 4px 5px; }
-      .statusbar { padding: 7px 8px; font-size: 11px; }
     }
     #loginOverlay {
       position: fixed; inset: 0;
@@ -314,65 +274,45 @@
         </div>
       </div>
 
-      <div class="planner-grid">
-        <div class="subcard">
-          <p class="subheading">Eingaben</p>
-          <div class="field">
-            <label for="yearSelect">Jahrgang</label>
-            <select id="yearSelect">
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7" selected>7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="courseSelect">Kursart</label>
-            <select id="courseSelect">
-              <option value="GK" selected>GK</option>
-              <option value="EK">EK</option>
-            </select>
-            <div id="courseHint" class="hint">GK und EK gibt es erst ab Jahrgang 7.</div>
-          </div>
-          <div class="field">
-            <label for="specSelect">Was möchten Sie vorgeben?</label>
-            <select id="specSelect">
-              <option value="total" selected>Gesamtpunktzahl</option>
-              <option value="k1">Kompetenz 1: Listening / Reading / Mediation</option>
-              <option value="k2">Kompetenz 2: Verfügen über sprachliche Mittel</option>
-              <option value="k3">Kompetenz 3: Schreiben</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="pointsInput">Punktzahl</label>
-            <input id="pointsInput" type="number" inputmode="numeric" min="0" step="1" value="50">
-            <div id="allowedHint" class="hint">Zulässig: ganze Zahl von 0 bis 150</div>
-          </div>
+      <div class="subcard">
+        <p class="subheading">Eingaben</p>
+        <div class="field">
+          <label for="subjectSelect">Fach</label>
+          <select id="subjectSelect">
+            <option value="englisch" selected>Englisch</option>
+            <option value="deutsch">Deutsch</option>
+          </select>
         </div>
-
-        <div class="subcard result">
-          <p class="subheading">Ergebnis & Status</p>
-          <div class="result-grid">
-            <div class="metric">
-              <div class="metric-label">Gesamtpunktzahl</div>
-              <div id="totalOut" class="metric-value">50</div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">Zulässig</div>
-              <div id="allowedOut" class="metric-value">0–150</div>
-            </div>
-            <div class="metric full">
-              <div class="metric-label">Einschätzung</div>
-              <div id="assessmentOut" class="metric-value">Gut geeignet für differenzierte Bewertung.</div>
-            </div>
-          </div>
-          <div id="statusOut" class="statusbar ok">Die Eingabe ist gültig. Die Vorgaben werden exakt eingehalten.</div>
-          <div id="extraOut" class="hint"></div>
+        <div class="field">
+          <label for="yearSelect">Jahrgang</label>
+          <select id="yearSelect">
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7" selected>7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="courseSelect">Kursart</label>
+          <select id="courseSelect">
+            <option value="GK" selected>GK</option>
+            <option value="EK">EK</option>
+          </select>
+          <div id="courseHint" class="hint">GK und EK gibt es erst ab Jahrgang 7.</div>
+        </div>
+        <div class="field">
+          <label for="specSelect">Was möchten Sie vorgeben?</label>
+          <select id="specSelect"></select>
+        </div>
+        <div class="field">
+          <label for="pointsInput">Punktzahl</label>
+          <input id="pointsInput" type="number" inputmode="numeric" min="0" step="1" value="50">
+          <div id="allowedHint" class="hint">Zulässig: ganze Zahl von 0 bis 150</div>
         </div>
       </div>
-      <div class="viewer-note no-print">Hinweis: Diese Datei rechnet direkt im Browser. Auf dem iPad bitte in Safari öffnen. Zum Sichern als PDF: „Drucken / PDF sichern“ verwenden.</div>
+      <div class="viewer-note no-print">Hinweis: Diese Datei rechnet direkt im Browser. Auf dem iPad bitte in Safari öffnen. Zum Sichern als PDF: „Drucken / PDF sichern" verwenden.</div>
     </div>
   </section>
 
@@ -415,37 +355,7 @@
   const els = {};
   function $(id){ return document.getElementById(id); }
 
-  function isYearWithoutCourse(year){ return Number(year) <= 6; }
-
-  function normalizeCourse(year, course){
-    year = Number(year);
-    if (isYearWithoutCourse(year)) return 'NONE';
-    return (course === 'GK' || course === 'EK') ? course : '';
-  }
-
-  function isValidCourse(year, course){
-    year = Number(year);
-    if (isYearWithoutCourse(year)) return true;
-    return course === 'GK' || course === 'EK';
-  }
-
-  function isSpecialSchema(year, course){
-    year = Number(year);
-    return (year === 9 || year === 10) && course === 'EK';
-  }
-
-  function schemaName(year, course){
-    return isSpecialSchema(year, course) ? 'Sonderschema Jahrgang 9/10 EK' : 'Standardschema';
-  }
-
-  function mainWeights(year, course){
-    year = Number(year);
-    if (year === 5 || year === 6) return [30,25,45];
-    if (year === 7 || year === 8) return [25,25,50];
-    if ((year === 9 || year === 10) && course === 'EK') return [20,20,60];
-    if (year === 9 || year === 10) return [30,25,45];
-    return null;
-  }
+  // ── shared ────────────────────────────────────────────────────────────────
 
   function largestRemainder(total, parts){
     const rows = parts.map((p, idx) => {
@@ -465,9 +375,99 @@
     return split.reduce((s,r) => s + Math.abs(r.points - r.ideal), 0);
   }
 
-  function calculateDistribution(year, course, total){
-    year = Number(year); total = Number(total); course = normalizeCourse(year, course);
-    const weights = mainWeights(year, course);
+  function roundHalfDownPercent(total, pct){
+    const num = Number(total) * pct;
+    const q = Math.floor(num / 100);
+    const r = num % 100;
+    return r > 50 ? q + 1 : q;
+  }
+
+  function gradeRows(total){
+    total = Number(total);
+    if (total === 0) return GRADE_LIMITS.map(g => ({note:g.note, min:0, range:'–'}));
+    const mins = GRADE_LIMITS.map(g => roundHalfDownPercent(total, g.pct));
+    const ranges = [];
+    for (let i = 0; i < GRADE_LIMITS.length; i++) {
+      let lo, hi;
+      if (i === 0) { lo = mins[i]; hi = total; }
+      else { lo = mins[i]; hi = mins[i-1] - 1; }
+      let range;
+      if (lo > hi) range = 'kein eigener Punktbereich';
+      else if (lo === hi) range = String(lo);
+      else range = lo + '–' + hi;
+      ranges.push({note:GRADE_LIMITS[i].note, min:mins[i], lo, hi, range});
+    }
+    return ranges;
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  }
+
+  function genericSolver(year, course, spec, inputPoints, calcFn, compValFn, specWeightFn, maxAllowedFn, validCourseFn){
+    inputPoints = Number(inputPoints);
+    if (!validCourseFn(year, course)) return {valid:false, reason:'course'};
+    if (!Number.isInteger(inputPoints) || inputPoints < 0) return {valid:false, reason:'integer'};
+    const maxAllowed = maxAllowedFn(year, course, spec);
+    if (inputPoints > maxAllowed) return {valid:false, reason:'tooHigh', maxAllowed};
+    if (spec === 'total') {
+      return {valid:true, exact:true, total:inputPoints, actual:inputPoints, maxAllowed, dist:calcFn(year, course, inputPoints)};
+    }
+    const w = specWeightFn(year, course, spec);
+    const idealTotal = w === 0 ? 0 : inputPoints * 100 / w;
+    const candidates = [];
+    for (let total = 0; total <= 150; total++) {
+      const dist = calcFn(year, course, total);
+      const actual = compValFn(dist, spec);
+      candidates.push({
+        total, actual, dist,
+        exact: actual === inputPoints,
+        pointDiff: Math.abs(actual - inputPoints),
+        idealDiff: Math.abs(total - idealTotal),
+        dev: dist.aggregateDeviation
+      });
+    }
+    const exacts = candidates.filter(c => c.exact);
+    const pool = exacts.length ? exacts : candidates;
+    pool.sort((a,b) => {
+      if (!exacts.length && a.pointDiff !== b.pointDiff) return a.pointDiff - b.pointDiff;
+      if (a.idealDiff !== b.idealDiff) return a.idealDiff - b.idealDiff;
+      if (Math.abs(a.dev - b.dev) > 1e-9) return a.dev - b.dev;
+      return a.total - b.total;
+    });
+    const best = pool[0];
+    return {valid:true, exact:best.exact, total:best.total, actual:best.actual, maxAllowed, dist:best.dist, pointDiff:best.pointDiff};
+  }
+
+  // ── Englisch ──────────────────────────────────────────────────────────────
+
+  function isYearWithoutCourseEn(year){ return Number(year) <= 6; }
+
+  function normalizeCourseEn(year, course){
+    if (isYearWithoutCourseEn(year)) return 'NONE';
+    return (course === 'GK' || course === 'EK') ? course : '';
+  }
+
+  function isValidCourseEn(year, course){ return isYearWithoutCourseEn(year) || course === 'GK' || course === 'EK'; }
+
+  function isSpecialSchemaEn(year, course){ return (Number(year) === 9 || Number(year) === 10) && course === 'EK'; }
+
+  function schemaNameEn(year, course){
+    return isSpecialSchemaEn(year, course) ? 'Sonderschema Jahrgang 9/10 EK' : 'Standardschema';
+  }
+
+  function mainWeightsEn(year, course){
+    year = Number(year);
+    if (year === 5 || year === 6) return [30,25,45];
+    if (year === 7 || year === 8) return [25,25,50];
+    if ((year === 9 || year === 10) && course === 'EK') return [20,20,60];
+    if (year === 9 || year === 10) return [30,25,45];
+    return null;
+  }
+
+  function calculateDistributionEn(year, course, total){
+    year = Number(year); total = Number(total); course = normalizeCourseEn(year, course);
+    const weights = mainWeightsEn(year, course);
     if (!weights) return null;
     const main = largestRemainder(total, [
       {key:'k1', label:'Kompetenz 1: Listening / Reading / Mediation', weight:weights[0], level:0},
@@ -480,7 +480,7 @@
       {key:'presentation', label:'Darstellungsleistung', weight:60, level:1}
     ]);
     const content = write[0].points, presentation = write[1].points;
-    const special = isSpecialSchema(year, course);
+    const special = isSpecialSchemaEn(year, course);
     const presentationParts = special ? [
       {key:'expression', label:'Ausdrucksvermögen', weight:35, level:2},
       {key:'communication', label:'Kommunikative Textgestaltung', weight:30, level:2},
@@ -509,18 +509,18 @@
     const values = {total, k1, k2, k3, content, presentation, correctness};
     pres.forEach(r => values[r.key] = r.points);
     corr.forEach(r => values[r.key] = r.points);
-    return {year, course, special, schema:schemaName(year, course), rows, values, aggregateDeviation:dev};
+    return {year, course, special, schema:schemaNameEn(year, course), rows, values, aggregateDeviation:dev};
   }
 
-  function componentValue(dist, spec){
+  function componentValueEn(dist, spec){
     if (spec === 'k1') return dist.values.k1;
     if (spec === 'k2') return dist.values.k2;
     if (spec === 'k3') return dist.values.k3;
     return dist.values.total;
   }
 
-  function specWeight(year, course, spec){
-    const weights = mainWeights(year, normalizeCourse(year, course));
+  function specWeightEn(year, course, spec){
+    const weights = mainWeightsEn(year, normalizeCourseEn(year, course));
     if (!weights) return 100;
     if (spec === 'k1') return weights[0];
     if (spec === 'k2') return weights[1];
@@ -528,110 +528,149 @@
     return 100;
   }
 
-  function getMaxAllowed(year, course, spec){
+  function getMaxAllowedEn(year, course, spec){
     if (spec === 'total') return 150;
-    course = normalizeCourse(year, course);
-    if (!isValidCourse(year, course)) return 0;
+    course = normalizeCourseEn(year, course);
+    if (!isValidCourseEn(year, course)) return 0;
     let max = 0;
     for (let total = 0; total <= 150; total++) {
-      const dist = calculateDistribution(year, course, total);
-      max = Math.max(max, componentValue(dist, spec));
+      const dist = calculateDistributionEn(year, course, total);
+      max = Math.max(max, componentValueEn(dist, spec));
     }
     return max;
   }
 
-  function solveTotal(year, course, spec, inputPoints){
-    year = Number(year); inputPoints = Number(inputPoints); course = normalizeCourse(year, course);
-    if (!isValidCourse(year, course)) return {valid:false, reason:'course'};
-    if (!Number.isInteger(inputPoints) || inputPoints < 0) return {valid:false, reason:'integer'};
-    const maxAllowed = getMaxAllowed(year, course, spec);
-    if (inputPoints > maxAllowed) return {valid:false, reason:'tooHigh', maxAllowed};
-    if (spec === 'total') {
-      return {valid:true, exact:true, total:inputPoints, actual:inputPoints, maxAllowed, dist:calculateDistribution(year, course, inputPoints)};
+  function solveTotalEn(year, course, spec, inputPoints){
+    return genericSolver(
+      year, normalizeCourseEn(year, course), spec, inputPoints,
+      calculateDistributionEn, componentValueEn, specWeightEn, getMaxAllowedEn,
+      isValidCourseEn
+    );
+  }
+
+  // ── Deutsch ───────────────────────────────────────────────────────────────
+
+  function isYearWithoutCourseDe(year){ return Number(year) <= 8; }
+
+  function normalizeCourseDe(year, course){
+    if (isYearWithoutCourseDe(year)) return 'NONE';
+    return (course === 'GK' || course === 'EK') ? course : '';
+  }
+
+  function isValidCourseDe(year, course){ return isYearWithoutCourseDe(year) || course === 'GK' || course === 'EK'; }
+
+  function isSpecialSchemaDe(year, course){ return (Number(year) === 9 || Number(year) === 10) && course === 'EK'; }
+
+  function schemaNameDe(year, course){
+    return isSpecialSchemaDe(year, course) ? 'Sonderschema Jahrgang 9/10 EK' : 'Standardschema';
+  }
+
+  function deutschWeights(year, course){
+    if (isSpecialSchemaDe(year, course)) {
+      return {
+        vorb:20, aufg:80, inh:70, darst:30,
+        darst_subs:[
+          {key:'struktur',        label:'Struktur',                weight:16, level:2},
+          {key:'syntax',          label:'Syntax',                  weight:16, level:2},
+          {key:'ausdruck',        label:'Ausdruck',                weight:12, level:2},
+          {key:'spr_richtigkeit', label:'Sprachliche Richtigkeit', weight:44, level:2},
+          {key:'indiv',           label:'Individuelles Kriterium', weight:12, level:2}
+        ]
+      };
     }
-    const w = specWeight(year, course, spec);
-    const idealTotal = w === 0 ? 0 : inputPoints * 100 / w;
-    const candidates = [];
+    return {
+      vorb:25, aufg:75, inh:80, darst:20,
+      darst_subs:[
+        {key:'struktur',        label:'Struktur',                weight:16, level:2},
+        {key:'syntax',          label:'Syntax',                  weight:16, level:2},
+        {key:'ausdruck',        label:'Ausdruck',                weight:16, level:2},
+        {key:'spr_richtigkeit', label:'Sprachliche Richtigkeit', weight:44, level:2},
+        {key:'indiv',           label:'Individuelles Kriterium', weight: 8, level:2}
+      ]
+    };
+  }
+
+  function calculateDistributionDe(year, course, total){
+    year = Number(year); total = Number(total); course = normalizeCourseDe(year, course);
+    const w = deutschWeights(year, course);
+    const main = largestRemainder(total, [
+      {key:'vorb', label:'1. Vorbereitende Aufgaben', weight:w.vorb, level:0},
+      {key:'aufg', label:'2. Aufgabentyp nach KLP',  weight:w.aufg, level:0}
+    ]);
+    const vorb = main[0].points, aufg = main[1].points;
+    const aufgParts = largestRemainder(aufg, [
+      {key:'inh',   label:'Inhaltliche Leistung', weight:w.inh,   level:1},
+      {key:'darst', label:'Darstellungsleistung', weight:w.darst, level:1}
+    ]);
+    const inh = aufgParts[0].points, darst = aufgParts[1].points;
+    const darstParts = largestRemainder(darst, w.darst_subs);
+    const rows = [];
+    function row(label, points, level, major){ rows.push({label, points, level, major: !!major}); }
+    row(main[0].label, vorb, 0, true);
+    row(main[1].label, aufg, 0, true);
+    row('Inhaltliche Leistung', inh, 1, false);
+    row('Darstellungsleistung', darst, 1, false);
+    darstParts.forEach(r => row(r.label, r.points, 2, false));
+    const dev = addDeviation(main) + addDeviation(aufgParts) + addDeviation(darstParts);
+    const values = {total, vorb, aufg, inh, darst};
+    darstParts.forEach(r => values[r.key] = r.points);
+    return {year, course, special:isSpecialSchemaDe(year, course), schema:schemaNameDe(year, course), rows, values, aggregateDeviation:dev};
+  }
+
+  function componentValueDe(dist, spec){
+    if (spec === 'vorb') return dist.values.vorb;
+    if (spec === 'aufg') return dist.values.aufg;
+    return dist.values.total;
+  }
+
+  function specWeightDe(year, course, spec){
+    const w = deutschWeights(year, normalizeCourseDe(year, course));
+    if (spec === 'vorb') return w.vorb;
+    if (spec === 'aufg') return w.aufg;
+    return 100;
+  }
+
+  function getMaxAllowedDe(year, course, spec){
+    if (spec === 'total') return 150;
+    course = normalizeCourseDe(year, course);
+    if (!isValidCourseDe(year, course)) return 0;
+    let max = 0;
     for (let total = 0; total <= 150; total++) {
-      const dist = calculateDistribution(year, course, total);
-      const actual = componentValue(dist, spec);
-      candidates.push({
-        total, actual, dist,
-        exact: actual === inputPoints,
-        pointDiff: Math.abs(actual - inputPoints),
-        idealDiff: Math.abs(total - idealTotal),
-        dev: dist.aggregateDeviation
-      });
+      const dist = calculateDistributionDe(year, course, total);
+      max = Math.max(max, componentValueDe(dist, spec));
     }
-    const exacts = candidates.filter(c => c.exact);
-    const pool = exacts.length ? exacts : candidates;
-    pool.sort((a,b) => {
-      if (!exacts.length && a.pointDiff !== b.pointDiff) return a.pointDiff - b.pointDiff;
-      if (a.idealDiff !== b.idealDiff) return a.idealDiff - b.idealDiff;
-      if (Math.abs(a.dev - b.dev) > 1e-9) return a.dev - b.dev;
-      return a.total - b.total;
-    });
-    const best = pool[0];
-    return {valid:true, exact:best.exact, total:best.total, actual:best.actual, maxAllowed, dist:best.dist, pointDiff:best.pointDiff};
+    return max;
   }
 
-  function roundHalfDownPercent(total, pct){
-    const num = Number(total) * pct;
-    const q = Math.floor(num / 100);
-    const r = num % 100;
-    return r > 50 ? q + 1 : q;
+  function solveTotalDe(year, course, spec, inputPoints){
+    return genericSolver(
+      year, normalizeCourseDe(year, course), spec, inputPoints,
+      calculateDistributionDe, componentValueDe, specWeightDe, getMaxAllowedDe,
+      isValidCourseDe
+    );
   }
 
-  function gradeRows(total){
-    total = Number(total);
-    if (total === 0) return GRADE_LIMITS.map(g => ({note:g.note, min:0, range:'–'}));
-    const mins = GRADE_LIMITS.map(g => roundHalfDownPercent(total, g.pct));
-    const ranges = [];
-    for (let i = 0; i < GRADE_LIMITS.length; i++) {
-      let lo, hi;
-      if (i === 0) { lo = mins[i]; hi = total; }
-      else { lo = mins[i]; hi = mins[i-1] - 1; }
-      let range;
-      if (lo > hi) range = 'kein eigener Punktbereich';
-      else if (lo === hi) range = String(lo);
-      else range = lo + '–' + hi;
-      ranges.push({note:GRADE_LIMITS[i].note, min:mins[i], lo, hi, range});
-    }
-    return ranges;
-  }
+  // ── UI ────────────────────────────────────────────────────────────────────
 
-  function assessmentText(total){
-    total = Number(total);
-    if (total === 0) return '0 Punkte sind rechnerisch möglich, aber für eine Klassenarbeit nicht sinnvoll.';
-    if (total < 7) return 'Unter 7 Punkten können nicht alle Notenstufen abgebildet werden.';
-    if (total <= 29) return 'Formal abbildbar, aber geringe Aussagekraft.';
-    if (total <= 35) return 'Erste sinnvolle Aussagekraft; empfohlen ab 36 Punkten.';
-    if (total <= 49) return 'Empfehlenswerter Bereich.';
-    if (total <= 59) return 'Gut geeignet für differenzierte Bewertung.';
-    return 'Besonders geeignet für feine Unterkategorien.';
-  }
-
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
-  }
+  function currentSubject(){ return els.subjectSelect.value; }
 
   function updateCourseOptions(){
     const year = Number(els.yearSelect.value);
+    const subject = currentSubject();
+    const noCourseFn = subject === 'deutsch' ? isYearWithoutCourseDe : isYearWithoutCourseEn;
     const current = els.courseSelect.value;
     els.courseSelect.innerHTML = '';
-    if (isYearWithoutCourse(year)) {
+    if (noCourseFn(year)) {
       const opt = document.createElement('option');
       opt.value = 'NONE';
       opt.textContent = 'Keine Kursart erforderlich';
       els.courseSelect.appendChild(opt);
-      els.courseSelect.value = 'NONE';
       els.courseSelect.disabled = true;
-      els.courseHint.textContent = 'GK und EK gibt es erst ab Jahrgang 7.';
+      els.courseHint.textContent = 'GK und EK gibt es erst ab ' + (subject === 'deutsch' ? 'Jahrgang 9' : 'Jahrgang 7') + '.';
     } else {
       ['GK','EK'].forEach(v => {
         const opt = document.createElement('option');
-        opt.value = v;
-        opt.textContent = v;
+        opt.value = v; opt.textContent = v;
         els.courseSelect.appendChild(opt);
       });
       els.courseSelect.disabled = false;
@@ -640,10 +679,29 @@
     }
   }
 
-  function setStatus(kind, text, extra){
-    els.statusOut.className = 'statusbar ' + kind;
-    els.statusOut.textContent = text;
-    els.extraOut.textContent = extra || '';
+  function updateSpecOptions(){
+    const subject = currentSubject();
+    const current = els.specSelect.value;
+    const opts = subject === 'deutsch'
+      ? [
+          {value:'total', label:'Gesamtpunktzahl'},
+          {value:'vorb',  label:'1. Vorbereitende Aufgaben'},
+          {value:'aufg',  label:'2. Aufgabentyp nach KLP'}
+        ]
+      : [
+          {value:'total', label:'Gesamtpunktzahl'},
+          {value:'k1',    label:'Kompetenz 1: Listening / Reading / Mediation'},
+          {value:'k2',    label:'Kompetenz 2: Verfügen über sprachliche Mittel'},
+          {value:'k3',    label:'Kompetenz 3: Schreiben'}
+        ];
+    els.specSelect.innerHTML = '';
+    opts.forEach(o => {
+      const opt = document.createElement('option');
+      opt.value = o.value; opt.textContent = o.label;
+      els.specSelect.appendChild(opt);
+    });
+    const validValues = opts.map(o => o.value);
+    els.specSelect.value = validValues.includes(current) ? current : 'total';
   }
 
   function renderDistribution(dist){
@@ -659,41 +717,34 @@
 
   function calculate(){
     updateCourseOptions();
+    const subject = currentSubject();
     const year = Number(els.yearSelect.value);
-    const course = normalizeCourse(year, els.courseSelect.value);
+    const rawCourse = els.courseSelect.value;
     const spec = els.specSelect.value;
     const raw = els.pointsInput.value;
     const points = Number(raw);
-    const maxAllowed = getMaxAllowed(year, course, spec);
+
+    const normFn   = subject === 'deutsch' ? normalizeCourseDe  : normalizeCourseEn;
+    const maxFn    = subject === 'deutsch' ? getMaxAllowedDe     : getMaxAllowedEn;
+    const solveFn  = subject === 'deutsch' ? solveTotalDe        : solveTotalEn;
+    const schemaFn = subject === 'deutsch' ? schemaNameDe        : schemaNameEn;
+
+    const course = normFn(year, rawCourse);
+    const maxAllowed = maxFn(year, course, spec);
     els.allowedHint.textContent = 'Zulässig: ganze Zahl von 0 bis ' + maxAllowed;
-    els.allowedOut.textContent = '0–' + maxAllowed;
-    els.schemaLabel.textContent = schemaName(year, course);
+    els.schemaLabel.textContent = schemaFn(year, course);
+
     if (raw === '' || !Number.isInteger(points) || points < 0) {
-      els.totalOut.textContent = '–';
-      els.assessmentOut.textContent = '–';
       renderDistribution({rows:[]}); renderGrades(0);
-      setStatus('error', 'Bitte geben Sie eine ganze Punktzahl ein.');
       return;
     }
-    const solved = solveTotal(year, course, spec, points);
+    const solved = solveFn(year, rawCourse, spec, points);
     if (!solved.valid) {
-      els.totalOut.textContent = '–';
-      els.assessmentOut.textContent = '–';
       renderDistribution({rows:[]}); renderGrades(0);
-      if (solved.reason === 'tooHigh') setStatus('error', 'Die Punktzahl ist zu hoch. Für diese Auswahl sind maximal ' + solved.maxAllowed + ' Punkte möglich.', 'Grund: Die Gesamtpunktzahl ist auf 150 begrenzt.');
-      else if (solved.reason === 'course') setStatus('error', 'Bitte wählen Sie eine Kursart aus.');
-      else setStatus('error', 'Bitte geben Sie eine gültige Punktzahl ein.');
       return;
     }
-    els.totalOut.textContent = solved.total;
-    els.assessmentOut.textContent = assessmentText(solved.total);
     renderDistribution(solved.dist);
     renderGrades(solved.total);
-    const extraParts = [];
-    if (solved.total === 0) setStatus('warn', '0 Punkte sind rechnerisch möglich, aber für eine Klassenarbeit nicht sinnvoll.', extraParts.join(' '));
-    else if (solved.total < 7) setStatus('warn', 'Unter 7 Punkten können nicht alle Notenstufen abgebildet werden.', extraParts.join(' '));
-    else if (solved.exact) setStatus('ok', 'Die Eingabe ist gültig. Die Vorgaben werden exakt eingehalten.', extraParts.join(' '));
-    else setStatus('warn', 'Die Eingabe ist gültig, aber nicht exakt umsetzbar. Angezeigt wird die beste passende Gesamtpunktzahl.', extraParts.concat(['Abweichung: ' + solved.pointDiff + ' Punkt(e).']).join(' '));
   }
 
   function handleLogin(){
@@ -707,8 +758,10 @@
   }
 
   function init(){
-    ['yearSelect','courseSelect','specSelect','pointsInput','allowedHint','allowedOut','totalOut','assessmentOut','statusOut','extraOut','distributionBody','gradesBody','schemaLabel','courseHint'].forEach(id => els[id] = $(id));
+    ['subjectSelect','yearSelect','courseSelect','specSelect','pointsInput','allowedHint','distributionBody','gradesBody','schemaLabel','courseHint'].forEach(id => els[id] = $(id));
+    updateSpecOptions();
     updateCourseOptions();
+    els.subjectSelect.addEventListener('change', () => { updateSpecOptions(); calculate(); });
     ['yearSelect','courseSelect','specSelect','pointsInput'].forEach(id => els[id].addEventListener('change', calculate));
     els.pointsInput.addEventListener('input', calculate);
     $('calcBtn').addEventListener('click', calculate);
@@ -716,7 +769,11 @@
     calculate();
   }
 
-  window.__plannerTest = {largestRemainder, calculateDistribution, solveTotal, gradeRows, getMaxAllowed, normalizeCourse, isSpecialSchema, mainWeights};
+  window.__plannerTest = {
+    largestRemainder, gradeRows,
+    en: {calculateDistribution:calculateDistributionEn, solveTotal:solveTotalEn, getMaxAllowed:getMaxAllowedEn, normalizeCourse:normalizeCourseEn, isSpecialSchema:isSpecialSchemaEn, mainWeights:mainWeightsEn},
+    de: {calculateDistribution:calculateDistributionDe, solveTotal:solveTotalDe, getMaxAllowed:getMaxAllowedDe, normalizeCourse:normalizeCourseDe, isSpecialSchema:isSpecialSchemaDe, deutschWeights}
+  };
   document.addEventListener('DOMContentLoaded', () => {
     $('loginBtn').addEventListener('click', handleLogin);
     $('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
