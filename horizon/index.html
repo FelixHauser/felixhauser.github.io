@@ -95,10 +95,19 @@
     .body { padding: 16px 18px 18px; }
     .meta-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 2fr;
+      grid-template-columns: 1fr;
       gap: 12px;
       margin-bottom: 14px;
     }
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .field-row:last-child { margin-bottom: 0; }
+    .field-row .field { margin-bottom: 0; }
+    .field-row--narrow-second { grid-template-columns: 2fr 1fr; }
     .subcard {
       border: 1px solid var(--line);
       border-radius: 14px;
@@ -131,6 +140,11 @@
       background: white;
       color: var(--ink);
     }
+    #className { text-transform: uppercase; }
+    #className::placeholder { text-transform: none; }
+    #className.invalid { border-color: var(--error); }
+    #subjectSelect:invalid { color: var(--muted); }
+    .hint.error { color: var(--error); }
     input:focus, select:focus, button:focus {
       outline: 3px solid rgba(31,95,139,.22);
       outline-offset: 2px;
@@ -179,7 +193,7 @@
       main { width: min(100vw - 20px, 720px); padding-top: 18px; }
       header { grid-template-columns: 1fr; align-items: start; }
       .actions { justify-content: flex-start; }
-      .meta-grid, .two-col { grid-template-columns: 1fr; }
+      .meta-grid, .two-col, .field-row { grid-template-columns: 1fr; }
       .card-header { align-items: flex-start; flex-direction: column; }
     }
     @media print {
@@ -193,7 +207,8 @@
       .card { box-shadow: none; border-color: #b8c2cc; margin-bottom: 8px; break-inside: avoid; }
       .card-header { padding: 8px 10px; background: #f8f8f8; }
       .body { padding: 10px; }
-      .meta-grid { grid-template-columns: 1fr 1fr 2fr; gap: 8px; margin-bottom: 8px; }
+      .meta-grid { gap: 8px; margin-bottom: 8px; }
+      .field-row { gap: 8px; margin-bottom: 8px; }
       .two-col { grid-template-columns: 1.22fr .78fr; gap: 8px; }
       .subcard { border-color: #d0d0d0; padding: 8px; }
       input, select { min-height: 28px; padding: 4px 6px; border-color: #bbb; background: #fff; font-size: 11px; }
@@ -259,13 +274,16 @@
     </div>
     <div class="body">
       <div class="meta-grid">
-        <div class="field">
-          <label for="className">Klasse</label>
-          <input id="className" type="text" placeholder="z. B. 7a">
-        </div>
-        <div class="field">
-          <label for="dateText">Datum</label>
-          <input id="dateText" type="text" placeholder="TT.MM.JJJJ">
+        <div class="field-row">
+          <div class="field">
+            <label for="className">Klasse</label>
+            <input id="className" type="text" placeholder="z. B. 7a" value="7a" maxlength="3">
+            <div id="classNameHint" class="hint">Jahrgang 5–10, optional Lerngruppen A–F</div>
+          </div>
+          <div class="field">
+            <label for="dateText">Datum</label>
+            <input id="dateText" type="text" placeholder="TT.MM.JJJJ">
+          </div>
         </div>
         <div class="field">
           <label for="topicText">Thema</label>
@@ -275,40 +293,33 @@
 
       <div class="subcard">
         <p class="subheading">Eingaben</p>
-        <div class="field">
-          <label for="subjectSelect">Fach</label>
-          <select id="subjectSelect">
-            <option value="englisch" selected>Englisch</option>
-            <option value="deutsch">Deutsch</option>
-          </select>
+        <div class="field-row field-row--narrow-second">
+          <div class="field">
+            <label for="subjectSelect">Fach</label>
+            <select id="subjectSelect" required autocomplete="off">
+              <option value="" selected disabled>Fach wählen</option>
+              <option value="englisch">Englisch</option>
+              <option value="deutsch">Deutsch</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="courseSelect">Kursart</label>
+            <select id="courseSelect">
+              <option value="GK" selected>GK</option>
+              <option value="EK">EK</option>
+            </select>
+          </div>
         </div>
-        <div class="field">
-          <label for="yearSelect">Jahrgang</label>
-          <select id="yearSelect">
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7" selected>7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="courseSelect">Kursart</label>
-          <select id="courseSelect">
-            <option value="GK" selected>GK</option>
-            <option value="EK">EK</option>
-          </select>
-          <div id="courseHint" class="hint">GK und EK gibt es erst ab Jahrgang 7.</div>
-        </div>
-        <div class="field">
-          <label for="specSelect">Was möchten Sie vorgeben?</label>
-          <select id="specSelect"></select>
-        </div>
-        <div class="field">
-          <label for="pointsInput">Punktzahl</label>
-          <input id="pointsInput" type="number" inputmode="numeric" min="0" step="1" value="50">
-          <div id="allowedHint" class="hint">Zulässig: ganze Zahl von 0 bis 150</div>
+        <div class="field-row field-row--narrow-second">
+          <div class="field">
+            <label for="specSelect">Was möchten Sie vorgeben?</label>
+            <select id="specSelect"></select>
+          </div>
+          <div class="field">
+            <label for="pointsInput">Punktzahl</label>
+            <input id="pointsInput" type="number" inputmode="numeric" min="0" step="1" value="50">
+            <div id="allowedHint" class="hint"></div>
+          </div>
         </div>
       </div>
       <div class="viewer-note no-print">Hinweis: Diese Datei rechnet direkt im Browser. Auf dem iPad bitte in Safari öffnen. Zum Sichern als PDF: „Drucken / PDF sichern" verwenden.</div>
@@ -317,9 +328,9 @@
 
   <div class="two-col">
     <section class="card">
-      <div class="card-header"><h2>Punkteverteilung kompakt</h2></div>
+      <div class="card-header"><h2>Punkteverteilung</h2></div>
       <div class="body table-wrap">
-        <table aria-label="Punkteverteilung kompakt">
+        <table aria-label="Punkteverteilung">
           <thead><tr><th>Bereich</th><th class="num">Punkte</th></tr></thead>
           <tbody id="distributionBody"></tbody>
         </table>
@@ -327,9 +338,9 @@
     </section>
 
     <section class="card">
-      <div class="card-header"><h2>Notengrenzen kompakt</h2></div>
+      <div class="card-header"><h2>Notengrenzen</h2></div>
       <div class="body table-wrap">
-        <table aria-label="Notengrenzen kompakt">
+        <table aria-label="Notengrenzen">
           <thead><tr><th>Note</th><th class="num">Punktbereich</th></tr></thead>
           <tbody id="gradesBody"></tbody>
         </table>
@@ -653,8 +664,43 @@
 
   function currentSubject(){ return els.subjectSelect.value; }
 
+  // Keeps className to a valid Jahrgang (5–10) optionally followed by one letter A–F;
+  // a letter is only accepted once a valid Jahrgang has been typed.
+  function sanitizeClassName(raw){
+    let digits = '';
+    let letter = '';
+    for (const ch of raw) {
+      if (letter) break;
+      if (/[0-9]/.test(ch)) {
+        if (digits === '1' && ch === '0') digits = '10';
+        else if (digits === '' && '56789'.includes(ch)) digits = ch;
+        else if (digits === '' && ch === '1') digits = '1';
+      } else if (/[a-fA-F]/.test(ch) && ['5','6','7','8','9','10'].includes(digits)) {
+        letter = ch;
+      }
+    }
+    return digits + letter;
+  }
+
+  // Returns the Jahrgang as a number, or null while the digits typed so far
+  // (e.g. a lone "1") don't yet form a valid 5–10 Jahrgang.
+  function currentYear(){
+    const m = els.className.value.match(/^\d+/);
+    const digits = m ? m[0] : '';
+    return ['5','6','7','8','9','10'].includes(digits) ? Number(digits) : null;
+  }
+
+  function updateClassNameValidity(year){
+    const invalid = year === null;
+    els.className.classList.toggle('invalid', invalid);
+    els.classNameHint.classList.toggle('error', invalid);
+    els.classNameHint.textContent = invalid
+      ? 'Ungültiger Jahrgang – bitte auf 5–10 korrigieren (z. B. „10")'
+      : 'Jahrgang 5–10, optional Lerngruppen A–F';
+  }
+
   function updateCourseOptions(){
-    const year = Number(els.yearSelect.value);
+    const year = currentYear();
     const subject = currentSubject();
     const noCourseFn = subject === 'deutsch' ? isYearWithoutCourseDe : isYearWithoutCourseEn;
     const current = els.courseSelect.value;
@@ -665,7 +711,6 @@
       opt.textContent = 'Keine Kursart erforderlich';
       els.courseSelect.appendChild(opt);
       els.courseSelect.disabled = true;
-      els.courseHint.textContent = 'GK und EK gibt es erst ab ' + (subject === 'deutsch' ? 'Jahrgang 9' : 'Jahrgang 7') + '.';
     } else {
       ['GK','EK'].forEach(v => {
         const opt = document.createElement('option');
@@ -674,7 +719,6 @@
       });
       els.courseSelect.disabled = false;
       els.courseSelect.value = (current === 'EK') ? 'EK' : 'GK';
-      els.courseHint.textContent = 'Wählen Sie GK oder EK.';
     }
   }
 
@@ -714,24 +758,40 @@
     els.gradesBody.innerHTML = gradeRows(total).map(r => '<tr><td>' + escapeHtml(r.note) + '</td><td class="num">' + escapeHtml(r.range) + '</td></tr>').join('');
   }
 
+  function setPointsMessage(msg){
+    els.allowedHint.textContent = msg;
+    els.allowedHint.classList.toggle('error', !!msg);
+  }
+
   function calculate(){
-    updateCourseOptions();
+    const year = currentYear();
+    updateClassNameValidity(year);
+    if (year === null) {
+      els.schemaLabel.textContent = '–';
+      setPointsMessage('Bitte gültigen Jahrgang eingeben, um fortzufahren.');
+      renderDistribution({rows:[]}); renderGrades(0);
+      return;
+    }
     const subject = currentSubject();
-    const year = Number(els.yearSelect.value);
+    if (!subject) {
+      els.schemaLabel.textContent = '–';
+      setPointsMessage('Bitte Fach wählen, um fortzufahren.');
+      renderDistribution({rows:[]}); renderGrades(0);
+      return;
+    }
+    updateCourseOptions();
     const rawCourse = els.courseSelect.value;
     const spec = els.specSelect.value;
     const raw = els.pointsInput.value;
     const points = Number(raw);
 
     const normFn   = subject === 'deutsch' ? normalizeCourseDe  : normalizeCourseEn;
-    const maxFn    = subject === 'deutsch' ? getMaxAllowedDe     : getMaxAllowedEn;
     const solveFn  = subject === 'deutsch' ? solveTotalDe        : solveTotalEn;
     const schemaFn = subject === 'deutsch' ? schemaNameDe        : schemaNameEn;
 
     const course = normFn(year, rawCourse);
-    const maxAllowed = maxFn(year, course, spec);
-    els.allowedHint.textContent = 'Zulässig: ganze Zahl von 0 bis ' + maxAllowed;
     els.schemaLabel.textContent = schemaFn(year, course);
+    setPointsMessage(points > 150 ? 'Maximal 150 Punkte zulässig.' : '');
 
     if (raw === '' || !Number.isInteger(points) || points < 0) {
       renderDistribution({rows:[]}); renderGrades(0);
@@ -757,11 +817,15 @@
   }
 
   function init(){
-    ['subjectSelect','yearSelect','courseSelect','specSelect','pointsInput','allowedHint','distributionBody','gradesBody','schemaLabel','courseHint'].forEach(id => els[id] = $(id));
+    ['className','classNameHint','subjectSelect','courseSelect','specSelect','pointsInput','allowedHint','distributionBody','gradesBody','schemaLabel'].forEach(id => els[id] = $(id));
+    els.subjectSelect.value = ''; // browsers may restore a previous selection on reload; force the placeholder
     updateSpecOptions();
-    updateCourseOptions();
     els.subjectSelect.addEventListener('change', () => { updateSpecOptions(); calculate(); });
-    ['yearSelect','courseSelect','specSelect','pointsInput'].forEach(id => els[id].addEventListener('change', calculate));
+    ['courseSelect','specSelect','pointsInput'].forEach(id => els[id].addEventListener('change', calculate));
+    els.className.addEventListener('input', () => {
+      els.className.value = sanitizeClassName(els.className.value);
+      calculate();
+    });
     els.pointsInput.addEventListener('input', calculate);
     $('calcBtn').addEventListener('click', calculate);
     $('printBtn').addEventListener('click', () => { calculate(); window.print(); });
