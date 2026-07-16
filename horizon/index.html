@@ -335,6 +335,9 @@
 (function(){
   'use strict';
 
+  // Set to true to re-enable the login screen (kept in place, just inactive for now).
+  const LOGIN_ENABLED = false;
+
   const GRADE_LIMITS = [
     {note:'sehr gut', pct:87},
     {note:'gut', pct:73},
@@ -676,7 +679,7 @@
   }
 
   function updateClassNameValidity(year){
-    const invalid = year === null;
+    const invalid = year === null && els.className.value !== '';
     els.className.classList.toggle('invalid', invalid);
     els.classNameHint.classList.toggle('error', invalid);
     els.classNameHint.textContent = invalid
@@ -753,7 +756,7 @@
     updateClassNameValidity(year);
     if (year === null) {
       els.schemaLabel.textContent = '–';
-      setPointsMessage('Bitte gültigen Jahrgang eingeben, um fortzufahren.');
+      setPointsMessage(els.className.value === '' ? '' : 'Bitte gültigen Jahrgang eingeben, um fortzufahren.');
       renderDistribution({rows:[]}); renderGrades(0);
       return;
     }
@@ -822,6 +825,12 @@
     de: {calculateDistribution:calculateDistributionDe, solveTotal:solveTotalDe, getMaxAllowed:getMaxAllowedDe, normalizeCourse:normalizeCourseDe, isSpecialSchema:isSpecialSchemaDe, deutschWeights}
   };
   document.addEventListener('DOMContentLoaded', () => {
+    if (!LOGIN_ENABLED) {
+      $('loginOverlay').style.display = 'none';
+      document.querySelector('main').style.display = 'block';
+      init();
+      return;
+    }
     $('loginBtn').addEventListener('click', handleLogin);
     $('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
     $('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginPass').focus(); });
