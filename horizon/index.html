@@ -109,6 +109,7 @@
     .field-row .field { margin-bottom: 0; }
     .field-row--narrow-second { grid-template-columns: 2fr 1fr; }
     .field-row--3col { grid-template-columns: 1fr 1fr 1fr; }
+    .field-row--work { grid-template-columns: .25fr 1.75fr 1fr; }
     .field { margin-bottom: 12px; }
     .field:last-child { margin-bottom: 0; }
     label {
@@ -132,6 +133,7 @@
     #className::placeholder { text-transform: none; }
     #className.invalid { border-color: var(--error); }
     #subjectSelect:invalid { color: var(--muted); }
+    #courseSelect:invalid { color: var(--muted); }
     .hint.error { color: var(--error); }
     input:focus, select:focus, button:focus {
       outline: 3px solid rgba(31,95,139,.22);
@@ -167,15 +169,6 @@
     .indent-3 { padding-left: 60px; color: #6b7f92; }
     .muted { color: var(--muted); }
     .two-col { display: grid; grid-template-columns: 1.25fr .85fr; gap: 16px; align-items: start; }
-    .viewer-note {
-      margin-top: 14px;
-      padding: 10px 12px;
-      border: 1px solid #d7e7f4;
-      background: #f4f9fd;
-      color: #31516a;
-      border-radius: 12px;
-      font-size: 13px;
-    }
     .print-only { display: none; }
     @media (max-width: 860px) {
       main { width: min(100vw - 20px, 720px); padding-top: 18px; }
@@ -190,7 +183,7 @@
       main { width: 100%; padding: 0; }
       header { margin-bottom: 8px; }
       h1 { font-size: 24px; margin-bottom: 2px; }
-      .lead, .actions, .viewer-note, .no-print, button { display: none !important; }
+      .lead, .actions, .no-print, button { display: none !important; }
       .print-only { display: block; }
       .card { box-shadow: none; border-color: #b8c2cc; margin-bottom: 8px; break-inside: avoid; }
       .card-header { padding: 8px 10px; background: #f8f8f8; }
@@ -276,15 +269,15 @@
           </div>
           <div class="field">
             <label for="courseSelect">Kursart</label>
-            <select id="courseSelect">
+            <select id="courseSelect" required>
               <option value="GK" selected>GK</option>
               <option value="EK">EK</option>
             </select>
           </div>
         </div>
-        <div class="field-row field-row--3col">
+        <div class="field-row field-row--work">
           <div class="field">
-            <label for="workNumberSelect">Arbeitnummer</label>
+            <label for="workNumberSelect">Nr.</label>
             <select id="workNumberSelect">
               <option value="1" selected>1</option>
               <option value="2">2</option>
@@ -316,7 +309,6 @@
           <div id="allowedHint" class="hint"></div>
         </div>
       </div>
-      <div class="viewer-note no-print">Hinweis: Diese Datei rechnet direkt im Browser. Auf dem iPad bitte in Safari öffnen. Zum Sichern als PDF: „Drucken / PDF sichern" verwenden.</div>
     </div>
   </section>
 
@@ -712,13 +704,17 @@
       els.courseSelect.appendChild(opt);
       els.courseSelect.disabled = true;
     } else {
+      const placeholder = document.createElement('option');
+      placeholder.value = ''; placeholder.disabled = true;
+      placeholder.textContent = 'Kursart wählen';
+      els.courseSelect.appendChild(placeholder);
       ['GK','EK'].forEach(v => {
         const opt = document.createElement('option');
         opt.value = v; opt.textContent = v;
         els.courseSelect.appendChild(opt);
       });
       els.courseSelect.disabled = false;
-      els.courseSelect.value = (current === 'EK') ? 'EK' : 'GK';
+      els.courseSelect.value = (current === 'GK' || current === 'EK') ? current : '';
     }
   }
 
@@ -764,6 +760,11 @@
   }
 
   function calculate(){
+    const subject = currentSubject();
+    els.courseSelect.disabled = !subject;
+    if (!subject) {
+      els.courseSelect.innerHTML = '<option value="" selected disabled>–</option>';
+    }
     const year = currentYear();
     updateClassNameValidity(year);
     if (year === null) {
@@ -772,7 +773,6 @@
       renderDistribution({rows:[]}); renderGrades(0);
       return;
     }
-    const subject = currentSubject();
     if (!subject) {
       els.schemaLabel.textContent = '–';
       setPointsMessage('Bitte Fach wählen, um fortzufahren.');
@@ -781,6 +781,12 @@
     }
     updateCourseOptions();
     const rawCourse = els.courseSelect.value;
+    if (rawCourse === '') {
+      els.schemaLabel.textContent = '–';
+      setPointsMessage('Bitte Kursart wählen, um fortzufahren.');
+      renderDistribution({rows:[]}); renderGrades(0);
+      return;
+    }
     const spec = els.specSelect.value;
     const raw = els.pointsInput.value;
     const points = Number(raw);
