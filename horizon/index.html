@@ -108,6 +108,7 @@
     .field-row:last-child { margin-bottom: 0; }
     .field-row .field { margin-bottom: 0; }
     .field-row--narrow-second { grid-template-columns: 2fr 1fr; }
+    .field-row--3col { grid-template-columns: 1fr 1fr 1fr; }
     .field { margin-bottom: 12px; }
     .field:last-child { margin-bottom: 0; }
     label {
@@ -259,40 +260,51 @@
     </div>
     <div class="body">
       <div class="meta-grid">
-        <div class="field-row">
+        <div class="field-row field-row--3col">
           <div class="field">
             <label for="className">Klasse</label>
             <input id="className" type="text" placeholder="z. B. 7a" value="7a" maxlength="3">
             <div id="classNameHint" class="hint">Jahrgang 5–10, optional Lerngruppen A–F</div>
           </div>
           <div class="field">
-            <label for="dateText">Datum</label>
-            <input id="dateText" type="text" placeholder="TT.MM.JJJJ">
+            <label for="subjectSelect">Fach</label>
+            <select id="subjectSelect" required autocomplete="off">
+              <option value="" selected disabled>Fach wählen</option>
+              <option value="englisch">Englisch</option>
+              <option value="deutsch">Deutsch</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="courseSelect">Kursart</label>
+            <select id="courseSelect">
+              <option value="GK" selected>GK</option>
+              <option value="EK">EK</option>
+            </select>
           </div>
         </div>
-        <div class="field">
-          <label for="topicText">Thema</label>
-          <input id="topicText" type="text" placeholder="Thema der Klassenarbeit">
+        <div class="field-row field-row--3col">
+          <div class="field">
+            <label for="workNumberSelect">Arbeitnummer</label>
+            <select id="workNumberSelect">
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="topicText">Thema</label>
+            <input id="topicText" type="text" placeholder="Thema der Klassenarbeit">
+          </div>
+          <div class="field">
+            <label for="dateText">Datum</label>
+            <input id="dateText" type="date" lang="de-DE">
+          </div>
         </div>
       </div>
 
-      <div class="field-row field-row--narrow-second">
-        <div class="field">
-          <label for="subjectSelect">Fach</label>
-          <select id="subjectSelect" required autocomplete="off">
-            <option value="" selected disabled>Fach wählen</option>
-            <option value="englisch">Englisch</option>
-            <option value="deutsch">Deutsch</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="courseSelect">Kursart</label>
-          <select id="courseSelect">
-            <option value="GK" selected>GK</option>
-            <option value="EK">EK</option>
-          </select>
-        </div>
-      </div>
       <div class="field-row field-row--narrow-second">
         <div class="field">
           <label for="specSelect">Was möchten Sie vorgeben?</label>
