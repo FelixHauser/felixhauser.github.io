@@ -108,12 +108,6 @@
     .field-row:last-child { margin-bottom: 0; }
     .field-row .field { margin-bottom: 0; }
     .field-row--narrow-second { grid-template-columns: 2fr 1fr; }
-    .subcard {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 14px;
-      background: #fff;
-    }
     .field { margin-bottom: 12px; }
     .field:last-child { margin-bottom: 0; }
     label {
@@ -203,7 +197,6 @@
       .meta-grid { gap: 8px; margin-bottom: 8px; }
       .field-row { gap: 8px; margin-bottom: 8px; }
       .two-col { grid-template-columns: 1.22fr .78fr; gap: 8px; }
-      .subcard { border-color: #d0d0d0; padding: 8px; }
       input, select { min-height: 28px; padding: 4px 6px; border-color: #bbb; background: #fff; font-size: 11px; }
       .hint { font-size: 10px; }
       h2 { font-size: 14px; }
@@ -255,7 +248,6 @@
       <h1>Klassenarbeit planen</h1>
     </div>
     <div class="actions no-print">
-      <button type="button" id="calcBtn">Berechnen</button>
       <button type="button" class="secondary" id="printBtn">Drucken / PDF sichern</button>
     </div>
   </header>
@@ -284,34 +276,32 @@
         </div>
       </div>
 
-      <div class="subcard">
-        <div class="field-row field-row--narrow-second">
-          <div class="field">
-            <label for="subjectSelect">Fach</label>
-            <select id="subjectSelect" required autocomplete="off">
-              <option value="" selected disabled>Fach wählen</option>
-              <option value="englisch">Englisch</option>
-              <option value="deutsch">Deutsch</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="courseSelect">Kursart</label>
-            <select id="courseSelect">
-              <option value="GK" selected>GK</option>
-              <option value="EK">EK</option>
-            </select>
-          </div>
+      <div class="field-row field-row--narrow-second">
+        <div class="field">
+          <label for="subjectSelect">Fach</label>
+          <select id="subjectSelect" required autocomplete="off">
+            <option value="" selected disabled>Fach wählen</option>
+            <option value="englisch">Englisch</option>
+            <option value="deutsch">Deutsch</option>
+          </select>
         </div>
-        <div class="field-row field-row--narrow-second">
-          <div class="field">
-            <label for="specSelect">Was möchten Sie vorgeben?</label>
-            <select id="specSelect"></select>
-          </div>
-          <div class="field">
-            <label for="pointsInput">Punktzahl</label>
-            <input id="pointsInput" type="number" inputmode="numeric" min="0" step="1" value="50">
-            <div id="allowedHint" class="hint"></div>
-          </div>
+        <div class="field">
+          <label for="courseSelect">Kursart</label>
+          <select id="courseSelect">
+            <option value="GK" selected>GK</option>
+            <option value="EK">EK</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row field-row--narrow-second">
+        <div class="field">
+          <label for="specSelect">Was möchten Sie vorgeben?</label>
+          <select id="specSelect"></select>
+        </div>
+        <div class="field">
+          <label for="pointsInput">Punktzahl</label>
+          <input id="pointsInput" type="number" inputmode="numeric" min="0" step="1" value="50">
+          <div id="allowedHint" class="hint"></div>
         </div>
       </div>
       <div class="viewer-note no-print">Hinweis: Diese Datei rechnet direkt im Browser. Auf dem iPad bitte in Safari öffnen. Zum Sichern als PDF: „Drucken / PDF sichern" verwenden.</div>
@@ -359,6 +349,9 @@
 
   // ── shared ────────────────────────────────────────────────────────────────
 
+  // Ties (equal remainders) are broken by each part's `priority`
+  // (lower wins the extra point first), per the Priorisierung guidance;
+  // parts without an explicit priority fall back to their array position.
   function largestRemainder(total, parts){
     const rows = parts.map((p, idx) => {
       const num = total * p.weight;
@@ -367,7 +360,7 @@
       return Object.assign({}, p, {ideal: num / 100, points: floor, remainder: rem, order: idx});
     });
     let missing = total - rows.reduce((s,r) => s + r.points, 0);
-    rows.slice().sort((a,b) => (b.remainder - a.remainder) || (a.order - b.order)).forEach(r => {
+    rows.slice().sort((a,b) => (b.remainder - a.remainder) || ((a.priority ?? a.order) - (b.priority ?? b.order))).forEach(r => {
       if (missing > 0) { rows[r.order].points += 1; missing -= 1; }
     });
     return rows;
@@ -472,31 +465,31 @@
     const weights = mainWeightsEn(year, course);
     if (!weights) return null;
     const main = largestRemainder(total, [
-      {key:'k1', label:'Kompetenz 1: Listening / Reading / Mediation', weight:weights[0], level:0},
-      {key:'k2', label:'Kompetenz 2: Verfügen über sprachliche Mittel', weight:weights[1], level:0},
-      {key:'k3', label:'Kompetenz 3: Schreiben', weight:weights[2], level:0}
+      {key:'k1', label:'Kompetenz 1: Listening / Reading / Mediation', weight:weights[0], level:0, priority:1},
+      {key:'k2', label:'Kompetenz 2: Verfügen über sprachliche Mittel', weight:weights[1], level:0, priority:2},
+      {key:'k3', label:'Kompetenz 3: Schreiben', weight:weights[2], level:0, priority:0}
     ]);
     const k1 = main[0].points, k2 = main[1].points, k3 = main[2].points;
     const write = largestRemainder(k3, [
-      {key:'content', label:'Inhaltliche Leistung', weight:40, level:1},
-      {key:'presentation', label:'Darstellungsleistung', weight:60, level:1}
+      {key:'content', label:'Inhaltliche Leistung', weight:40, level:1, priority:0},
+      {key:'presentation', label:'Darstellungsleistung', weight:60, level:1, priority:1}
     ]);
     const content = write[0].points, presentation = write[1].points;
     const special = isSpecialSchemaEn(year, course);
     const presentationParts = special ? [
-      {key:'expression', label:'Ausdrucksvermögen', weight:35, level:2},
-      {key:'communication', label:'Kommunikative Textgestaltung', weight:35, level:2},
-      {key:'correctness', label:'Sprachliche Korrektheit', weight:30, level:2}
+      {key:'expression', label:'Ausdrucksvermögen', weight:35, level:2, priority:1},
+      {key:'communication', label:'Kommunikative Textgestaltung', weight:35, level:2, priority:2},
+      {key:'correctness', label:'Sprachliche Korrektheit', weight:30, level:2, priority:0}
     ] : [
-      {key:'exprcomm', label:'Ausdrucksvermögen und kommunikative Textgestaltung', weight:65, level:2},
-      {key:'correctness', label:'Sprachliche Korrektheit', weight:35, level:2}
+      {key:'exprcomm', label:'Ausdrucksvermögen und kommunikative Textgestaltung', weight:65, level:2, priority:1},
+      {key:'correctness', label:'Sprachliche Korrektheit', weight:35, level:2, priority:0}
     ];
     const pres = largestRemainder(presentation, presentationParts);
     const correctness = pres.find(r => r.key === 'correctness').points;
     const corr = largestRemainder(correctness, [
-      {key:'orthography', label:'Orthographie', weight:20, level:2},
-      {key:'grammar', label:'Grammatik', weight:40, level:2},
-      {key:'vocabulary', label:'Wortschatz', weight:40, level:2}
+      {key:'orthography', label:'Orthographie', weight:20, level:2, priority:2},
+      {key:'grammar', label:'Grammatik', weight:40, level:2, priority:0},
+      {key:'vocabulary', label:'Wortschatz', weight:40, level:2, priority:1}
     ]);
     const rows = [];
     function row(label, points, level, major){ rows.push({label, points, level, major: !!major}); }
@@ -572,22 +565,22 @@
       return {
         vorb:20, aufg:80, inh:70, darst:30,
         darst_subs:[
-          {key:'struktur',        label:'Struktur',                weight:16, level:2},
-          {key:'syntax',          label:'Syntax',                  weight:16, level:2},
-          {key:'ausdruck',        label:'Ausdruck',                weight:12, level:2},
-          {key:'spr_richtigkeit', label:'Sprachliche Richtigkeit', weight:44, level:2},
-          {key:'indiv',           label:'Individuelles Kriterium', weight:12, level:2}
+          {key:'struktur',        label:'Struktur',                weight:16, level:2, priority:1},
+          {key:'syntax',          label:'Syntax',                  weight:16, level:2, priority:0},
+          {key:'ausdruck',        label:'Ausdruck',                weight:12, level:2, priority:2},
+          {key:'spr_richtigkeit', label:'Sprachliche Richtigkeit', weight:44, level:2, priority:4},
+          {key:'indiv',           label:'Individuelles Kriterium', weight:12, level:2, priority:3}
         ]
       };
     }
     return {
       vorb:25, aufg:75, inh:80, darst:20,
       darst_subs:[
-        {key:'struktur',        label:'Struktur',                weight:16, level:2},
-        {key:'syntax',          label:'Syntax',                  weight:16, level:2},
-        {key:'ausdruck',        label:'Ausdruck',                weight:16, level:2},
-        {key:'spr_richtigkeit', label:'Sprachliche Richtigkeit', weight:44, level:2},
-        {key:'indiv',           label:'Individuelles Kriterium', weight: 8, level:2}
+        {key:'struktur',        label:'Struktur',                weight:16, level:2, priority:1},
+        {key:'syntax',          label:'Syntax',                  weight:16, level:2, priority:0},
+        {key:'ausdruck',        label:'Ausdruck',                weight:16, level:2, priority:2},
+        {key:'spr_richtigkeit', label:'Sprachliche Richtigkeit', weight:44, level:2, priority:4},
+        {key:'indiv',           label:'Individuelles Kriterium', weight: 8, level:2, priority:3}
       ]
     };
   }
@@ -596,13 +589,13 @@
     year = Number(year); total = Number(total); course = normalizeCourseDe(year, course);
     const w = deutschWeights(year, course);
     const main = largestRemainder(total, [
-      {key:'vorb', label:'1. Vorbereitende Aufgaben', weight:w.vorb, level:0},
-      {key:'aufg', label:'2. Aufgabentyp nach KLP',  weight:w.aufg, level:0}
+      {key:'vorb', label:'1. Vorbereitende Aufgaben', weight:w.vorb, level:0, priority:1},
+      {key:'aufg', label:'2. Aufgabentyp nach KLP',  weight:w.aufg, level:0, priority:0}
     ]);
     const vorb = main[0].points, aufg = main[1].points;
     const aufgParts = largestRemainder(aufg, [
-      {key:'inh',   label:'Inhaltliche Leistung', weight:w.inh,   level:1},
-      {key:'darst', label:'Darstellungsleistung', weight:w.darst, level:1}
+      {key:'inh',   label:'Inhaltliche Leistung', weight:w.inh,   level:1, priority:1},
+      {key:'darst', label:'Darstellungsleistung', weight:w.darst, level:1, priority:0}
     ]);
     const inh = aufgParts[0].points, darst = aufgParts[1].points;
     const darstParts = largestRemainder(darst, w.darst_subs);
@@ -819,7 +812,6 @@
       calculate();
     });
     els.pointsInput.addEventListener('input', calculate);
-    $('calcBtn').addEventListener('click', calculate);
     $('printBtn').addEventListener('click', () => { calculate(); window.print(); });
     calculate();
   }
