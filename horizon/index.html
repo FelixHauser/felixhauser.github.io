@@ -97,7 +97,7 @@
       display: grid;
       grid-template-columns: 1fr;
       gap: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .field-row {
       display: grid;
@@ -106,6 +106,7 @@
       margin-bottom: 12px;
     }
     .field-row:last-child { margin-bottom: 0; }
+    .meta-grid .field-row { margin-bottom: 0; }
     .field-row .field { margin-bottom: 0; }
     .field-row--narrow-second { grid-template-columns: 2fr 1fr; }
     .field-row--3col { grid-template-columns: 1fr 1fr 1fr; }
@@ -134,6 +135,8 @@
     #className.invalid { border-color: var(--error); }
     #subjectSelect:invalid { color: var(--muted); }
     #courseSelect:invalid { color: var(--muted); }
+    #workNumberSelect:invalid { color: var(--muted); }
+    #specSelect:invalid { color: var(--muted); }
     .hint.error { color: var(--error); }
     input:focus, select:focus, button:focus {
       outline: 3px solid rgba(31,95,139,.22);
@@ -147,17 +150,6 @@
       -webkit-text-fill-color: #34495e;
     }
     .hint { margin-top: 5px; font-size: 12px; color: var(--muted); }
-    .schema-pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: var(--primary-soft);
-      color: var(--primary-dark);
-      font-size: 12px;
-      font-weight: 800;
-      white-space: nowrap;
-    }
     .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
     th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
@@ -169,8 +161,19 @@
     .indent-3 { padding-left: 60px; color: #6b7f92; }
     .muted { color: var(--muted); }
     .two-col { display: grid; grid-template-columns: 1.25fr .85fr; gap: 16px; align-items: start; }
+    #resultsMessage {
+      margin-bottom: 16px;
+      padding: 14px 16px;
+      border: 1px solid #d7e7f4;
+      background: #f4f9fd;
+      color: #31516a;
+      border-radius: var(--radius);
+      font-size: 14px;
+    }
     .print-only { display: none; }
-    @media (max-width: 860px) {
+    .print-summary .field-row { margin-bottom: 8px; }
+    .print-label { font-weight: 800; }
+    @media screen and (max-width: 860px) {
       main { width: min(100vw - 20px, 720px); padding-top: 18px; }
       header { grid-template-columns: 1fr; align-items: start; }
       .actions { justify-content: flex-start; }
@@ -179,23 +182,11 @@
     }
     @media print {
       @page { size: A4 portrait; margin: 10mm; }
-      body { background: white; font-size: 11px; color: #111; }
-      main { width: 100%; padding: 0; }
-      header { margin-bottom: 8px; }
-      h1 { font-size: 24px; margin-bottom: 2px; }
-      .lead, .actions, .no-print, button { display: none !important; }
+      body { background: white; }
+      .actions, .no-print, button { display: none !important; }
       .print-only { display: block; }
-      .card { box-shadow: none; border-color: #b8c2cc; margin-bottom: 8px; break-inside: avoid; }
-      .card-header { padding: 8px 10px; background: #f8f8f8; }
-      .body { padding: 10px; }
-      .meta-grid { gap: 8px; margin-bottom: 8px; }
-      .field-row { gap: 8px; margin-bottom: 8px; }
-      .two-col { grid-template-columns: 1.22fr .78fr; gap: 8px; }
-      input, select { min-height: 28px; padding: 4px 6px; border-color: #bbb; background: #fff; font-size: 11px; }
-      .hint { font-size: 10px; }
-      h2 { font-size: 14px; }
-      table { font-size: 10.2px; }
-      th, td { padding: 4px 5px; }
+      .card { box-shadow: none; border: none; border-radius: 0; break-inside: avoid; }
+      .card-header { background: none; border-bottom: 1px solid #333; }
     }
     #loginOverlay {
       position: fixed; inset: 0;
@@ -249,20 +240,20 @@
   <section class="card">
     <div class="card-header">
       <h2>Klassenarbeit festlegen</h2>
-      <span id="schemaLabel" class="schema-pill">Standardschema</span>
     </div>
     <div class="body">
+      <div class="no-print">
       <div class="meta-grid">
         <div class="field-row field-row--3col">
           <div class="field">
             <label for="className">Klasse</label>
-            <input id="className" type="text" placeholder="z. B. 7a" value="7a" maxlength="3">
-            <div id="classNameHint" class="hint">Jahrgang 5–10, optional Lerngruppen A–F</div>
+            <input id="className" type="text" placeholder="z. B. 7a" maxlength="3">
+            <div id="classNameHint" class="hint"></div>
           </div>
           <div class="field">
             <label for="subjectSelect">Fach</label>
             <select id="subjectSelect" required autocomplete="off">
-              <option value="" selected disabled>Fach wählen</option>
+              <option value="" selected disabled>...</option>
               <option value="englisch">Englisch</option>
               <option value="deutsch">Deutsch</option>
             </select>
@@ -278,8 +269,9 @@
         <div class="field-row field-row--work">
           <div class="field">
             <label for="workNumberSelect">Nr.</label>
-            <select id="workNumberSelect">
-              <option value="1" selected>1</option>
+            <select id="workNumberSelect" required autocomplete="off">
+              <option value="" selected disabled>...</option>
+              <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
               <option value="4">4</option>
@@ -289,7 +281,7 @@
           </div>
           <div class="field">
             <label for="topicText">Thema</label>
-            <input id="topicText" type="text" placeholder="Thema der Klassenarbeit">
+            <input id="topicText" type="text" placeholder="...">
           </div>
           <div class="field">
             <label for="dateText">Datum</label>
@@ -301,18 +293,37 @@
       <div class="field-row field-row--narrow-second">
         <div class="field">
           <label for="specSelect">Was möchten Sie vorgeben?</label>
-          <select id="specSelect"></select>
+          <select id="specSelect" required autocomplete="off"></select>
         </div>
         <div class="field">
           <label for="pointsInput">Punktzahl</label>
-          <input id="pointsInput" type="number" inputmode="numeric" min="0" step="1" value="50">
+          <input id="pointsInput" type="number" inputmode="numeric" min="0" step="1" placeholder="...">
           <div id="allowedHint" class="hint"></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="print-only print-summary">
+        <div class="field-row field-row--3col">
+          <div><span class="print-label">Klasse:</span> <span id="printClass"></span></div>
+          <div><span class="print-label">Fach:</span> <span id="printSubject"></span></div>
+          <div><span class="print-label">Kursart:</span> <span id="printCourse"></span></div>
+        </div>
+        <div class="field-row field-row--work">
+          <div><span class="print-label">Nr.:</span> <span id="printWorkNumber"></span></div>
+          <div><span class="print-label">Thema:</span> <span id="printTopic"></span></div>
+          <div><span class="print-label">Datum:</span> <span id="printDate"></span></div>
+        </div>
+        <div class="field-row field-row--narrow-second">
+          <div><span class="print-label">Vorgabe:</span> <span id="printSpec"></span></div>
+          <div><span class="print-label">Punktzahl:</span> <span id="printPoints"></span></div>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="two-col">
+  <div id="resultsMessage" class="no-print" style="display:none"></div>
+  <div class="two-col" id="resultsSection">
     <section class="card">
       <div class="card-header"><h2>Punkteverteilung</h2></div>
       <div class="body table-wrap">
@@ -688,7 +699,7 @@
     els.classNameHint.classList.toggle('error', invalid);
     els.classNameHint.textContent = invalid
       ? 'Ungültiger Jahrgang – bitte auf 5–10 korrigieren (z. B. „10")'
-      : 'Jahrgang 5–10, optional Lerngruppen A–F';
+      : '';
   }
 
   function updateCourseOptions(){
@@ -706,7 +717,7 @@
     } else {
       const placeholder = document.createElement('option');
       placeholder.value = ''; placeholder.disabled = true;
-      placeholder.textContent = 'Kursart wählen';
+      placeholder.textContent = '...';
       els.courseSelect.appendChild(placeholder);
       ['GK','EK'].forEach(v => {
         const opt = document.createElement('option');
@@ -734,13 +745,17 @@
           {value:'k3',    label:'Kompetenz 3: Schreiben'}
         ];
     els.specSelect.innerHTML = '';
+    const placeholder = document.createElement('option');
+    placeholder.value = ''; placeholder.disabled = true;
+    placeholder.textContent = '...';
+    els.specSelect.appendChild(placeholder);
     opts.forEach(o => {
       const opt = document.createElement('option');
       opt.value = o.value; opt.textContent = o.label;
       els.specSelect.appendChild(opt);
     });
     const validValues = opts.map(o => o.value);
-    els.specSelect.value = validValues.includes(current) ? current : 'total';
+    els.specSelect.value = validValues.includes(current) ? current : '';
   }
 
   function renderDistribution(dist){
@@ -759,57 +774,91 @@
     els.allowedHint.classList.toggle('error', !!msg);
   }
 
+  // Hides the results tables behind an explanatory message (pass a string),
+  // or reveals them again (pass null) once every field is filled in.
+  function showResults(message){
+    els.resultsMessage.textContent = message || '';
+    els.resultsMessage.style.display = message ? 'block' : 'none';
+    els.resultsSection.style.display = message ? 'none' : '';
+  }
+
   function calculate(){
+    setPointsMessage('');
+    const year = currentYear();
+    updateClassNameValidity(year);
+    els.subjectSelect.disabled = year === null;
+    if (year === null) {
+      els.subjectSelect.value = '';
+      els.courseSelect.disabled = true;
+      els.courseSelect.innerHTML = '<option value="" selected disabled>...</option>';
+      showResults('Bitte eine gültige Klasse eingeben (Jahrgang 5–10), um die Berechnung zu sehen.');
+      return;
+    }
     const subject = currentSubject();
     els.courseSelect.disabled = !subject;
     if (!subject) {
-      els.courseSelect.innerHTML = '<option value="" selected disabled>–</option>';
-    }
-    const year = currentYear();
-    updateClassNameValidity(year);
-    if (year === null) {
-      els.schemaLabel.textContent = '–';
-      setPointsMessage(els.className.value === '' ? '' : 'Bitte gültigen Jahrgang eingeben, um fortzufahren.');
-      renderDistribution({rows:[]}); renderGrades(0);
-      return;
-    }
-    if (!subject) {
-      els.schemaLabel.textContent = '–';
-      setPointsMessage('Bitte Fach wählen, um fortzufahren.');
-      renderDistribution({rows:[]}); renderGrades(0);
+      els.courseSelect.innerHTML = '<option value="" selected disabled>...</option>';
+      showResults('Bitte ein Fach wählen, um die Berechnung zu sehen.');
       return;
     }
     updateCourseOptions();
     const rawCourse = els.courseSelect.value;
     if (rawCourse === '') {
-      els.schemaLabel.textContent = '–';
-      setPointsMessage('Bitte Kursart wählen, um fortzufahren.');
-      renderDistribution({rows:[]}); renderGrades(0);
+      showResults('Bitte eine Kursart wählen, um die Berechnung zu sehen.');
+      return;
+    }
+    if (els.workNumberSelect.value === '') {
+      showResults('Bitte eine Nr. wählen, um die Berechnung zu sehen.');
+      return;
+    }
+    if (els.topicText.value.trim() === '') {
+      showResults('Bitte ein Thema eingeben, um die Berechnung zu sehen.');
+      return;
+    }
+    if (els.dateText.value === '') {
+      showResults('Bitte ein Datum auswählen, um die Berechnung zu sehen.');
+      return;
+    }
+    if (els.specSelect.value === '') {
+      showResults('Bitte eine Vorgabe wählen, um die Berechnung zu sehen.');
       return;
     }
     const spec = els.specSelect.value;
     const raw = els.pointsInput.value;
     const points = Number(raw);
 
-    const normFn   = subject === 'deutsch' ? normalizeCourseDe  : normalizeCourseEn;
-    const solveFn  = subject === 'deutsch' ? solveTotalDe        : solveTotalEn;
-    const schemaFn = subject === 'deutsch' ? schemaNameDe        : schemaNameEn;
-
-    const course = normFn(year, rawCourse);
-    els.schemaLabel.textContent = schemaFn(year, course);
+    const solveFn = subject === 'deutsch' ? solveTotalDe : solveTotalEn;
     setPointsMessage(points > 150 ? 'Maximal 150 Punkte zulässig.' : '');
 
     if (raw === '' || !Number.isInteger(points) || points < 0) {
-      renderDistribution({rows:[]}); renderGrades(0);
+      showResults('Bitte eine gültige Punktzahl eingeben, um die Berechnung zu sehen.');
       return;
     }
     const solved = solveFn(year, rawCourse, spec, points);
     if (!solved.valid) {
-      renderDistribution({rows:[]}); renderGrades(0);
+      showResults('Bitte eine gültige Punktzahl eingeben, um die Berechnung zu sehen.');
       return;
     }
+    showResults(null);
     renderDistribution(solved.dist);
     renderGrades(solved.total);
+  }
+
+  function formatDateDe(iso){
+    if (!iso) return '';
+    const [y, m, d] = iso.split('-');
+    return d + '.' + m + '.' + y;
+  }
+
+  function fillPrintSummary(){
+    $('printClass').textContent = els.className.value;
+    $('printSubject').textContent = els.subjectSelect.selectedOptions[0]?.textContent || '';
+    $('printCourse').textContent = els.courseSelect.selectedOptions[0]?.textContent || '';
+    $('printWorkNumber').textContent = els.workNumberSelect.selectedOptions[0]?.textContent || '';
+    $('printTopic').textContent = els.topicText.value;
+    $('printDate').textContent = formatDateDe(els.dateText.value);
+    $('printSpec').textContent = els.specSelect.selectedOptions[0]?.textContent || '';
+    $('printPoints').textContent = els.pointsInput.value;
   }
 
   function handleLogin(){
@@ -823,17 +872,19 @@
   }
 
   function init(){
-    ['className','classNameHint','subjectSelect','courseSelect','specSelect','pointsInput','allowedHint','distributionBody','gradesBody','schemaLabel'].forEach(id => els[id] = $(id));
+    ['className','classNameHint','subjectSelect','courseSelect','workNumberSelect','specSelect','pointsInput','allowedHint','distributionBody','gradesBody','resultsMessage','resultsSection','topicText','dateText'].forEach(id => els[id] = $(id));
     els.subjectSelect.value = ''; // browsers may restore a previous selection on reload; force the placeholder
     updateSpecOptions();
     els.subjectSelect.addEventListener('change', () => { updateSpecOptions(); calculate(); });
-    ['courseSelect','specSelect','pointsInput'].forEach(id => els[id].addEventListener('change', calculate));
+    ['courseSelect','workNumberSelect','specSelect','pointsInput'].forEach(id => els[id].addEventListener('change', calculate));
     els.className.addEventListener('input', () => {
       els.className.value = sanitizeClassName(els.className.value);
       calculate();
     });
     els.pointsInput.addEventListener('input', calculate);
-    $('printBtn').addEventListener('click', () => { calculate(); window.print(); });
+    els.topicText.addEventListener('input', calculate);
+    els.dateText.addEventListener('change', calculate);
+    $('printBtn').addEventListener('click', () => { calculate(); fillPrintSummary(); window.print(); });
     calculate();
   }
 
