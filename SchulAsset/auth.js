@@ -37,10 +37,6 @@ async function handleLogin(event) {
     .eq('user_id', authData.user.id)
     .single();
 
-  console.log('user id:', authData.user.id);
-  console.log('role row:', roleRow);
-  console.log('role error:', roleError);
-
   if (roleError || !roleRow) {
     showError(t('login.errorNoRole'));
     await supabase.auth.signOut();

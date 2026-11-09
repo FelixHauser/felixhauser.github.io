@@ -1,6 +1,6 @@
 # SchulAsset — Status Quo & Road Map
 
-Last updated: 2026-06-08 (session 9 planned — digital signatures feature scoped)
+Last updated: 2026-11-09 (cleanup: removed dead code, unused .docx templates and config.js; docs brought up to date)
 
 ---
 
@@ -22,8 +22,8 @@ Last updated: 2026-06-08 (session 9 planned — digital signatures feature scope
 ### Student portal (`portal.html`)
 - Login → role check → routes to portal
 - Shows iPad info card (S/N, status, type, storage, assigned date)
-- **Leihvertrag (terms)** — accept button if not yet done; optional guardian fields (erz_first_name, erz_last_name, erz_address — only if different from pupil); writes to `terms_acceptance` + `ipad_history`; shows download button once accepted → downloads filled **Leihvertrag.docx** (Word template via docxtemplater)
-- **Schadenmeldung** — modal form (damage type, description, datum_eingetreten, datum_entdeckt, perpetrator); writes to `schadenmeldung` + `ipad_history`; shows download button → downloads filled **Schadensmeldung.docx** (Word template via docxtemplater)
+- **Leihvertrag (terms)** — accept button if not yet done; optional guardian fields (erz_first_name, erz_last_name, erz_address — only if different from pupil); writes to `terms_acceptance` + `ipad_history`; shows download button once accepted → downloads filled **Leihvertrag.pdf** (PDF form via pdf-lib, with signature)
+- **Schadenmeldung** — modal form (damage type, description, datum_eingetreten, datum_entdeckt, perpetrator); writes to `schadenmeldung` + `ipad_history`; shows download button → downloads filled **Schadensmeldung.pdf** (PDF form via pdf-lib)
 - **Verlustmeldung** — modal form (date, circumstances, ort_verlust, datum_bemerkt, police ref, notitzen); writes to `verlustmeldung` + `ipad_history`; **automatically sets iPad status to `lost`**; shows download button → downloads jsPDF-generated **Verlustmeldung.pdf**
 - **Übergabeprotokoll / Rückgabeprotokoll** — portal-side code ready: shows card if admin has created a record; pending ones show "Erhalt/Rückgabe bestätigen" button; accepted ones show download button (jsPDF). Cards only appear once admin creates records (Priority 2).
 - Fully localised: DE (default), EN, TR
@@ -74,7 +74,10 @@ Buttons are contextual — only shown when relevant to the current iPad state:
 - Pending protocols show full details (condition, accessories, Kürzel) so pupil can review before signing
 
 ### What is NOT yet built
-- PDF conversion Edge Function (documents currently download as .docx)
+- Nothing open on the road map — next priorities to be defined
+
+### Known issue
+- **Edge Function 1000-account limit** — `create-ipad-account` finds existing accounts via `listUsers({ perPage: 1000 })`. With more than 1000 portal accounts, an account not on that first page is not found → `createUser` fails with "already registered" → reassignment / password reset fails. Fix: look the user up by email instead of listing all users.
 
 ---
 
@@ -86,8 +89,7 @@ SchulAsset/
   auth.js                        — login logic, role detection, routing
   supabase-client.js             — Supabase client (credentials hardcoded, anon key, safe)
   translations.js                — i18n: DE (default), EN, TR; covers login + full portal
-  doc-generator.js               — document generation: docxtemplater for Leihvertrag + Schadenmeldung (fills Word templates → .docx); jsPDF for Verlustmeldung, Übergabeprotokoll, Rückgabeprotokoll (→ .pdf). Loaded in both portal.html and admin.html.
-  views/meldungen.js             — admin Meldungen view: tabbed list of all Schadenmeldungen + Verlustmeldungen with download buttons
+  doc-generator.js               — document generation: pdf-lib fills PDF form templates for Leihvertrag + Schadenmeldung; jsPDF builds Verlustmeldung, Übergabeprotokoll, Rückgabeprotokoll. Loaded in both portal.html and admin.html.
   admin.html / admin.css         — admin shell, light sidebar, Lucide icons
   admin.js                       — auth guard, view router, shared helpers
   portal.html / portal.css       — student portal shell + 3 modals
@@ -102,7 +104,8 @@ SchulAsset/
     staff-detail.js              — staff info (editable) + current iPad
     meldungen.js                 — Pending view (4 tabs: Schäden, Verlust, Übergabe, Rückgabe)
     activity.js                  — Last activity view (last 50 ipad_history entries)
-  document_templates/            — original .docx files (for reference; not used at runtime)
+  document_templates/            — fillable PDF templates used at runtime (Leihvertrag_2.1_fillable.pdf, Schadensmeldung_fillable.pdf)
+  supabase/functions/            — Edge Function source (create-ipad-account)
   mlks_logo.png                  — school logo (used in login card + portal header)
   CLAUDE.md                      — project instructions for coding agent
   statusquo.md                   — this file
@@ -110,7 +113,7 @@ SchulAsset/
 
 ---
 
-## Database schema (as of session 3)
+## Database schema (additions beyond CLAUDE.md)
 
 ### Tables and key columns
 
@@ -172,11 +175,7 @@ SchulAsset/
 | Supabase lowercases all emails | Extract S/N with `.toUpperCase()` in JS; use `upper()` in all RLS policies |
 | Supabase pupils join returns `{}` when student has no RLS policy | `{}` is truthy → name renders as "undefined undefined"; fix: add student SELECT policy on pupils |
 | jsPDF UMD build | Accessed as `window.jspdf.jsPDF` — loaded from `https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js` |
-| docxtemplater CDN | Use jsDelivr with pinned versions: pizzip@3.1.7 + docxtemplater@3.44.0 — unpkg resolves @3 to a broken build |
-| docxtemplater global name | Use `window.Docxtemplater \|\| window.docxtemplater` — name varies across CDN builds |
-| Word splits `{placeholder}` across XML runs | Delete and retype the placeholder in Word in plain text with no mid-word formatting changes |
-| Download button only available immediately after submit | Schadenmeldung/Verlustmeldung download appears in modal success state only; downloading past reports is a Priority 2/3 item |
-| Client-side docx → PDF conversion | Rejected. New approach: pdf-lib fills named form fields in a PDF template directly in the browser — no server needed. Leihvertrag + Schadenmeldung only (Priority 1) |
+| Client-side docx → PDF conversion | Rejected. pdf-lib fills named form fields in a PDF template directly in the browser — no server needed |
 
 ### Local development
 ```bash
@@ -198,7 +197,7 @@ Both documents now use **pdf-lib** to fill PDF form templates in the browser and
 - **Schadenmeldung** → `document_templates/Schadensmeldung_fillable.pdf`
 - **Leihvertrag** → `document_templates/Leihvertrag_2.1_fillable.pdf`
 
-pdf-lib loaded via CDN in `admin.html` and `portal.html`. `generateLeihvertrag()` and `generateSchadenmeldung()` in `doc-generator.js` updated accordingly. docxtemplater still used for nothing (can be removed eventually).
+pdf-lib loaded via CDN in `admin.html` and `portal.html`. `generateLeihvertrag()` and `generateSchadenmeldung()` in `doc-generator.js` updated accordingly. docxtemplater and the old .docx templates have been removed.
 
 ---
 
@@ -243,36 +242,32 @@ Recent activity is covered by the dedicated **Last activity** nav item (clock ic
 - **Student RLS policies**: always use `upper(split_part(auth.email(), '@', 1))` for serial number comparison
 - **Admin RLS policies**: use `EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin')`
 - **UI strings**: add to all three languages (de, en, tr) in `translations.js`, use `t('key')` in code
-- **Document download (Word template)**: `generateLeihvertrag(data)` and `generateSchadenmeldung(data)` are **async** — fetch the .docx from `document_templates/`, fill with docxtemplater, download as .docx. Always `await` them and wrap in try/catch.
+- **Document download (PDF form)**: `generateLeihvertrag(data)` and `generateSchadenmeldung(data)` are **async** — fetch the fillable PDF from `document_templates/`, fill with pdf-lib, download as .pdf. Always `await` them and wrap in try/catch.
 - **Document download (jsPDF)**: `generateVerlustmeldung(data)`, `generateUebergabeprotokoll(data)`, `generateRueckgabeprotokoll(data)` are **synchronous** — generate PDF in-browser and save directly.
 - **Global state in portal.js**: `_ipad`, `_pupilName`, `_termsRow`, `_uebergabe`, `_rueckgabe` — use these to build data objects for document generation.
 
 ---
 
-## Session 9 — Digital signatures (planned, not yet built)
+## ~~Session 9 — Digital signatures~~ ✅ Done
 
 ### Feature
-Parents/students can draw their signature with a mouse (desktop) or finger (iPad/smartphone) when accepting the Leihvertrag, Übergabeprotokoll, and Rückgabeprotokoll. The signature is stored as a PNG in Supabase Storage and embedded into the generated PDF.
+Parents/students can draw their signature with a mouse (desktop) or finger (iPad/smartphone) when accepting the Leihvertrag, Übergabeprotokoll, and Rückgabeprotokoll. The signature is stored as a PNG data URL in the DB and embedded into the generated PDF.
 
-### Approach
-- **Library:** `signature_pad` by Szymon Nowak — MIT, CDN-loadable, ~5 KB, handles mouse + touch natively
-- **Storage:** Supabase Storage bucket `signatures` — files saved as `{ipad_id}/{document_type}.png`
-- **DB:** `signature_url text` (nullable) column added to `uebergabeprotokoll`, `rueckgabeprotokoll`, and `terms_acceptance`
-- **PDF:** pdf-lib embeds the signature PNG image into the generated document before download
-- **Admin:** "Unterschrift anzeigen" link on iPad detail when `signature_url` is present
+- **Library:** `signature_pad` v4 (CDN, MIT) — handles mouse + touch + retina natively
+- **Storage:** signature stored as base64 PNG data URL in `signature_url text` column (no Storage bucket needed)
+- **DB columns added:** `signature_url` on `uebergabeprotokoll`, `rueckgabeprotokoll`, `terms_acceptance`
+- **Leihvertrag modal:** signature canvas + clear button; acceptance blocked until signed
+- **Übergabe/Rückgabe:** new `accept-sig-modal` opens before confirming; signature required
+- **PDFs:** signature image embedded — pdf-lib for Leihvertrag, jsPDF `addImage` for protocols
+- **Admin downloads:** Leihvertrag download passes `signature_url` through; protocols use `select('*')` so already included
+- Tested on desktop (mouse) and iPad (finger) ✅
 
-### DB changes (run in Supabase SQL editor before building)
-```sql
-ALTER TABLE uebergabeprotokoll ADD COLUMN signature_url text;
-ALTER TABLE rueckgabeprotokoll ADD COLUMN signature_url text;
-ALTER TABLE terms_acceptance    ADD COLUMN signature_url text;
-```
+---
 
-### Supabase Storage
-- Create bucket `signatures`
-- RLS: students can upload to their own iPad's path; admins can read all
+## ~~Session 10 — Cleanup~~ ✅ Done (2026-11-09)
 
-### Integration points
-- Portal acceptance modal (Übergabe + Rückgabe): signature canvas above confirm button
-- Leihvertrag acceptance (terms modal): signature canvas above accept button
-- `doc-generator.js`: `generateLeihvertrag()`, `generateUebergabeprotokoll()`, `generateRueckgabeprotokoll()` updated to embed signature image via pdf-lib
+- **Removed dead code:** `views/dashboard.js` (never loaded; dashboard merged into iPad list), unused `formatTime()` in `portal.js`, debug `console.log`s in `auth.js` (logged user id + role on every login), stale TODO in `doc-generator.js`
+- **Removed unused files:** `config.js` (credentials live in `supabase-client.js`) + its `.gitignore` entry; the four `.docx` files in `document_templates/` (no longer used at runtime; recoverable from git history)
+- **Removed duplicate Edge Function** at repo root `supabase/functions/create-ipad-account/` — an older session 3–5 draft, superseded by `SchulAsset/supabase/functions/create-ipad-account/` (the deployed version)
+- **Docs:** `statusquo.md` and `CLAUDE.md` updated — no more docxtemplater / `.docx` / `config.js` references
+- **OpenSpec** (v1.3.1) initialised at repo root for Claude Code: `/opsx:explore`, `/opsx:propose`, `/opsx:apply`, `/opsx:archive` — use for future feature work

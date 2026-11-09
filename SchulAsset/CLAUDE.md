@@ -33,7 +33,7 @@
 
 - Already created and configured
 - Tables, Auth, and dummy data are all in place
-- The Supabase URL and anon key will be provided separately — use a `config.js` file to store them, never hardcode in source
+- The Supabase URL and the public anon key live in `supabase-client.js` (safe to commit — security is enforced by RLS). Never put the service_role key in client code
 
 ---
 
@@ -173,4 +173,3 @@ RLS policies in Supabase will need to be configured alongside each view as it is
 - Clean, readable, well commented
 - No frameworks for proof of concept — vanilla JS only
 - Separate files for: auth, supabase client, translations, each major view
-- `config.js` for Supabase URL and anon key (gitignored)

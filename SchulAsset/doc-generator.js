@@ -204,9 +204,7 @@ function generateVerlustmeldung(data) {
 }
 
 
-// ── Übergabeprotokoll (jsPDF stopgap — Priority 2) ───────────────
-// TODO: restructure Übergabeprotokoll.docx to use {condition_neuwertig} etc.
-// placeholders for the checkbox states, then switch to _fillTemplate like above.
+// ── Übergabeprotokoll / Rückgabeprotokoll (jsPDF) ────────────────
 
 function _createPdf() {
   const { jsPDF } = window.jspdf;

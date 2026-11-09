@@ -715,8 +715,3 @@ function formatDate(iso) {
     year:  'numeric',
   });
 }
-
-function formatTime(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-}
