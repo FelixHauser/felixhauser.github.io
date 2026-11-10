@@ -127,6 +127,11 @@ const TRANSLATIONS = {
       errorInvalidCredentials: 'E-Mail / Seriennummer oder Passwort falsch.',
       errorNoRole:         'Diesem Konto ist keine Rolle zugewiesen. Bitte Administrator kontaktieren.',
       errorGeneric:        'Anmeldung fehlgeschlagen. Bitte erneut versuchen.',
+    },
+    // Footer link labels only — the legal pages themselves are German only.
+    legal: {
+      footerDatenschutz: 'Datenschutz',
+      footerImpressum:   'Impressum',
     }
   },
   en: {
@@ -254,6 +259,11 @@ const TRANSLATIONS = {
       errorInvalidCredentials: 'Incorrect email / serial number or password.',
       errorNoRole:         'No role is assigned to this account. Please contact the administrator.',
       errorGeneric:        'Login failed. Please try again.',
+    },
+    // Footer link labels only — the legal pages themselves are German only.
+    legal: {
+      footerDatenschutz: 'Privacy policy',
+      footerImpressum:   'Legal notice',
     }
   },
   tr: {
@@ -381,6 +391,11 @@ const TRANSLATIONS = {
       errorInvalidCredentials: 'E-posta / seri numarası veya şifre yanlış.',
       errorNoRole:         'Bu hesaba herhangi bir rol atanmamış. Lütfen yönetici ile iletişime geçin.',
       errorGeneric:        'Giriş başarısız. Lütfen tekrar deneyin.',
+    },
+    // Footer link labels only — the legal pages themselves are German only.
+    legal: {
+      footerDatenschutz: 'Gizlilik politikası',
+      footerImpressum:   'Yasal bilgiler',
     }
   }
 };

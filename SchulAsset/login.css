@@ -240,3 +240,23 @@ body {
     margin-right: -1.5rem;
   }
 }
+
+/* ---- Legal links (Datenschutz · Impressum) ---- */
+
+.legal-footer {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  font-size: 0.78rem;
+  color: var(--grey-500);
+}
+
+.legal-footer a {
+  color: var(--grey-500);
+  text-decoration: none;
+}
+
+.legal-footer a:hover {
+  text-decoration: underline;
+}

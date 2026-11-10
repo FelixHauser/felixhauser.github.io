@@ -1,6 +1,6 @@
 # SchulAsset — Status Quo & Road Map
 
-Last updated: 2026-11-10 (session 10 complete — cleanup, decisions, prioritised TODO.md)
+Last updated: 2026-11-10 (session 11 complete — legal pages via OpenSpec)
 
 ---
 
@@ -234,6 +234,17 @@ Recent activity is covered by the dedicated **Last activity** nav item (clock ic
 
 ---
 
+## Legal pages (Datenschutzerklärung / Impressum)
+
+`datenschutz.html` and `impressum.html` are public, **German only** (German is the legally binding language), and load no `translations.js`, no Supabase and no CDN. They are linked from a footer on `login.html` and `portal.html`; only the footer link labels are localised (`legal.footerDatenschutz`, `legal.footerImpressum`). Styling: `legal.css`.
+
+### How to insert the real legal text
+1. In each page, replace everything inside `<main id="legal-content">` with the school's text (plain HTML: `<h2>`, `<p>`, `<ul>`).
+2. Delete the `<div id="placeholder-notice">` banner.
+3. Tick the item off in `TODO.md`.
+
+---
+
 ## Patterns to follow
 
 - **New admin view**: create `views/my-view.js` with `renderMyView()`, add `<script>` to `admin.html` before `lucide.createIcons(); initAdmin();`, add to `VIEW_RENDERERS` in `admin.js`
@@ -282,3 +293,18 @@ Parents/students can draw their signature with a mouse (desktop) or finger (iPad
 
 ### Next session
 Start with **Priority 1** in `TODO.md` — first the refresh bug on the iPad detail view.
+
+---
+
+## ~~Session 11 — Legal pages (OpenSpec change `add-legal-placeholder-pages`)~~ ✅ Done (2026-11-10)
+
+First feature built with the OpenSpec workflow (explore → apply → archive). Archived at `openspec/changes/archive/2026-11-10-add-legal-placeholder-pages/`; main spec at `openspec/specs/legal-pages/spec.md`.
+
+- **Datenschutzerklärung + Impressum pages** — `datenschutz.html`, `impressum.html`, `legal.css`. Public, **German only** (decision: German is the only legally binding language; EN/TR elsewhere are a courtesy). No `translations.js`, no Supabase, no CDN; only a tiny inline back-link script.
+- **Footer links** on `login.html` (inside the card) and `portal.html` (static `<footer>` outside `#portal-content` so `portal.js` re-renders never wipe it). Only the link labels are localised (`legal.footerDatenschutz`, `legal.footerImpressum`).
+- **Content is placeholder** with a visible orange banner. See the "Legal pages" section above for how to insert the real text.
+- **Found while testing:** several login-page strings are hardcoded German ("Passwort vergessen?" etc.) → added to `TODO.md` (Localization).
+- **Open questions recorded in the archived design:** Impressum entity (school vs. Stadt Marl); the app is served from a personal GitHub Pages domain; the Datenschutzerklärung must disclose the CDNs (jsDelivr, unpkg, cdnjs) — self-hosting them would be a separate change.
+
+### Next session
+Start with **Priority 1** in `TODO.md`. Then the login-page translation fix (Priority 2, Localization).

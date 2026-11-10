@@ -1,0 +1,118 @@
+/* =========================================================
+   SchulAsset — Legal pages (Datenschutzerklärung, Impressum)
+   Standalone: shares the colour palette with login.css but does
+   not depend on it. Long-text layout, German only.
+   ========================================================= */
+
+:root {
+  --navy:         #3B6DB5;
+  --blue:         #1E56A0;
+  --bg:           #EEF2F7;
+  --surface:      #FFFFFF;
+  --border:       #DCE3ED;
+  --text-primary: #1A202C;
+  --text-secondary: #4A5568;
+  --warn-bg:      #FFF7ED;
+  --warn-border:  #FDBA74;
+  --warn-text:    #9A3412;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.65;
+  min-height: 100dvh;
+}
+
+/* ---- Header: logo + back link ---- */
+
+.legal-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.legal-logo {
+  height: 36px;
+  width: auto;
+}
+
+.legal-back {
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--blue);
+  cursor: pointer;
+  padding: 0.25rem 0;
+}
+
+.legal-back:hover {
+  text-decoration: underline;
+}
+
+/* ---- Content column ---- */
+
+.legal-page {
+  max-width: 720px;      /* comfortable line length */
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;   /* 16px side gutter on phones */
+}
+
+.legal-page h1 {
+  font-size: 1.6rem;
+  color: var(--navy);
+  margin-bottom: 1rem;
+}
+
+#legal-content {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.25rem 1.5rem;
+  overflow-wrap: anywhere;   /* long URLs / addresses never cause horizontal scroll */
+}
+
+#legal-content h2 {
+  font-size: 1.1rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+#legal-content h2:first-child {
+  margin-top: 0;
+}
+
+#legal-content p,
+#legal-content ul,
+#legal-content ol {
+  margin-bottom: 0.75rem;
+  color: var(--text-secondary);
+}
+
+#legal-content ul,
+#legal-content ol {
+  padding-left: 1.25rem;
+}
+
+/* ---- Placeholder banner (delete the element once the real text is in) ---- */
+
+#placeholder-notice {
+  background: var(--warn-bg);
+  border: 2px solid var(--warn-border);
+  color: var(--warn-text);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}

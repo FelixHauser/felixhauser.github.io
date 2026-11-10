@@ -902,3 +902,23 @@ body {
 .sig-clear-btn:hover {
   color: var(--red-text);
 }
+
+/* ---- Legal links (Datenschutz · Impressum) ---- */
+
+.legal-footer {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem 2rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.legal-footer a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.legal-footer a:hover {
+  text-decoration: underline;
+}

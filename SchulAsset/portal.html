@@ -26,6 +26,14 @@
     <p class="loading-msg" data-i18n="portal.loading">Wird geladen…</p>
   </main>
 
+  <!-- Legal links — static, outside #portal-content so portal.js re-renders never remove them.
+       Pages are German only; labels follow the UI language. -->
+  <footer class="legal-footer">
+    <a href="datenschutz.html" data-i18n="legal.footerDatenschutz">Datenschutz</a>
+    <span aria-hidden="true">·</span>
+    <a href="impressum.html" data-i18n="legal.footerImpressum">Impressum</a>
+  </footer>
+
   <!-- ── iPad info modal ── -->
   <div id="ipad-info-modal" class="modal-backdrop" hidden>
     <div class="modal-card">

@@ -21,7 +21,8 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 - [ ] Get sign-off from the school's / Schulträger's **Datenschutzbeauftragte(r)** (incl. the US-parent-company question)
 - [ ] Involve the **Stadt Marl** as owner of the iPads
 - [ ] Define a **retention and deletion concept** — when is a pupil's data deleted after leaving?
-- [ ] Add **Datenschutzerklärung** and **Impressum** pages, linked from login and portal (DE/EN/TR)
+- [x] **Datenschutzerklärung** and **Impressum** pages — built (German only, linked from login and portal), with placeholder text
+- [ ] Insert the **real Datenschutzerklärung and Impressum text** from the school — see "How to insert the real legal text" in `statusquo.md`; remove the placeholder banner afterwards
 
 ### Getting real data in (part of the admin panel, see Priority 3)
 - [ ]  **Bulk import (CSV)** for iPads, pupils and staff — e.g. from the Logineo export or the school's pupil list
@@ -33,6 +34,7 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 - [ ]  **Document admin management** — how a new admin account is created in Supabase Studio, and who holds the Supabase owner login.
 
 ### Localization
+- [ ]  **Translate the hardcoded German strings on the login page** — found: not everything on `login.html` goes through `translations.js`, e.g. "Passwort vergessen?", "Wird angemeldet…" (auto-login), the forgot-password and new-password sections ("Zurück zum Login", "Reset-Link senden", …) and the admin-only hints. These show German whatever language is selected. Add `data-i18n` keys in DE/EN/TR and check `auth.js` messages too (`CLAUDE.md`: login must be fully localised). Other portal strings should be found by the evaluation below.
 - [ ]  **Evaluate localization** — check the portal in all set languages (DE/EN/TR): missing or empty texts (automated check), translation quality (native speaker)
 
 

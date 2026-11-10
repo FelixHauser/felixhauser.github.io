@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!--
+  Datenschutzerklärung — German only, public (no login, no Supabase, no translations.js).
+
+  HOW TO INSERT THE REAL TEXT:
+  1. Replace everything inside <main id="legal-content"> with the text from the school (plain HTML: <h2>, <p>, <ul>).
+  2. Delete the <div id="placeholder-notice"> banner.
+-->
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Datenschutzerklärung — SchulAsset</title>
+  <link rel="stylesheet" href="legal.css">
+</head>
+<body>
+
+  <header class="legal-header">
+    <img src="mlks_logo.png" class="legal-logo" alt="Martin-Luther-King-Schule">
+    <button type="button" class="legal-back" id="legal-back">← Zurück</button>
+  </header>
+
+  <div class="legal-page">
+    <h1>Datenschutzerklärung</h1>
+
+    <div id="placeholder-notice">
+      Platzhalter — dieser Text ist rechtlich nicht gültig. Die endgültige Datenschutzerklärung wird von der Schule bereitgestellt.
+    </div>
+
+    <main id="legal-content">
+      <!-- PLACEHOLDER: replace with text supplied by the school -->
+      <h2>1. Verantwortliche Stelle</h2>
+      <p>Hier folgen Name und Anschrift der verantwortlichen Stelle.</p>
+
+      <h2>2. Datenschutzbeauftragte(r)</h2>
+      <p>Hier folgen die Kontaktdaten der oder des Datenschutzbeauftragten.</p>
+
+      <h2>3. Verarbeitete Daten und Zwecke</h2>
+      <p>Hier folgt die Beschreibung der verarbeiteten personenbezogenen Daten und der Zwecke der Verarbeitung.</p>
+
+      <h2>4. Empfänger und eingesetzte Dienstleister</h2>
+      <p>Hier folgen die Empfänger der Daten und die eingesetzten Auftragsverarbeiter.</p>
+
+      <h2>5. Speicherdauer</h2>
+      <p>Hier folgen die Angaben zur Speicherdauer.</p>
+
+      <h2>6. Ihre Rechte</h2>
+      <p>Hier folgt die Belehrung über die Betroffenenrechte.</p>
+    </main>
+  </div>
+
+  <script>
+    // Back link: go back if the visitor came from somewhere in this tab, otherwise to the login page.
+    document.getElementById('legal-back').addEventListener('click', function () {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = 'login.html';
+      }
+    });
+  </script>
+
+</body>
+</html>

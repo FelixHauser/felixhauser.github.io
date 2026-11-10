@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!--
+  Impressum — German only, public (no login, no Supabase, no translations.js).
+
+  HOW TO INSERT THE REAL TEXT:
+  1. Replace everything inside <main id="legal-content"> with the text from the school (plain HTML: <h2>, <p>, <ul>).
+  2. Delete the <div id="placeholder-notice"> banner.
+-->
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Impressum — SchulAsset</title>
+  <link rel="stylesheet" href="legal.css">
+</head>
+<body>
+
+  <header class="legal-header">
+    <img src="mlks_logo.png" class="legal-logo" alt="Martin-Luther-King-Schule">
+    <button type="button" class="legal-back" id="legal-back">← Zurück</button>
+  </header>
+
+  <div class="legal-page">
+    <h1>Impressum</h1>
+
+    <div id="placeholder-notice">
+      Platzhalter — dieser Text ist rechtlich nicht gültig. Das endgültige Impressum wird von der Schule bereitgestellt.
+    </div>
+
+    <main id="legal-content">
+      <!-- PLACEHOLDER: replace with text supplied by the school -->
+      <h2>Angaben gemäß § 5 DDG</h2>
+      <p>Hier folgen Name und Anschrift des Anbieters (Schule bzw. Schulträger).</p>
+
+      <h2>Vertretungsberechtigte Person</h2>
+      <p>Hier folgt der Name der vertretungsberechtigten Person.</p>
+
+      <h2>Kontakt</h2>
+      <p>Hier folgen Telefonnummer und E-Mail-Adresse.</p>
+
+      <h2>Aufsichtsbehörde</h2>
+      <p>Hier folgt die zuständige Aufsichtsbehörde.</p>
+    </main>
+  </div>
+
+  <script>
+    // Back link: go back if the visitor came from somewhere in this tab, otherwise to the login page.
+    document.getElementById('legal-back').addEventListener('click', function () {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = 'login.html';
+      }
+    });
+  </script>
+
+</body>
+</html>
