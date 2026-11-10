@@ -1,6 +1,6 @@
 # SchulAsset — Status Quo & Road Map
 
-Last updated: 2026-11-09 (cleanup: removed dead code, unused .docx templates and config.js; docs brought up to date)
+Last updated: 2026-11-10 (session 10 complete — cleanup, decisions, prioritised TODO.md)
 
 ---
 
@@ -74,7 +74,7 @@ Buttons are contextual — only shown when relevant to the current iPad state:
 - Pending protocols show full details (condition, accessories, Kürzel) so pupil can review before signing
 
 ### What is NOT yet built
-- Nothing open on the road map — next priorities to be defined
+- See **`TODO.md`** — prioritised to-do list towards full operation (Priority 1 → 6)
 
 ### Known issue
 - **Edge Function 1000-account limit** — `create-ipad-account` finds existing accounts via `listUsers({ perPage: 1000 })`. With more than 1000 portal accounts, an account not on that first page is not found → `createUser` fails with "already registered" → reassignment / password reset fails. Fix: look the user up by email instead of listing all users.
@@ -264,10 +264,21 @@ Parents/students can draw their signature with a mouse (desktop) or finger (iPad
 
 ---
 
-## ~~Session 10 — Cleanup~~ ✅ Done (2026-11-09)
+## ~~Session 10 — Cleanup & planning~~ ✅ Done (2026-11-09 / 10)
 
 - **Removed dead code:** `views/dashboard.js` (never loaded; dashboard merged into iPad list), unused `formatTime()` in `portal.js`, debug `console.log`s in `auth.js` (logged user id + role on every login), stale TODO in `doc-generator.js`
 - **Removed unused files:** `config.js` (credentials live in `supabase-client.js`) + its `.gitignore` entry; the four `.docx` files in `document_templates/` (no longer used at runtime; recoverable from git history)
 - **Removed duplicate Edge Function** at repo root `supabase/functions/create-ipad-account/` — an older session 3–5 draft, superseded by `SchulAsset/supabase/functions/create-ipad-account/` (the deployed version)
 - **Docs:** `statusquo.md` and `CLAUDE.md` updated — no more docxtemplater / `.docx` / `config.js` references
 - **OpenSpec** (v1.3.1) initialised at repo root for Claude Code: `/opsx:explore`, `/opsx:propose`, `/opsx:apply`, `/opsx:archive` — use for future feature work
+- **`TODO.md` created** — prioritised to-do list towards full operation; replaces the road map in this file
+
+### Decisions taken (2026-11-10)
+- **Stay on Supabase (Frankfurt).** Migrating to own SQL/SQLite would mean a full rewrite (own backend, auth, access control). A Raspberry Pi 3 as production host was rejected: too little RAM for self-hosted Supabase, must be reachable from parents' homes (school LAN), reliability and DSGVO burden. The Pi may serve as nightly backup target / test server instead.
+- **No hard deletes.** iPads are archived (history kept), pupils/staff anonymised (audit trail kept).
+- **New read-only role for teachers/staff** planned (Priority 3).
+- **Localisation:** portal + login fully localised (DE/EN/TR); admin interface German only — `CLAUDE.md` updated.
+- **Distribution:** Supabase credentials via a config file (no GUI page); school details (name, logo, Schulträger, templates) to become configurable.
+
+### Next session
+Start with **Priority 1** in `TODO.md` — first the refresh bug on the iPad detail view.

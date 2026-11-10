@@ -3,6 +3,8 @@
 > **At the start of every session, read `statusquo.md` before doing anything else.**
 > It contains the current build status, what works, known gotchas, and the prioritised road map.
 > Update it at the end of each session to reflect what was done and what comes next.
+>
+> The prioritised to-do list towards full operation lives in **`TODO.md`** — work from it and tick items off when done.
 
 **Then initiate a local server**
 > The developement of the project must be tested from the local computer. So it needs a simulated environment.
@@ -152,7 +154,8 @@ Public signups are disabled. Email confirmation is disabled.
 ## Localisation
 
 Three languages: German (de), English (en), Turkish (tr). German is default.
-Use JSON translation files. All UI strings must go through the translation system — no hardcoded German in the interface.
+The **student/parent portal** (and login) must be fully localised: all its UI strings go through `translations.js` — no hardcoded German there.
+The **admin interface** is German only (decision 2026-11-10) — translation not required.
 
 ---
 
