@@ -1,6 +1,6 @@
 # SchulAsset — Status Quo & Road Map
 
-Last updated: 2026-11-10 (session 11 complete — legal pages via OpenSpec)
+Last updated: 2026-11-11 (session 12 — CDN pinning, account-lookup fix, refresh bug fixed)
 
 ---
 
@@ -315,3 +315,35 @@ First feature built with the OpenSpec workflow (explore → apply → archive). 
 
 ### Next session
 Start with **Priority 1** in `TODO.md`. Then the login-page translation fix (Priority 2, Localization).
+
+---
+
+## Session 12 (2026-11-11) — summary and where to continue
+
+### Done and pushed (OpenSpec changes, archived)
+- **`pin-cdn-versions`** — lucide 1.72.0 and supabase-js 2.119.0 pinned; admin app starts even if Lucide fails (`window.lucide?.createIcons()`). Spec: `openspec/specs/cdn-dependencies/`.
+- **`fix-account-lookup-limit`** — `create-ipad-account` now creates first and only pages through `listUsers` if the account exists, so there is no account limit. Also: CORS headers on all responses, and the admin alert now shows the function's real error text. Deployed in Supabase and tested live (create + reset). The paging path beyond 1000 accounts is **untested** (optional task 2.4, skipped). Spec: `openspec/specs/ipad-portal-accounts/`.
+- **`supabase/db-changes.md`** — log of manual database changes (first entry: `GRANT SELECT, INSERT, UPDATE ON public.user_roles TO service_role`). **Rule: log every SQL/setting we change by hand in Supabase there.** The schema export (TODO Priority 1) is planned for late in the project and must include this log.
+
+### Refresh bug — OpenSpec change `fix-ipad-detail-refresh` (implemented and tested manually, 2026-11-11)
+Location: `openspec/changes/fix-ipad-detail-refresh/` (not yet archived). Run openspec commands from the `SchulAsset/` folder.
+
+Causes found and fixed:
+1. **Browser reload (F5) on a detail page left a dead list.** The URL said `#ipad-detail` without the id (the id lived only in `window._currentIpadId`); after F5 the app fell back to the list but kept the URL, so clicking an iPad set the same hash again → no `hashchange` → nothing happened. **Now:** detail pages use `#ipad-detail/<id>`, `#pupil-detail/<id>`, `#staff-detail/<id>`. `routeToHash()` in `admin.js` splits `view/id`, sets the `_current…Id` global for the view file, and always replaces the URL (`history.replaceState`, no history entry) when the requested page differs from the address — so the URL always matches the screen. `showIpadDetail/showPupilDetail/showStaffDetail` only write the hash.
+2. **Assignment:** `submitAssign` now re-renders right after the save, so the page behind the password card is current however it is closed. `_showPasswordCard` keeps its callback in `_passwordCardOnClose` (button calls `_finishPasswordCard()`) instead of serialising it with `toString()`.
+3. **Overlapping renders:** `renderIpadDetail()` uses a counter (`_detailRenderId`); only the latest render writes the page (also stops if the admin left the page meanwhile). Errors of the `uebergabeprotokoll` / `rueckgabeprotokoll` / `terms_acceptance` queries are logged with `console.error`.
+
+**Ruled out:** the earlier demo symptom ("↻ Aktualisieren shows nothing after the parent accepted the Leihvertrag") was not caused by caching — Supabase responses are fetched from the network (no cache headers, `cf-cache-status: DYNAMIC`) and ↻ works in a retest. Probable causes: reload (F5) instead of ↻, or admin and parent logged in in the same browser. **Gotcha for testing:** all tabs of one browser share one Supabase session (`localStorage`); a second login in another tab replaces the first. Use a second browser or a private window for the parent.
+
+Out of scope, open question: several actions ignore errors of their secondary writes (e.g. status update in `submitUebergabe`, `ipad_history` inserts). Small known gap: opening a detail link in a fresh tab leaves "← Zurück" without a previous page.
+
+### Other candidates from `TODO.md` for a short session
+- Translate hardcoded German strings on `login.html` (Priority 2, Localization), about 20 minutes.
+- Git housekeeping (Priority 5): add `.claude/settings.local.json` to `.gitignore`; keep `CLAUDE.md` and `statusquo.md` tracked.
+- Still open in Priority 1: paid Supabase plan, schema export (late).
+
+### Working notes for the next session
+- Commits and pushes only after the user's explicit OK (a plain "commit and push" in the same message counts for that commit only).
+- Local test server: `python3 -m http.server 8080` in `SchulAsset/`.
+- The Edge Function in the repo is not deployed automatically: after editing `supabase/functions/create-ipad-account/index.ts`, paste it into Supabase Studio → Edge Functions → Deploy updates. Direct link: https://supabase.com/dashboard/project/uevovvrxwrwvxqnhehmm/functions
+

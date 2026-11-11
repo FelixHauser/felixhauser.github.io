@@ -11,11 +11,20 @@ const EVENT_LABELS = {
   reassigned:      'Neu zugewiesen',
 };
 
+// Counts renders so a slow, older render can never overwrite a newer one.
+// Every render takes the next number; after each await it checks it is still the latest.
+let _detailRenderId = 0;
+
 async function renderIpadDetail() {
   const container = document.getElementById('view-container');
   const id = window._currentIpadId;
 
   if (!id) { routeToHash('ipads'); return; }
+
+  const myRender = ++_detailRenderId;
+  // True when a newer render has started, or the admin has left this page meanwhile
+  // (then #detail-body no longer exists and writing to it would throw).
+  const isStale = () => myRender !== _detailRenderId || !document.getElementById('detail-body');
 
   container.innerHTML = `
     <div class="view-header detail-header">
@@ -38,6 +47,8 @@ async function renderIpadDetail() {
     .eq('id', id)
     .single();
 
+  if (isStale()) return;
+
   if (ipadError || !ipad) {
     document.getElementById('detail-body').innerHTML =
       '<p class="error-inline">iPad konnte nicht geladen werden.</p>';
@@ -51,9 +62,9 @@ async function renderIpadDetail() {
   const since = ipad.assigned_date || '1970-01-01';
   const [
     { data: history, error: histError },
-    { data: uebergabe },
-    { data: rueckgabe },
-    { data: terms },
+    { data: uebergabe, error: uebergabeError },
+    { data: rueckgabe, error: rueckgabeError },
+    { data: terms,     error: termsError },
   ] = await Promise.all([
     supabase
       .from('ipad_history')
@@ -83,6 +94,14 @@ async function renderIpadDetail() {
       .is('invalidated_at', null)
       .maybeSingle(),
   ]);
+
+  if (isStale()) return;
+
+  // These queries do not block the page, but a failure must not stay invisible:
+  // without it a missing Übergabe/Rückgabe/terms row looks the same as "not done yet".
+  if (uebergabeError) console.error('uebergabeprotokoll query failed:', uebergabeError);
+  if (rueckgabeError) console.error('rueckgabeprotokoll query failed:', rueckgabeError);
+  if (termsError)     console.error('terms_acceptance query failed:', termsError);
 
   // Store for document download functions.
   window._detailTerms     = terms;
@@ -650,6 +669,10 @@ async function submitAssign() {
     notes: `Zugewiesen an: ${personName}`,
   });
 
+  // The assignment is saved: refresh the page now, so it is already current behind the
+  // modal and however the password card is closed (Verstanden, ✕ or Abbrechen).
+  renderIpadDetail();
+
   // ── Create / reset the iPad portal account ──────────────────
   // Only needed for pupil assignments — staff don't use the portal.
   if (type === 'pupil') {
@@ -667,17 +690,15 @@ async function submitAssign() {
       try { detail = JSON.parse(rawBody); } catch { detail = rawBody ? { error: rawBody } : null; }
       console.error('Account function error:', fnError?.context?.status, rawBody, fnError || fnData)
       closeAdminModal();
-      renderIpadDetail();
       alert('Zuweisung gespeichert, aber Passwort konnte nicht generiert werden.\nBitte manuell in Supabase Auth nachsehen.' + (detail?.error ? '\n\n' + detail.error : ''));
       return;
     }
 
-    _showPasswordCard(ipad, fnData.password, personName, () => { closeAdminModal(); renderIpadDetail(); });
+    _showPasswordCard(ipad, fnData.password, personName, closeAdminModal);
     return;
   }
 
   closeAdminModal();
-  renderIpadDetail();
 }
 
 // ─── 2. Remove owner ─────────────────────────────────────────
@@ -1088,7 +1109,7 @@ async function submitResetPortalPassword() {
     return;
   }
 
-  _showPasswordCard(ipad, fnData.password, assignedName(ipad), () => closeAdminModal());
+  _showPasswordCard(ipad, fnData.password, assignedName(ipad), closeAdminModal);
 }
 
 // ─── 8. Admin Verlustmeldung ──────────────────────────────────
@@ -1168,8 +1189,19 @@ async function submitAdminVerlust() {
 // ─── Password card helper ─────────────────────────────────────────
 // Shows credentials in the modal + populates the print card.
 
+// The function the "Verstanden" button runs. Kept in a variable (not written into the
+// button's HTML as source text) so it keeps working when the callback uses other functions.
+let _passwordCardOnClose = null;
+
+function _finishPasswordCard() {
+  const callback = _passwordCardOnClose;
+  _passwordCardOnClose = null;
+  if (callback) callback();
+}
+
 function _showPasswordCard(ipad, password, pupilName, onClose) {
-  const base     = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
+  _passwordCardOnClose = onClose;
+  const base    = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
   const loginUrl = `${base}login.html?sn=${encodeURIComponent(ipad.serial_number)}&pw=${encodeURIComponent(password)}`;
 
   document.getElementById('admin-modal-title').textContent = 'Zugangsdaten Schülerportal';
@@ -1194,7 +1226,7 @@ function _showPasswordCard(ipad, password, pupilName, onClose) {
   document.getElementById('admin-modal-error').hidden = true;
   document.querySelector('.admin-modal-footer').innerHTML = `
     <button class="btn-secondary" onclick="window.print()">🖨 Drucken</button>
-    <button class="btn-primary"   onclick="(${onClose.toString()})()">Verstanden</button>
+    <button class="btn-primary"   onclick="_finishPasswordCard()">Verstanden</button>
   `;
 
   // Generate QR code inside modal

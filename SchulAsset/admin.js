@@ -67,15 +67,43 @@ const VIEW_RENDERERS = {
   'staff-detail': () => renderStaffDetail(),
 };
 
+// Detail views and the global that holds the id of the item they show.
+// The id lives in the URL (#ipad-detail/<id>) so a reload, a bookmark or a pasted
+// link shows the same item; the router copies it into this global for the view file.
+const DETAIL_ID_GLOBALS = {
+  'ipad-detail':  '_currentIpadId',
+  'pupil-detail': '_currentPupilId',
+  'staff-detail': '_currentStaffId',
+};
+
+// Shows the view for a URL hash such as "ipads" or "ipad-detail/<id>".
 function routeToHash(hash) {
-  // Highlight active sidebar link.
+  // Keep the address bar in sync with what is shown: if we were asked for a page the
+  // URL does not say (empty hash, unknown page, detail page without id), replace the
+  // URL. replaceState adds no history entry and fires no hashchange, so there is no
+  // double render and Back does not return to the broken address.
+  if (window.location.hash.slice(1) !== hash) {
+    history.replaceState(null, '', '#' + hash);
+  }
+
+  // "ipad-detail/<id>" -> view "ipad-detail", param "<id>".
+  const slash = hash.indexOf('/');
+  const view  = slash === -1 ? hash : hash.slice(0, slash);
+  const param = slash === -1 ? ''   : hash.slice(slash + 1);
+
+  // Highlight active sidebar link (detail views have no sidebar item).
   document.querySelectorAll('.nav-item').forEach(el => {
-    el.classList.toggle('active', el.dataset.view === hash);
+    el.classList.toggle('active', el.dataset.view === view);
   });
 
-  const render = VIEW_RENDERERS[hash];
-  if (render) {
-    render();
+  // Hand the id to the detail view (cleared when the URL has none).
+  const idGlobal = DETAIL_ID_GLOBALS[view];
+  if (idGlobal) {
+    window[idGlobal] = param || null;
+  }
+
+  if (Object.hasOwn(VIEW_RENDERERS, view)) {
+    VIEW_RENDERERS[view]();
   } else {
     routeToHash('ipads');
   }
@@ -105,21 +133,22 @@ async function logout() {
   window.location.href = 'login.html';
 }
 
+// Navigates to a detail view by putting the item's id into the URL.
+// The hashchange listener above then calls routeToHash(), which sets the id global.
+function _showDetail(view, id) {
+  const target = view + '/' + id;
+  if (window.location.hash.slice(1) === target) {
+    // Same address: the browser fires no hashchange, so route directly.
+    routeToHash(target);
+  } else {
+    window.location.hash = target;
+  }
+}
+
 // Navigates to the iPad detail view for the given iPad id.
-function showIpadDetail(id) {
-  window._currentIpadId = id;
-  window.location.hash = 'ipad-detail';
-}
-
-function showPupilDetail(id) {
-  window._currentPupilId = id;
-  window.location.hash = 'pupil-detail';
-}
-
-function showStaffDetail(id) {
-  window._currentStaffId = id;
-  window.location.hash = 'staff-detail';
-}
+function showIpadDetail(id)  { _showDetail('ipad-detail', id); }
+function showPupilDetail(id) { _showDetail('pupil-detail', id); }
+function showStaffDetail(id) { _showDetail('staff-detail', id); }
 
 // Escapes a string for safe insertion into HTML attributes and text.
 function _htmlEsc(str) {
