@@ -9,6 +9,9 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 
 - [ ]  **Upgrade Supabase to the paid plan** — free tier pauses the project after 7 days of inactivity and has no automatic backups. Not acceptable for signed contracts.
 - [ ]  **Export the database schema into the repo** — tables, RLS policies, triggers and grants currently exist only inside Supabase. Save as SQL (e.g. `supabase/schema.sql`) so the database can be rebuilt at any time.
+  - Also include everything logged in `supabase/db-changes.md` (manual changes made so far), the `auth.users` triggers, and the Auth settings (signups off, email confirmation off)
+  - Verify by building an empty second Supabase project from the file and checking the app works against it
+  - Planned for late in the project; until then, log every manual database change in `supabase/db-changes.md`
 - [x]  **Fix the Edge Function 1000-account limit** (done: create first, paged lookup only on conflict; tested live) — `create-ipad-account` uses `listUsers({ perPage: 1000 })`; beyond 1000 accounts, reassignment and password reset fail. Look the user up by email instead.
 - [ ]  **Fix refresh bug** — website doesn't refresh correctly after a change. Most noticeable on iPad detail view.
 - [x]  **Pin all CDN library versions** (done: lucide 1.72.0, supabase-js 2.119.0; Lucide guarded with `window.lucide?.`) — `lucide@latest` and `supabase-js@2` can change overnight and break the app.
