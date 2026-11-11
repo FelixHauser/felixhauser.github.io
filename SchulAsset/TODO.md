@@ -11,7 +11,9 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 - [ ]  **Export the database schema into the repo** — tables, RLS policies, triggers and grants currently exist only inside Supabase. Save as SQL (e.g. `supabase/schema.sql`) so the database can be rebuilt at any time.
 - [ ]  **Fix the Edge Function 1000-account limit** — `create-ipad-account` uses `listUsers({ perPage: 1000 })`; beyond 1000 accounts, reassignment and password reset fail. Look the user up by email instead.
 - [ ]  **Fix refresh bug** — website doesn't refresh correctly after a change. Most noticeable on iPad detail view.
-- [ ]  **Pin all CDN library versions** — `lucide@latest` and `supabase-js@2` can change overnight and break the app.
+- [x]  **Pin all CDN library versions** (done: lucide 1.72.0, supabase-js 2.119.0; Lucide guarded with `window.lucide?.`) — `lucide@latest` and `supabase-js@2` can change overnight and break the app.
+  - Pin both to an exact, currently working version (`lucide` in `admin.html`; `supabase-js` in `login.html`, `portal.html`, `admin.html`); the other CDN libraries are already pinned
+  - Make Lucide failures harmless: in `admin.html` change `lucide.createIcons(); initAdmin();` to `window.lucide?.createIcons(); initAdmin();` (plain `lucide?.` still throws when the global is missing) — otherwise a Lucide problem throws and `initAdmin()` never runs, which kills the whole admin app (not just the icons)
 
 ## Priority 2 — Blockers before going live
 

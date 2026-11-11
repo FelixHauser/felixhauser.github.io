@@ -245,6 +245,13 @@ Recent activity is covered by the dedicated **Last activity** nav item (clock ic
 
 ---
 
+## CDN libraries
+
+All CDN libraries are pinned to exact versions (lucide 1.72.0, supabase-js 2.119.0 — same supabase-js version in `login.html`, `portal.html`, `admin.html`). The admin app starts even if Lucide fails to load (`window.lucide?.createIcons()`).
+To upgrade one: bump the version string in every HTML file that uses it, smoke-test (admin login, icons, QR scanner, portal), then commit.
+
+---
+
 ## Patterns to follow
 
 - **New admin view**: create `views/my-view.js` with `renderMyView()`, add `<script>` to `admin.html` before `lucide.createIcons(); initAdmin();`, add to `VIEW_RENDERERS` in `admin.js`

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SchulAsset — Admin</title>
   <link rel="stylesheet" href="admin.css">
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://unpkg.com/lucide@1.72.0/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 
@@ -72,7 +72,7 @@
 
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -90,7 +90,11 @@
   <script src="views/activity.js"></script>
   <script src="views/pupil-detail.js"></script>
   <script src="views/staff-detail.js"></script>
-  <script>lucide.createIcons(); initAdmin();</script>
+  <script>
+    // window.lucide?. keeps the admin app starting even if the icon library failed to load
+    window.lucide?.createIcons();
+    initAdmin();
+  </script>
 
   <!-- Print card — hidden on screen, shown only when printing -->
   <div id="print-card">
