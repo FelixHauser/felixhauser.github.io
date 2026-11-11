@@ -9,7 +9,7 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 
 - [ ]  **Upgrade Supabase to the paid plan** — free tier pauses the project after 7 days of inactivity and has no automatic backups. Not acceptable for signed contracts.
 - [ ]  **Export the database schema into the repo** — tables, RLS policies, triggers and grants currently exist only inside Supabase. Save as SQL (e.g. `supabase/schema.sql`) so the database can be rebuilt at any time.
-- [ ]  **Fix the Edge Function 1000-account limit** — `create-ipad-account` uses `listUsers({ perPage: 1000 })`; beyond 1000 accounts, reassignment and password reset fail. Look the user up by email instead.
+- [x]  **Fix the Edge Function 1000-account limit** (done: create first, paged lookup only on conflict; tested live) — `create-ipad-account` uses `listUsers({ perPage: 1000 })`; beyond 1000 accounts, reassignment and password reset fail. Look the user up by email instead.
 - [ ]  **Fix refresh bug** — website doesn't refresh correctly after a change. Most noticeable on iPad detail view.
 - [x]  **Pin all CDN library versions** (done: lucide 1.72.0, supabase-js 2.119.0; Lucide guarded with `window.lucide?.`) — `lucide@latest` and `supabase-js@2` can change overnight and break the app.
   - Pin both to an exact, currently working version (`lucide` in `admin.html`; `supabase-js` in `login.html`, `portal.html`, `admin.html`); the other CDN libraries are already pinned
@@ -52,6 +52,8 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
       - Archive / Decommission button on iPad detail view
       - Implements the retention concept from Priority 2
 - [ ]  **Editable, versioned Leihvertrag** — edit the iPad contract conditions via both a .md file (for displaying it online) and the fillable PDF. `terms_version: '1.0'` is currently hardcoded; every change must create a new version, so it stays recorded which version each family signed.
+
+
 
 
 ## Priority 4 — Day-to-day operation

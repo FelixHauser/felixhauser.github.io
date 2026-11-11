@@ -18,14 +18,50 @@ function generatePassword(): string {
   return `${adj}-${noun}-${num}`
 }
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+// JSON response that always carries CORS headers, so the browser can read
+// error messages too (without them, errors show up as an opaque CORS failure).
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+  })
+}
+
+const PAGE_SIZE = 1000
+
+// True if createUser failed because the email is already registered.
+// Checks the error code/status first; the message is only a fallback.
+function isEmailExistsError(err: { code?: string; status?: number; message?: string } | null): boolean {
+  if (!err) return false
+  return err.code === 'email_exists'
+    || err.status === 422
+    || /already/i.test(err.message ?? '')
+}
+
+// Finds a user's id by email by paging through all users, one page at a time.
+// No fixed upper limit on the number of accounts (the old code only looked at
+// the first 1000). Stops as soon as the email is found or a page comes back empty
+// (not "page not full", so a server-side cap on the page size cannot cut it short).
+// deno-lint-ignore no-explicit-any
+async function findUserIdByEmail(adminClient: any, email: string): Promise<string | null> {
+  for (let page = 1; ; page++) {
+    const { data, error } = await adminClient.auth.admin.listUsers({ page, perPage: PAGE_SIZE })
+    if (error) throw new Error('Could not list users: ' + error.message)
+    const users = data?.users ?? []
+    const match = users.find((u: { email?: string }) => u.email?.toLowerCase() === email.toLowerCase())
+    if (match) return match.id
+    if (users.length === 0) return null
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-      },
-    })
+    return new Response('ok', { headers: CORS_HEADERS })
   }
 
   try {
@@ -35,7 +71,7 @@ Deno.serve(async (req) => {
     const authHeader     = req.headers.get('Authorization')
 
     if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Missing authorization' }), { status: 401 })
+      return json({ error: 'Missing authorization' }, 401)
     }
 
     // Verify the caller is an authenticated admin.
@@ -44,7 +80,7 @@ Deno.serve(async (req) => {
     })
     const { data: { user }, error: userError } = await callerClient.auth.getUser()
     if (userError || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
+      return json({ error: 'Unauthorized' }, 401)
     }
     const { data: roleRow } = await callerClient
       .from('user_roles')
@@ -52,13 +88,13 @@ Deno.serve(async (req) => {
       .eq('user_id', user.id)
       .single()
     if (!roleRow || roleRow.role !== 'admin') {
-      return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403 })
+      return json({ error: 'Forbidden' }, 403)
     }
 
     // Parse request.
     const { serial_number } = await req.json()
     if (!serial_number) {
-      return new Response(JSON.stringify({ error: 'Missing serial_number' }), { status: 400 })
+      return json({ error: 'Missing serial_number' }, 400)
     }
 
     const email    = `${String(serial_number).toUpperCase()}@schulasset.local`
@@ -66,30 +102,32 @@ Deno.serve(async (req) => {
 
     const adminClient = createClient(supabaseUrl, serviceRoleKey)
 
-    // Find existing auth account for this iPad, or create one.
-    const { data: listData } = await adminClient.auth.admin.listUsers({ perPage: 1000 })
-    const existing = listData?.users?.find(
-      (u) => u.email?.toLowerCase() === email.toLowerCase()
-    )
-
+    // Create the auth account for this iPad. This is the common case (first
+    // assignment) and needs no user listing at all.
     let userId: string
 
-    if (existing) {
-      await adminClient.auth.admin.updateUserById(existing.id, { password })
-      userId = existing.id
-    } else {
-      const { data: newUser, error: createError } = await adminClient.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-      })
-      if (createError || !newUser.user) {
-        return new Response(
-          JSON.stringify({ error: createError?.message ?? 'Failed to create user' }),
-          { status: 500 }
-        )
-      }
+    const { data: newUser, error: createError } = await adminClient.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+    })
+
+    if (newUser?.user && !createError) {
       userId = newUser.user.id
+    } else if (isEmailExistsError(createError)) {
+      // The account already exists (reassignment / password reset): find it and
+      // set the new password. Paged search, so it works for any number of accounts.
+      const existingId = await findUserIdByEmail(adminClient, email)
+      if (!existingId) {
+        return json({ error: 'Account exists but could not be found' }, 500)
+      }
+      const { error: updateError } = await adminClient.auth.admin.updateUserById(existingId, { password })
+      if (updateError) {
+        return json({ error: 'Failed to reset password: ' + updateError.message }, 500)
+      }
+      userId = existingId
+    } else {
+      return json({ error: createError?.message ?? 'Failed to create user' }, 500)
     }
 
     // Always upsert user_roles — whether the account is new or existing.
@@ -98,16 +136,11 @@ Deno.serve(async (req) => {
       .upsert({ user_id: userId, role: 'student' }, { onConflict: 'user_id' })
 
     if (roleError) {
-      return new Response(JSON.stringify({ error: 'Failed to set user role: ' + roleError.message }), { status: 500 })
+      return json({ error: 'Failed to set user role: ' + roleError.message }, 500)
     }
 
-    return new Response(JSON.stringify({ password }), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-    })
+    return json({ password })
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 })
+    return json({ error: err.message }, 500)
   }
 })

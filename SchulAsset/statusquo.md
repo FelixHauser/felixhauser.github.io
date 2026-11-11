@@ -76,8 +76,8 @@ Buttons are contextual — only shown when relevant to the current iPad state:
 ### What is NOT yet built
 - See **`TODO.md`** — prioritised to-do list towards full operation (Priority 1 → 6)
 
-### Known issue
-- **Edge Function 1000-account limit** — `create-ipad-account` finds existing accounts via `listUsers({ perPage: 1000 })`. With more than 1000 portal accounts, an account not on that first page is not found → `createUser` fails with "already registered" → reassignment / password reset fails. Fix: look the user up by email instead of listing all users.
+### Account lookup (no account limit)
+- `create-ipad-account` tries `createUser` first; only if the email already exists does it page through `listUsers` (1000 per page, until found) to reset the password. Works for any number of portal accounts. **The deployed version in Supabase must be updated by hand after changing the source** (Studio → Edge Functions). All responses carry CORS headers so errors are readable in the browser. `service_role` needs `GRANT SELECT, INSERT, UPDATE ON public.user_roles` (the function upserts the role row).
 
 ---
 

@@ -660,10 +660,15 @@ async function submitAssign() {
 
     if (fnError || !fnData?.password) {
       // Assignment was saved — just warn, don't block.
-      console.error('Account function error:', fnError || fnData)
+      // For non-2xx answers the real message is in the response body.
+      // Read as text first (it may not be JSON, e.g. a platform error), then try to parse it.
+      const rawBody = await fnError?.context?.text?.().catch(() => null);
+      let detail = null;
+      try { detail = JSON.parse(rawBody); } catch { detail = rawBody ? { error: rawBody } : null; }
+      console.error('Account function error:', fnError?.context?.status, rawBody, fnError || fnData)
       closeAdminModal();
       renderIpadDetail();
-      alert('Zuweisung gespeichert, aber Passwort konnte nicht generiert werden.\nBitte manuell in Supabase Auth nachsehen.');
+      alert('Zuweisung gespeichert, aber Passwort konnte nicht generiert werden.\nBitte manuell in Supabase Auth nachsehen.' + (detail?.error ? '\n\n' + detail.error : ''));
       return;
     }
 
