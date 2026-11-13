@@ -1,3 +1,2 @@
-# Documentation and session notes — synced via iCloud, not needed in the repo
-CLAUDE.md
-statusquo.md
+# Personal Claude Code settings (permissions of this machine) — not shared
+.claude/settings.local.json

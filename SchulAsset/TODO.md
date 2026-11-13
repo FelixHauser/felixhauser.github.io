@@ -69,14 +69,12 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 ## Priority 5 — Nice to have / housekeeping
 
 - [ ]  **Nightly backup to the Raspberry Pi** — `pg_dump` from Supabase to the Pi in school: an on-site copy of all data, plus a test server for trying changes
-- [ ]  **Git housekeeping**
-  - add `.claude/settings.local.json` to the root `.gitignore`, then commit the OpenSpec setup
-  - decide whether `CLAUDE.md` / `statusquo.md` stay in the repo (they are tracked, but `.gitignore` says they shouldn't be)
 - [ ]  **Cache-busting for script files** — after a deploy, browsers may keep an old `translations.js` and show raw keys such as `login.forgotLink`; add a version suffix to the script tags (`translations.js?v=…`)
 
 ## Priority 6 — Distribution
 
 - [ ] **Create a distribution package** — create a distribution package so that the web app can be used for other schools
+  - **Not part of the package:** `CLAUDE.md`, `statusquo.md`, `TODO.md`, `.claude/`, `openspec/`, the school's own legal texts and logo, and `supabase/db-changes.md` (superseded by the schema export). They stay in the private repo for backup only.
 - [ ] **Config file for Supabase credentials** — one clearly commented file (e.g. `config.js`) the installing school edits once (decision: no GUI page — a static site could only store it in one visitor's browser; the anon key is public, so a file is safe)
 - [ ] **Configurable school details** — school name, logo, Schulträger (currently "Stadt Marl") and document templates, so another school can use its own
 - [ ] **Create a database creation system** — where after installing/copying the files on a server, the database structure can be created without having to enter the Supabase project page (if at all possible)
@@ -98,3 +96,6 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 - [x]  **Searchable person picker in the assign dialog** — search field with results (name, address, Kürzel; umlaut- and case-insensitive; max 20 results) replaces the long drop-down; reusable component `views/person-picker.js` (OpenSpec change `add-person-picker`)
 - [x]  **1000-row limit in other lists** — pupil/staff lists, assign dropdowns and Pending tabs use `fetchAllRows()`; the Übergabe tab no longer sends id lists in the URL (OpenSpec change `fix-1000-row-limit-lists`)
 - [x]  **Translate the hardcoded German strings on the login page** — 13 new `login.*` keys in DE/EN/TR, tested manually (OpenSpec change `translate-login-page`)
+
+## Priority 5 — Housekeeping
+- [x]  **Git housekeeping** — `.claude/settings.local.json` is ignored (personal permissions); the OpenSpec setup (`.claude/commands`, `.claude/skills`) is committed; `CLAUDE.md` and `statusquo.md` stay in the (private) repo as a backup — the misleading ignore lines were removed
