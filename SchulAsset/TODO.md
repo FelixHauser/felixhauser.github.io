@@ -69,7 +69,6 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 ## Priority 5 — Nice to have / housekeeping
 
 - [ ]  **Nightly backup to the Raspberry Pi** — `pg_dump` from Supabase to the Pi in school: an on-site copy of all data, plus a test server for trying changes
-- [ ]  **Cache-busting for script files** — after a deploy, browsers may keep an old `translations.js` and show raw keys such as `login.forgotLink`; add a version suffix to the script tags (`translations.js?v=…`)
 
 ## Priority 6 — Distribution
 
@@ -99,3 +98,4 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 
 ## Priority 5 — Housekeeping
 - [x]  **Git housekeeping** — `.claude/settings.local.json` is ignored (personal permissions); the OpenSpec setup (`.claude/commands`, `.claude/skills`) is committed; `CLAUDE.md` and `statusquo.md` stay in the (private) repo as a backup — the misleading ignore lines were removed
+- [x]  **Cache-busting for script files** — local scripts and stylesheets carry `?v=<version>`; run `./bump-version.sh` before every push that changes a `.js`/`.css` file (OpenSpec change `cache-busting`)
