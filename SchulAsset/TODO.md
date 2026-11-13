@@ -34,9 +34,10 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 - [ ]  **Document admin management** — how a new admin account is created in Supabase Studio, and who holds the Supabase owner login.
 
 ### Localization
-- [ ]  **Evaluate localization** — translation quality (native speaker review of EN/TR) is still open; the automated completeness check is done (see Done)
-- [ ]  **Wire the unused portal keys into `portal.js`** — the main portal view (greeting, iPad info, status labels, Übergabe/Rückgabe steps) is still hardcoded German although the keys exist in `translations.js`; found by `check-translations.js` (46 unused keys). CLAUDE.md requires the portal to be fully localised.
-  - **In progress:** OpenSpec change `wire-portal-translations` is proposed (artifacts written, not yet implemented) — continue with `/opsx:apply`. Leihvertrag text and PDFs stay German for now (decide separately whether to translate them).
+- [ ]  **Native-speaker review of EN/TR** — prepared by OpenSpec change `evaluate-translations`: run `node export-translations.js`, give `translation-review.csv` (+ `openspec/changes/evaluate-translations/translation-findings.md`) to a native speaker; they fill `comment_en` / `comment_tr`; apply the answers in `translations.js`. **Open: who reviews?** (colleague, parent representative…). The German questions are settled (2026-11-14: "Sie" everywhere, "Leihvertrag" as the only name) — 10 suggestions F3–F12 remain for the reviewer.
+- [x]  **Wire the unused portal keys into `portal.js`** — the main portal view (greeting, iPad info, Übergabe/Rückgabe steps) was hardcoded German; found by `check-translations.js` (46 unused keys). CLAUDE.md requires the portal to be fully localised.
+  - Done 2026-11-14 (OpenSpec change `wire-portal-translations`, tested manually in DE/EN/TR, archived; spec `openspec/specs/portal-localisation/`). Leihvertrag text and PDFs stay German for now (decide separately whether to translate them).
+- [x]  **Review sheet + first-pass evaluation** — `export-translations.js`, shared `translation-tools.js`, `translation-findings.md` (2 fixes applied, 12 open suggestions) (OpenSpec change `evaluate-translations`, 2026-11-14)
 
 ## Priority 3 — Administration side
 - [ ]  **Roles** (decision 2026-11-13) — three roles in `user_roles`:

@@ -204,19 +204,19 @@ function renderPortal(termsRow) {
   if (infoBody) {
     infoBody.innerHTML = `
       <div class="v2-info-row">
-        <span class="v2-info-key">Seriennummer</span>
+        <span class="v2-info-key">${t('portal.serialNumber')}</span>
         <span class="v2-info-val">${ipad.serial_number}</span>
       </div>
       <div class="v2-info-row">
-        <span class="v2-info-key">Speicher</span>
+        <span class="v2-info-key">${t('portal.storage')}</span>
         <span class="v2-info-val normal">${ipad.storage_capacity ?? '—'}</span>
       </div>
       <div class="v2-info-row">
-        <span class="v2-info-key">Typ</span>
-        <span class="v2-info-val normal">${ipad.ipad_type === 'staff' ? 'Lehrkraft' : 'Schüler/in'}</span>
+        <span class="v2-info-key">${t('portal.type')}</span>
+        <span class="v2-info-val normal">${ipad.ipad_type === 'staff' ? t('portal.typeStaff') : t('portal.typeStudent')}</span>
       </div>
       <div class="v2-info-row">
-        <span class="v2-info-key">Zugewiesen seit</span>
+        <span class="v2-info-key">${t('portal.assignedSince')}</span>
         <span class="v2-info-val normal">${formatDate(ipad.assigned_date)}</span>
       </div>
     `;
@@ -228,9 +228,9 @@ function renderPortal(termsRow) {
   document.getElementById('portal-content').innerHTML = `
     <div class="v2-page">
       <div class="v2-topbar">
-        <p class="v2-greeting">Hallo, ${_pupilName.split(' ')[0]}!</p>
+        <p class="v2-greeting">${tf('portal.greeting', { name: _pupilName.split(' ')[0] })}</p>
         <button class="v2-info-btn" onclick="document.getElementById('ipad-info-modal').hidden=false">
-          ℹ︎ iPad-Details
+          ℹ︎ ${t('portal.main.details')}
         </button>
       </div>
       <div class="v2-timeline">
@@ -238,10 +238,10 @@ function renderPortal(termsRow) {
       </div>
       ${inUse ? `
         <div class="v2-emergency">
-          <p class="v2-emergency-label">Problem mit dem iPad?</p>
+          <p class="v2-emergency-label">${t('portal.main.problem')}</p>
           <div class="v2-emergency-buttons">
-            <button class="v2-btn-damage" onclick="openModal('schaden-modal')">⚠️ Schaden<br>melden</button>
-            <button class="v2-btn-loss"   onclick="openModal('verlust-modal')">❗ Verlust /<br>Diebstahl melden</button>
+            <button class="v2-btn-damage" onclick="openModal('schaden-modal')">⚠️ ${t('portal.reportDamage')}</button>
+            <button class="v2-btn-loss"   onclick="openModal('verlust-modal')">❗ ${t('portal.reportLoss')}</button>
           </div>
         </div>
       ` : ''}
@@ -256,33 +256,33 @@ function _buildSteps(termsRow) {
 
   // Step 1: Leihvertrag
   if (termsRow) {
-    steps.push({ state: 'done', number: '✓', title: 'Leihvertrag', subtitle: `Akzeptiert am ${formatDate(termsRow.accepted_at)}`, download: { label: '↓ Leihvertrag herunterladen', onclick: 'downloadLeihvertrag()' } });
+    steps.push({ state: 'done', number: '✓', title: t('portal.steps.leihvertrag.title'), subtitle: tf('portal.steps.leihvertrag.acceptedOn', { date: formatDate(termsRow.accepted_at) }), download: { label: '↓ ' + t('portal.steps.leihvertrag.download'), onclick: 'downloadLeihvertrag()' } });
   } else {
-    steps.push({ state: 'active', number: '1', title: 'Leihvertrag lesen & bestätigen', subtitle: 'Bitte lesen Sie den Leihvertrag und bestätigen Sie ihn.', action: { label: 'Leihvertrag öffnen', onclick: "openModal('terms-modal')" } });
+    steps.push({ state: 'active', number: '1', title: t('portal.steps.leihvertrag.activeTitle'), subtitle: t('portal.steps.leihvertrag.activeSub'), action: { label: t('portal.steps.leihvertrag.open'), onclick: "openModal('terms-modal')" } });
   }
 
   // Step 2: Übergabeprotokoll
   if (!termsRow) {
-    steps.push({ state: 'locked', number: '2', title: 'iPad erhalten' });
+    steps.push({ state: 'locked', number: '2', title: t('portal.steps.uebergabe.title') });
   } else if (!_uebergabe) {
-    steps.push({ state: 'waiting', number: '⏳', title: 'iPad erhalten', subtitle: 'Die Schule bereitet die Übergabe vor. Sie müssen hier nichts tun.' });
+    steps.push({ state: 'waiting', number: '⏳', title: t('portal.steps.uebergabe.title'), subtitle: t('portal.steps.uebergabe.waiting') });
   } else if (_uebergabe.accepted_at) {
-    steps.push({ state: 'done', number: '✓', title: 'iPad erhalten', subtitle: `Bestätigt am ${formatDate(_uebergabe.accepted_at)}`, download: { label: '↓ Übergabeprotokoll herunterladen', onclick: 'downloadUebergabe()' } });
+    steps.push({ state: 'done', number: '✓', title: t('portal.steps.uebergabe.title'), subtitle: tf('portal.steps.uebergabe.confirmedOn', { date: formatDate(_uebergabe.accepted_at) }), download: { label: '↓ ' + t('portal.steps.uebergabe.download'), onclick: 'downloadUebergabe()' } });
   } else {
-    steps.push({ state: 'active', number: '2', title: 'iPad erhalten bestätigen', subtitle: 'Bitte prüfen Sie den Zustand des iPads und bestätigen Sie den Erhalt.', details: _protocolDetails(_uebergabe, 'uebergabe'), action: { label: 'Erhalt bestätigen', onclick: `openAcceptModal('uebergabe', '${_uebergabe.id}')` } });
+    steps.push({ state: 'active', number: '2', title: t('portal.steps.uebergabe.activeTitle'), subtitle: t('portal.steps.uebergabe.activeSub'), details: _protocolDetails(_uebergabe, 'uebergabe'), action: { label: t('portal.steps.uebergabe.confirm'), onclick: `openAcceptModal('uebergabe', '${_uebergabe.id}')` } });
   }
 
   // Step 3: In Verwendung
   const isActive = _ipad.status === 'in_use';
-  steps.push({ state: isActive ? 'done' : 'locked', number: isActive ? '✓' : '3', title: 'iPad in Verwendung', subtitle: isActive ? 'Das iPad wird aktiv genutzt.' : '' });
+  steps.push({ state: isActive ? 'done' : 'locked', number: isActive ? '✓' : '3', title: t('portal.steps.inUse.title'), subtitle: isActive ? t('portal.steps.inUse.active') : '' });
 
   // Step 4: Rückgabeprotokoll
   if (!_rueckgabe) {
-    steps.push({ state: 'locked', number: '4', title: 'iPad zurückgeben' });
+    steps.push({ state: 'locked', number: '4', title: t('portal.steps.rueckgabe.lockedTitle') });
   } else if (_rueckgabe.accepted_at) {
-    steps.push({ state: 'done', number: '✓', title: 'iPad zurückgegeben', subtitle: `Bestätigt am ${formatDate(_rueckgabe.accepted_at)}`, download: { label: '↓ Rückgabeprotokoll herunterladen', onclick: 'downloadRueckgabe()' } });
+    steps.push({ state: 'done', number: '✓', title: t('portal.steps.rueckgabe.doneTitle'), subtitle: tf('portal.steps.rueckgabe.confirmedOn', { date: formatDate(_rueckgabe.accepted_at) }), download: { label: '↓ ' + t('portal.steps.rueckgabe.download'), onclick: 'downloadRueckgabe()' } });
   } else {
-    steps.push({ state: 'active', number: '4', title: 'Rückgabe bestätigen', subtitle: 'Bitte prüfen Sie den Zustand des iPads und bestätigen Sie die Rückgabe.', details: _protocolDetails(_rueckgabe, 'rueckgabe'), action: { label: 'Rückgabe bestätigen', onclick: `openAcceptModal('rueckgabe', '${_rueckgabe.id}')` } });
+    steps.push({ state: 'active', number: '4', title: t('portal.steps.rueckgabe.activeTitle'), subtitle: t('portal.steps.rueckgabe.activeSub'), details: _protocolDetails(_rueckgabe, 'rueckgabe'), action: { label: t('portal.steps.rueckgabe.confirm'), onclick: `openAcceptModal('rueckgabe', '${_rueckgabe.id}')` } });
   }
 
   return steps;
@@ -357,7 +357,7 @@ async function acceptTerms() {
     assigned_to: _pupilName,
     changed_by:  _pupilName,
     changed_at:  now,
-    notes:       'Nutzungsbedingungen v1.0 akzeptiert (Schülerportal)',
+    notes:       'Leihvertrag v1.0 akzeptiert (Schülerportal)',
   });
 
   _termsRow = {
@@ -390,7 +390,7 @@ async function downloadLeihvertrag() {
     });
   } catch (e) {
     console.error('Download error:', e);
-    alert('Download fehlgeschlagen:\n' + (e.message || e));
+    alert(t('portal.downloadFailed') + '\n' + (e.message || e));
   }
 }
 
@@ -586,8 +586,11 @@ function downloadLastVerlust() {
 
 function openAcceptModal(type, id) {
   _pendingAccept = { type, id };
-  document.getElementById('accept-sig-title').textContent = t(`portal.sig.${type}Title`);
-  document.getElementById('accept-sig-desc').textContent  = t(`portal.sig.${type}Desc`);
+  // Written out per type (no computed keys) so check-translations.js can see they are used.
+  document.getElementById('accept-sig-title').textContent =
+    type === 'uebergabe' ? t('portal.sig.uebergabeTitle') : t('portal.sig.rueckgabeTitle');
+  document.getElementById('accept-sig-desc').textContent  =
+    type === 'uebergabe' ? t('portal.sig.uebergabeDesc')  : t('portal.sig.rueckgabeDesc');
   document.getElementById('accept-sig-error').hidden      = true;
   const btn = document.getElementById('accept-sig-btn');
   btn.disabled    = false;
@@ -668,6 +671,13 @@ function downloadRueckgabe() {
 
 // ── Helpers ───────────────────────────────────────────────────────
 
+// Called by setLang() (translations.js) after the language was switched:
+// redraws the main screen, whose texts are built in JavaScript.
+// Does nothing until the iPad has been loaded.
+window.onLangChange = () => {
+  if (_ipad) renderPortal(_termsRow);
+};
+
 function openModal(id) {
   const modal = document.getElementById(id);
   const form  = modal.querySelector('form');
@@ -707,9 +717,12 @@ async function portalLogout() {
   window.location.href = 'login.html';
 }
 
+// Date format follows the selected language (de-DE, en-GB, tr-TR).
+const DATE_LOCALES = { de: 'de-DE', en: 'en-GB', tr: 'tr-TR' };
+
 function formatDate(iso) {
   if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('de-DE', {
+  return new Date(iso).toLocaleDateString(DATE_LOCALES[currentLang] || 'de-DE', {
     day:   '2-digit',
     month: '2-digit',
     year:  'numeric',

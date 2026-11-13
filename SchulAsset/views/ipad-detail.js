@@ -4,7 +4,7 @@
 const EVENT_LABELS = {
   assignment:      'Zuweisung',
   status_change:   'Statusänderung',
-  terms_accepted:  'Nutzungsbedingungen akzeptiert',
+  terms_accepted:  'Leihvertrag akzeptiert',
   schadenmeldung:  'Schadenmeldung',
   verlustmeldung:  'Verlustmeldung',
   returned:        'Zurückgegeben',
@@ -727,15 +727,15 @@ async function openRemoveOwnerModal() {
     warningHtml = `
       <div class="admin-modal-warn">
         ⚠️ Kein Rückgabeprotokoll vorhanden.<br>
-        Bitte erstelle zuerst ein Rückgabeprotokoll und warte auf die Unterschrift
-        des Schülers / der Schülerin, bevor du die Zuweisung aufhebst.
+        Bitte erstellen Sie zuerst ein Rückgabeprotokoll und warten Sie auf die Unterschrift
+        des Schülers / der Schülerin, bevor Sie die Zuweisung aufheben.
       </div>`;
   } else if (!rg.accepted_at) {
     warningHtml = `
       <div class="admin-modal-warn">
         ⚠️ Das Rückgabeprotokoll wurde noch nicht unterschrieben.<br>
-        Warte auf die digitale Bestätigung durch den Schüler / die Schülerin,
-        bevor du die Zuweisung aufhebst.
+        Warten Sie auf die digitale Bestätigung durch den Schüler / die Schülerin,
+        bevor Sie die Zuweisung aufheben.
       </div>`;
   } else {
     warningHtml = `
@@ -749,7 +749,7 @@ async function openRemoveOwnerModal() {
     <p style="font-size:0.9rem;margin-top:0.9rem">
       Zuweisung von <strong>${prevName}</strong> aufheben?<br>
       <span style="color:var(--text-muted);font-size:0.82rem">
-        Der Portalzugang wird gesperrt und die Nutzungsbedingungen werden zurückgesetzt.
+        Der Portalzugang wird gesperrt und der Leihvertrag wird zurückgesetzt.
       </span>
     </p>
   `, 'Trotzdem aufheben', submitRemoveOwner);

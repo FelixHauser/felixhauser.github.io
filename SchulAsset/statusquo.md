@@ -1,6 +1,6 @@
 # SchulAsset — Status Quo & Road Map
 
-Last updated: 2026-11-13 (session 13 — login localised, iPad add/import, pupil/staff import, person picker, cache-busting, translation check; portal wiring proposed)
+Last updated: 2026-11-14 (session 14 — portal translations wired, translation review tooling, Sie + Leihvertrag decisions, admin Last activity in German)
 
 ---
 
@@ -382,9 +382,16 @@ The earlier rule "no hard deletes" is relaxed for old data, as a **manual, per-i
 - State on 2026-11-13: 120 keys per language, no errors.
 - **Finding:** the 46 "defined but never used" warnings are real. The main portal view in `portal.js` (greeting, serial number, storage, "Zugewiesen seit", the Übergabe/Rückgabe steps, etc.) is still **hardcoded German**; the keys `portal.greeting`, `portal.statuses.*`, `portal.uebergabe.*`, `portal.rueckgabe.*` exist but are not wired in. Open item in TODO.md. Translation quality (EN/TR) still needs a native speaker.
 
-## Where to continue (end of session 13, 2026-11-13)
-- **Open OpenSpec change, proposed but NOT yet implemented:** `wire-portal-translations` (`openspec/changes/wire-portal-translations/`: proposal, design, spec, 11 tasks). Run `/opsx:apply` to start. It makes the main portal screen (greeting, iPad details, the four steps, damage/loss buttons, dates) follow the selected language (DE/EN/TR); today it is hardcoded German in `portal.js`. The Leihvertrag text and PDFs stay German (separate decision); `ipad_history` notes stay German.
-- Verify with `node check-translations.js` (goal: no unused `portal.*` warnings) and a manual test in all three languages.
+## Session 14 (2026-11-14) — portal wiring implemented, review change proposed
+
+- **`wire-portal-translations`** implemented, tested manually (DE/EN/TR, all fine) and archived (`openspec/changes/archive/2026-11-14-wire-portal-translations/`, spec `openspec/specs/portal-localisation/`). `portal.js` main screen (greeting, iPad details pop-up, four steps, damage/loss block, download alert) now uses `t()` / `tf()`; `tf(key, {name})` in `translations.js` replaces `{placeholders}`; `formatDate` uses `de-DE` / `en-GB` / `tr-TR`; `setLang()` calls `window.onLangChange` (defined in `portal.js`) so the main screen redraws on language switch. New key groups `portal.main.*`, `portal.steps.*`, `portal.close`, `portal.downloadFailed`; old unused keys (`statuses`, `uebergabe`, `rueckgabe`, `terms*`, `status`, `leihvertrag.downloadBtn`) removed. German output verified identical to the former literals (34 texts). `check-translations.js` now also recognises `tf('key', …)`; result: 118 keys per language, no errors, no unused `portal.*` keys (remaining warnings: unused `login.errorGeneric`, one computed key in `openModal`).
+- Damage/loss buttons no longer force a line break (`Schaden<br>melden`); text wraps naturally (looked fine in the manual test).
+- Asset version bumped to `20261114-1` (`./bump-version.sh`). Nothing committed or pushed yet.
+- **`evaluate-translations`** implemented (manual browser check done, all fine; archived, spec `openspec/specs/translation-review/`): `translation-tools.js` (shared loading/scan code, used by both scripts), `export-translations.js` → `translation-review.csv` (git-ignored; `;`-separated, UTF-8 with BOM; columns key, screen, de, en, tr, comment_en, comment_tr; run `node export-translations.js` after every text change), and `openspec/changes/evaluate-translations/translation-findings.md` (first pass by the coding agent, not a native speaker: 2 certain fixes applied — EN "Pupils / Parents", EN "iPad received" — and 12 suggestions left open). **Decisions 2026-11-14:** German uses "Sie" everywhere (portal + login; 7 du-texts changed, also their HTML fallbacks) and "Leihvertrag" is the only name of the contract (replaced "Nutzungsbedingungen" / "Terms of Use" / "Kullanım Koşulları" in the pop-up title and accept button, the admin history label, and the history note written for new acceptances; old history rows keep the old wording). Still open: a person must do the native-speaker review (see `TODO.md`). Asset version `20261114-2`.
+
+## Where to continue (end of session 14, 2026-11-14)
+- **No open OpenSpec change.** Session 14 finished and archived `wire-portal-translations` and `evaluate-translations`. The portal and login are fully localised (DE/EN/TR); the admin area is German only, in "Sie" form (also the two unassign warnings in `views/ipad-detail.js`) and the Last activity view is now German too.
+- After any text change: `node check-translations.js`, then `node export-translations.js` to refresh the review sheet.
 - Before every push that changes a `.js`/`.css` file: `./bump-version.sh`.
 - Other small items still open (see TODO.md): read-only `teacher` role, active/not-active status for pupils/staff, admin panel (move the add/import buttons), native-speaker review of EN/TR. Distribution (Priority 6) stays for last.
 - Working on another computer: `git pull` first; start the local server from the SchulAsset folder (`python3 -m http.server 8080`); the OpenSpec CLI must be installed there (`openspec --version`).

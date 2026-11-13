@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SchulAsset — Login</title>
-  <link rel="stylesheet" href="login.css?v=20261113-1">
+  <link rel="stylesheet" href="login.css?v=20261114-5">
 </head>
 <body>
 
@@ -78,7 +78,7 @@
     <!-- Forgot password form (admin only) -->
     <div id="forgot-section" hidden>
       <p style="font-size:0.85rem;color:var(--text-secondary,#6b7280);margin-bottom:1.25rem;text-align:center" data-i18n="login.forgotIntro">
-        Gib deine Admin-E-Mail-Adresse ein. Du erhältst einen Reset-Link.
+        Geben Sie Ihre Admin-E-Mail-Adresse ein. Sie erhalten einen Reset-Link.
       </p>
       <div class="form-group">
         <label for="reset-email" data-i18n="login.emailLabel">E-Mail-Adresse</label>
@@ -96,7 +96,7 @@
     <!-- New password form (shown after clicking the email reset link) -->
     <div id="new-password-section" hidden>
       <p style="font-size:0.85rem;color:var(--text-secondary,#6b7280);margin-bottom:1.25rem;text-align:center" data-i18n="login.newPasswordIntro">
-        Wähle ein neues Passwort für deinen Admin-Account.
+        Wählen Sie ein neues Passwort für Ihren Admin-Account.
       </p>
       <div class="form-group">
         <label for="new-password" data-i18n="login.newPasswordLabel">Neues Passwort</label>
@@ -120,9 +120,9 @@
   <!-- Supabase JS client (CDN) — must come before our own scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.min.js"></script>
   <!-- Our files, in dependency order -->
-  <script src="supabase-client.js?v=20261113-1"></script>
-  <script src="translations.js?v=20261113-1"></script>
-  <script src="auth.js?v=20261113-1"></script>
+  <script src="supabase-client.js?v=20261114-5"></script>
+  <script src="translations.js?v=20261114-5"></script>
+  <script src="auth.js?v=20261114-5"></script>
   <script>
     // Apply translations on first load (language is read from localStorage or defaults to 'de').
     applyTranslations();

@@ -1,2 +1,5 @@
 # Personal Claude Code settings (permissions of this machine) — not shared
 .claude/settings.local.json
+
+# Generated translation review sheet (node export-translations.js)
+translation-review.csv

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SchulAsset — Schülerportal</title>
-  <link rel="stylesheet" href="portal.css?v=20261113-1">
+  <link rel="stylesheet" href="portal.css?v=20261114-5">
 </head>
 <body>
 
@@ -38,26 +38,26 @@
   <div id="ipad-info-modal" class="modal-backdrop" hidden>
     <div class="modal-card">
       <div class="modal-header">
-        <h2 class="modal-title">Mein iPad</h2>
+        <h2 class="modal-title" data-i18n="portal.myIpad">Mein iPad</h2>
         <button class="modal-close" onclick="document.getElementById('ipad-info-modal').hidden=true">✕</button>
       </div>
       <div class="modal-body" id="ipad-info-body"></div>
       <div class="modal-footer">
-        <button class="btn-primary" onclick="document.getElementById('ipad-info-modal').hidden=true">Schließen</button>
+        <button class="btn-primary" onclick="document.getElementById('ipad-info-modal').hidden=true" data-i18n="portal.close">Schließen</button>
       </div>
     </div>
   </div>
 
-  <!-- ── Nutzungsbedingungen modal ── -->
+  <!-- ── Leihvertrag modal ── -->
   <div id="terms-modal" class="modal-backdrop" hidden>
     <div class="modal-card">
       <div class="modal-header">
-        <h2 class="modal-title" data-i18n="portal.termsModalTitle">Nutzungsbedingungen</h2>
+        <h2 class="modal-title" data-i18n="portal.termsModalTitle">Leihvertrag</h2>
         <button class="modal-close" onclick="closeModal('terms-modal')">✕</button>
       </div>
       <div class="modal-body">
         <div class="terms-text">
-          <!-- PLACEHOLDER — replace with the school's official Nutzungsbedingungen -->
+          <!-- PLACEHOLDER — replace with the school's official Leihvertrag text -->
           <p>Das iPad ist Eigentum der Stadt Marl und wird dem/der Schüler/in unentgeltlich zur Verfügung gestellt.</p>
           <p>Mit der Nutzung des iPads erkenne ich folgende Bedingungen an:</p>
           <ol>
@@ -108,7 +108,7 @@
       <div class="modal-footer">
         <button class="btn-secondary" onclick="closeModal('terms-modal')" data-i18n="portal.cancel">Abbrechen</button>
         <button class="btn-primary" id="terms-accept-btn" onclick="acceptTerms()" data-i18n="portal.termsAcceptBtn">
-          Ich akzeptiere die Nutzungsbedingungen
+          Ich akzeptiere den Leihvertrag
         </button>
       </div>
     </div>
@@ -147,7 +147,7 @@
               id="schaden-desc"
               rows="4"
               data-i18n-placeholder="portal.schaden.descPlaceholder"
-              placeholder="Bitte beschreibe den Schaden genau…"
+              placeholder="Bitte beschreiben Sie den Schaden genau…"
               required
             ></textarea>
           </div>
@@ -167,7 +167,7 @@
               type="text"
               id="schaden-perpetrator"
               data-i18n-placeholder="portal.schaden.perpetratorPlaceholder"
-              placeholder="Name der Person, falls nicht du selbst"
+              placeholder="Name der Person, falls nicht Sie selbst"
             >
           </div>
           <div id="schaden-error" class="error-msg" hidden></div>
@@ -200,7 +200,7 @@
               id="verlust-circ"
               rows="4"
               data-i18n-placeholder="portal.verlust.circPlaceholder"
-              placeholder="Bitte beschreibe die Umstände genau…"
+              placeholder="Bitte beschreiben Sie die Umstände genau…"
               required
             ></textarea>
           </div>
@@ -275,10 +275,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.min.js"></script>
   <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-  <script src="supabase-client.js?v=20261113-1"></script>
-  <script src="translations.js?v=20261113-1"></script>
-  <script src="doc-generator.js?v=20261113-1"></script>
-  <script src="portal.js?v=20261113-1"></script>
+  <script src="supabase-client.js?v=20261114-5"></script>
+  <script src="translations.js?v=20261114-5"></script>
+  <script src="doc-generator.js?v=20261114-5"></script>
+  <script src="portal.js?v=20261114-5"></script>
   <script>
     applyTranslations();
     initPortal();
