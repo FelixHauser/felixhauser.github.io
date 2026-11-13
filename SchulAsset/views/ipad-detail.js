@@ -536,7 +536,7 @@ async function openAssignModal() {
     <div id="md-existing-section">
       <div class="admin-form-group">
         <label>Person</label>
-        <select id="md-person"><option value="">Wird geladen…</option></select>
+        <div id="md-person-picker"><p class="loading-msg">Wird geladen…</p></div>
       </div>
       <div style="margin-top:-0.4rem;text-align:right;margin-bottom:0.75rem">
         <button type="button" class="btn-link" style="font-size:0.8rem"
@@ -586,22 +586,25 @@ async function _loadPersonList() {
   if (existSection) existSection.hidden = false;
   if (newSection)   newSection.hidden   = true;
 
-  const type      = document.getElementById('md-type')?.value;
-  const personSel = document.getElementById('md-person');
-  const section   = document.getElementById('md-uebergabe-section');
-  if (!personSel) return;
+  const type    = document.getElementById('md-type')?.value;
+  const pickerEl = document.getElementById('md-person-picker');
+  const section = document.getElementById('md-uebergabe-section');
+  if (!pickerEl) return;
   if (section) section.hidden = (type !== 'pupil');
-  personSel.innerHTML = '<option value="">Wird geladen…</option>';
+  pickerEl.innerHTML = '<p class="loading-msg">Wird geladen…</p>';
 
+  // Load everyone of the chosen group (paged), then let the admin search in the list.
+  // Pupils are told apart by their address, staff by their Kürzel.
+  let items;
   if (type === 'pupil') {
-    const { data } = await fetchAllRows(() => supabase.from('pupils').select('id,first_name,last_name').order('last_name').order('first_name').order('id'));
-    personSel.innerHTML = '<option value="">— Bitte wählen —</option>' +
-      (data || []).map(p => `<option value="${p.id}">${p.last_name}, ${p.first_name}</option>`).join('');
+    const { data } = await fetchAllRows(() => supabase.from('pupils').select('id,first_name,last_name,address').order('last_name').order('first_name').order('id'));
+    items = (data || []).map(p => ({ id: p.id, label: `${p.last_name}, ${p.first_name}`, sub: p.address || '' }));
   } else {
     const { data } = await fetchAllRows(() => supabase.from('staff').select('id,first_name,last_name,kuerzel').order('last_name').order('first_name').order('id'));
-    personSel.innerHTML = '<option value="">— Bitte wählen —</option>' +
-      (data || []).map(s => `<option value="${s.id}">${s.last_name}, ${s.first_name} (${s.kuerzel})</option>`).join('');
+    items = (data || []).map(s => ({ id: s.id, label: `${s.last_name}, ${s.first_name}`, sub: s.kuerzel || '' }));
   }
+  // The picker keeps the selected id in <input id="md-person">, which submitAssign() reads.
+  createPersonPicker('md-person-picker', { items });
 }
 
 // Invalidates all active terms_acceptance rows for an iPad.
