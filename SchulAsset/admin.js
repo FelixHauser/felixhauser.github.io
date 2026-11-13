@@ -145,6 +145,22 @@ function _showDetail(view, id) {
   }
 }
 
+// Loads ALL rows of a query. Supabase returns at most 1000 rows per request, so a plain
+// query silently cuts off larger tables. Pass a function that builds a fresh query
+// (with a stable .order(), ideally on a unique column); it is run page by page.
+// Returns { data, error } like a normal Supabase call.
+async function fetchAllRows(buildQuery) {
+  const pageSize = 1000;
+  const all = [];
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await buildQuery().range(from, from + pageSize - 1);
+    if (error) return { data: null, error };
+    all.push(...data);
+    if (data.length < pageSize) break;
+  }
+  return { data: all, error: null };
+}
+
 // Navigates to the iPad detail view for the given iPad id.
 function showIpadDetail(id)  { _showDetail('ipad-detail', id); }
 function showPupilDetail(id) { _showDetail('pupil-detail', id); }

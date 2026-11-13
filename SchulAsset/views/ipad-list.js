@@ -29,20 +29,22 @@ async function renderIpadList() {
         <option value="staff">Lehrkraft</option>
       </select>
       <button class="btn-action-detail" onclick="openNewIpadModal()">+ Neues iPad</button>
+      <button class="btn-action-detail" onclick="openIpadImportModal()">CSV importieren</button>
     </div>
 
     <div id="ipad-count" class="result-count"></div>
     <div id="ipad-table-wrap"><p class="loading-msg">Wird geladen…</p></div>
   `;
 
-  const { data: ipads, error } = await supabase
+  // All iPads, paged (a single query would stop at 1000 rows).
+  const { data: ipads, error } = await fetchAllRows(() => supabase
     .from('ipads')
     .select(`
       id, serial_number, ipad_type, storage_capacity, status, assigned_date,
       pupils:assigned_pupil_id (first_name, last_name),
       staff:assigned_staff_id  (first_name, last_name)
     `)
-    .order('serial_number');
+    .order('serial_number'));
 
   if (error) {
     document.getElementById('overview-area').innerHTML =

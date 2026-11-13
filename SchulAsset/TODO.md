@@ -27,8 +27,9 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 - [ ] Insert the **real Datenschutzerklärung and Impressum text** from the school — see "How to insert the real legal text" in `statusquo.md`; remove the placeholder banner afterwards
 
 ### Getting real data in (part of the admin panel, see Priority 3)
-- [ ]  **Bulk import (CSV)** for iPads, pupils and staff — e.g. from the Logineo export or the school's pupil list
+- [ ]  **Bulk import (CSV)** for iPads, pupils and staff — **iPads done** (OpenSpec change `import-ipads-csv`: preview, optional status column, tested with 1500 rows); pupils and staff still open — — e.g. from the Logineo export or the school's pupil list
 - [x]  **Add individual iPads, pupils and staff** in the admin interface (done: "+ Neues iPad", "+ Neuer Schüler", "+ Neue Lehrkraft"; iPads via OpenSpec change `add-individual-ipads`)
+- [ ]  **1000-row limit in other lists** — Supabase returns at most 1000 rows per request. The iPad list is fixed (`fetchAllRows()` in `admin.js`); still affected: pupil list, staff list, the pupil/staff dropdowns in the assign dialog (`ipad-detail.js`), the Übergabe query in `meldungen.js`, and the duplicate check in the single "+ Neues iPad" dialog (uses the list, now fixed). Apply `fetchAllRows()` before pupils/staff are bulk-imported.
 - [ ]  Remove the dummy data before go-live
 
 ### Ownership
