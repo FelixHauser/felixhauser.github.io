@@ -1,6 +1,6 @@
 # SchulAsset — Status Quo & Road Map
 
-Last updated: 2026-11-13 (session 13 — login page localised, add individual iPads)
+Last updated: 2026-11-13 (session 13 — login localised, iPad add/import, pupil/staff import, person picker, cache-busting, translation check; portal wiring proposed)
 
 ---
 
@@ -355,7 +355,7 @@ Out of scope, open question: several actions ignore errors of their secondary wr
 - **`translate-login-page`** (OpenSpec, tested manually in DE/EN/TR; archived, spec `openspec`/specs/login-localisation/): all remaining hardcoded German on `login.html` and in `auth.js` (forgot-password link, auto-login message, forgot/new-password sections, their messages) now goes through `translations.js` (13 new `login.*` keys; the three languages have identical key sets). Supabase's own error text after the "Fehler:/Error:/Hata:" prefix stays as delivered.
 - `TODO.md`: login-translation item ticked; "Add individual pupils and staff" ticked (iPads still open).
 - **Gotcha:** after editing `translations.js` the browser may use a cached copy and show raw keys such as `login.forgotLink` — hard-reload (Cmd+Shift+R). Possible later fix: version suffix on script tags (`translations.js?v=…`) so users don't hit this after a deploy.
-- Next: Priority 2 "Add individual iPads" / CSV import.
+- (Superseded — see "Where to continue" at the end of this file.)
 
 - **`add-individual-ipads`** (OpenSpec, tested manually; archived, spec `openspec/specs/admin-ipad-creation/`): "+ Neues iPad" button in the toolbar of the iPad list (`views/ipad-list.js`, `openNewIpadModal` / `submitNewIpad`). Fields: serial number (trimmed, stored upper case), type, storage; status `available`; writes a first `ipad_history` row (`status_change`, "iPad angelegt") and opens the detail page. Duplicates rejected (list check + Postgres `23505`). DB: INSERT grant + admin-only policy `admin_insert_ipads` + case-insensitive unique index — logged in `supabase/db-changes.md`. Not tested: the student-cannot-insert check (optional). Remember to delete the test iPad(s) created while testing. Next on this path: CSV bulk import.
 - **Placement is temporary:** the "+ Neues iPad" button does not belong in the iPad list toolbar (decision 2026-11-13); it moves into the admin panel when the admin UI is reworked (see `TODO.md`, Priority 3).
@@ -381,3 +381,11 @@ The earlier rule "no hard deletes" is relaxed for old data, as a **manual, per-i
 - `node check-translations.js` (from the SchulAsset folder) checks DE/EN/TR: missing keys, empty texts, placeholder mismatches, and keys used in `.html`/`.js` but not defined in German (errors, exit code 1); unused keys and computed keys are warnings. Run it after every change to texts.
 - State on 2026-11-13: 120 keys per language, no errors.
 - **Finding:** the 46 "defined but never used" warnings are real. The main portal view in `portal.js` (greeting, serial number, storage, "Zugewiesen seit", the Übergabe/Rückgabe steps, etc.) is still **hardcoded German**; the keys `portal.greeting`, `portal.statuses.*`, `portal.uebergabe.*`, `portal.rueckgabe.*` exist but are not wired in. Open item in TODO.md. Translation quality (EN/TR) still needs a native speaker.
+
+## Where to continue (end of session 13, 2026-11-13)
+- **Open OpenSpec change, proposed but NOT yet implemented:** `wire-portal-translations` (`openspec/changes/wire-portal-translations/`: proposal, design, spec, 11 tasks). Run `/opsx:apply` to start. It makes the main portal screen (greeting, iPad details, the four steps, damage/loss buttons, dates) follow the selected language (DE/EN/TR); today it is hardcoded German in `portal.js`. The Leihvertrag text and PDFs stay German (separate decision); `ipad_history` notes stay German.
+- Verify with `node check-translations.js` (goal: no unused `portal.*` warnings) and a manual test in all three languages.
+- Before every push that changes a `.js`/`.css` file: `./bump-version.sh`.
+- Other small items still open (see TODO.md): read-only `teacher` role, active/not-active status for pupils/staff, admin panel (move the add/import buttons), native-speaker review of EN/TR. Distribution (Priority 6) stays for last.
+- Working on another computer: `git pull` first; start the local server from the SchulAsset folder (`python3 -m http.server 8080`); the OpenSpec CLI must be installed there (`openspec --version`).
+- Loose end: test CSV files may still be on the Desktop of the first computer (safe to delete).

@@ -36,6 +36,7 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 ### Localization
 - [ ]  **Evaluate localization** — translation quality (native speaker review of EN/TR) is still open; the automated completeness check is done (see Done)
 - [ ]  **Wire the unused portal keys into `portal.js`** — the main portal view (greeting, iPad info, status labels, Übergabe/Rückgabe steps) is still hardcoded German although the keys exist in `translations.js`; found by `check-translations.js` (46 unused keys). CLAUDE.md requires the portal to be fully localised.
+  - **In progress:** OpenSpec change `wire-portal-translations` is proposed (artifacts written, not yet implemented) — continue with `/opsx:apply`. Leihvertrag text and PDFs stay German for now (decide separately whether to translate them).
 
 ## Priority 3 — Administration side
 - [ ]  **Roles** (decision 2026-11-13) — three roles in `user_roles`:
