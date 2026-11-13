@@ -11,6 +11,7 @@ async function renderStaffList() {
       <input type="search" id="staff-search" class="search-input"
              placeholder="Name oder Kürzel suchen…">
       <button class="btn-action-detail" onclick="openNewStaffModal()">+ Neue Lehrkraft</button>
+      <button class="btn-action-detail" onclick="openCsvImportModal('staff')">CSV importieren</button>
     </div>
     <div id="staff-count" class="result-count"></div>
     <div id="staff-table-wrap"><p class="loading-msg">Wird geladen…</p></div>
@@ -72,14 +73,14 @@ async function submitNewStaff() {
 
   _setBusy(true, 'Anlegen');
 
+  const kuerzel = document.getElementById('ns-kuerzel')?.value.trim() || null;
   const { data, error } = await supabase
     .from('staff')
-    .insert({ first_name: firstName, last_name: lastName,
-              kuerzel: document.getElementById('ns-kuerzel')?.value.trim() || null })
+    .insert({ first_name: firstName, last_name: lastName, kuerzel })
     .select('id')
     .single();
 
-  if (error) { _setBusy(false, 'Anlegen'); _modalError('Fehler: ' + error.message); return; }
+  if (error) { _setBusy(false, 'Anlegen'); _modalError('Fehler: ' + kuerzelErrorText(error, kuerzel)); return; }
 
   closeAdminModal();
   showStaffDetail(data.id);

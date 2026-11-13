@@ -11,6 +11,7 @@ async function renderPupilList() {
       <input type="search" id="pupil-search" class="search-input"
              placeholder="Name suchen…">
       <button class="btn-action-detail" onclick="openNewPupilModal()">+ Neuer Schüler</button>
+      <button class="btn-action-detail" onclick="openCsvImportModal('pupils')">CSV importieren</button>
     </div>
     <div id="pupil-count" class="result-count"></div>
     <div id="pupil-table-wrap"><p class="loading-msg">Wird geladen…</p></div>

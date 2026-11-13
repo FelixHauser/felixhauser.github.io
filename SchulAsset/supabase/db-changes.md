@@ -35,3 +35,22 @@ CREATE UNIQUE INDEX IF NOT EXISTS ipads_serial_number_unique
 ```
 
 Existing constraints on `ipads` (for the schema export): `ipads_pkey`, `ipads_serial_number_key UNIQUE (serial_number)`, `only_one_assignment` CHECK, FKs `ipads_assigned_pupil_id_fkey` / `ipads_assigned_staff_id_fkey` (ON DELETE SET NULL). No CHECK constraints on `ipad_type` / `storage_capacity`.
+
+## 2026-11-13 — staff Kürzel unique case-insensitively
+
+**Why:** OpenSpec change `import-pupils-staff-csv`. A Kürzel identifies a teacher and must be unique. `staff_kuerzel_key UNIQUE (kuerzel)` already existed but is case-sensitive (`bei` and `BEI` would both be allowed), while the import and the forms treat them as the same.
+
+```sql
+CREATE UNIQUE INDEX IF NOT EXISTS staff_kuerzel_upper_unique
+  ON public.staff (upper(kuerzel));
+```
+
+Existing indexes on `staff` (for the schema export): `staff_pkey (id)`, `staff_kuerzel_key (kuerzel)`.
+
+## 2026-11-13 — pupil address is optional
+
+**Why:** OpenSpec change `import-pupils-staff-csv`. `pupils.address` was NOT NULL, but the forms ("Adresse (optional)"), the lists (`address ?? '—'`) and the CSV import treat the address as optional; saving a pupil without an address failed with `null value in column "address" … violates not-null constraint`. Decision: the address is a convenience, not a requirement. (The Leihvertrag PDF leaves the address field blank for such pupils.)
+
+```sql
+ALTER TABLE public.pupils ALTER COLUMN address DROP NOT NULL;
+```

@@ -636,7 +636,7 @@ async function submitAssign() {
     const { data: created, error: ce } = await supabase
       .from(type === 'pupil' ? 'pupils' : 'staff')
       .insert(newRow).select('id').single();
-    if (ce) { _setBusy(false, 'Zuweisen'); _modalError('Fehler beim Anlegen: ' + ce.message); return; }
+    if (ce) { _setBusy(false, 'Zuweisen'); _modalError('Fehler beim Anlegen: ' + (type === 'staff' ? kuerzelErrorText(ce, newRow.kuerzel) : ce.message)); return; }
     personId = created.id;
   } else {
     personId = document.getElementById('md-person')?.value;

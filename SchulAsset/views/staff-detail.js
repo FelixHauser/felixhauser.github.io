@@ -127,7 +127,7 @@ async function _saveStaffEdit(id) {
     .update({ first_name: firstName, last_name: lastName, kuerzel: kuerzel || null })
     .eq('id', id);
 
-  if (error) { alert('Fehler beim Speichern: ' + error.message); return; }
+  if (error) { alert('Fehler beim Speichern: ' + kuerzelErrorText(error, kuerzel)); return; }
 
   _currentStaff = { ..._currentStaff, first_name: firstName, last_name: lastName, kuerzel };
   document.getElementById('staff-detail-title').textContent = `${firstName} ${lastName}`;

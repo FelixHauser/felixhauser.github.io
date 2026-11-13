@@ -145,6 +145,13 @@ function _showDetail(view, id) {
   }
 }
 
+// Text for a failed write of a staff member: a unique violation (23505) means the Kürzel is taken.
+function kuerzelErrorText(error, kuerzel) {
+  return error.code === '23505'
+    ? `Das Kürzel ${kuerzel || ''} ist bereits vergeben.`.replace('  ', ' ')
+    : error.message;
+}
+
 // Loads ALL rows of a query. Supabase returns at most 1000 rows per request, so a plain
 // query silently cuts off larger tables. Pass a function that builds a fresh query
 // and a UNIQUE ordering — end with .order('id') if the other sort columns can repeat,

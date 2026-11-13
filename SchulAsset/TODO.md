@@ -27,7 +27,6 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 - [ ] Insert the **real Datenschutzerklärung and Impressum text** from the school — see "How to insert the real legal text" in `statusquo.md`; remove the placeholder banner afterwards
 
 ### Getting real data in (part of the admin panel, see Priority 3)
-- [ ]  **Bulk import (CSV) for pupils and staff** — iPads are done (see Done). Open question: names are not unique, so duplicate rules need thought; e.g. from the school's pupil list
 - [ ]  **Searchable person picker in the assign dialog** — the pupil dropdown becomes unwieldy with 1000+ pupils; replace the `<select>` by a search field with results
 - [ ]  **Remove the dummy data before go-live** — incl. the `ZZ…` test iPads from the import tests if still present
 
@@ -96,5 +95,6 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 - [x]  **Datenschutzerklärung** and **Impressum** pages — built (German only, linked from login and portal), with placeholder text (OpenSpec change `add-legal-placeholder-pages`)
 - [x]  **Add individual iPads, pupils and staff** in the admin interface — "+ Neues iPad" (OpenSpec change `add-individual-ipads`), "+ Neuer Schüler", "+ Neue Lehrkraft"
 - [x]  **Bulk import (CSV) for iPads** — preview before writing, optional `status` column, template download; tested with 1500 rows (OpenSpec change `import-ipads-csv`)
+- [x]  **Bulk import (CSV) for pupils and staff** — one combined import dialog (iPads / Schüler / Lehrkräfte) with preview; pupils match on first name + last name + address, staff on the unique Kürzel; the pupil address is now optional in the database; Kürzel unique case-insensitively with clear messages in all forms; tested with 1500 pupils (OpenSpec change `import-pupils-staff-csv`)
 - [x]  **1000-row limit in other lists** — pupil/staff lists, assign dropdowns and Pending tabs use `fetchAllRows()`; the Übergabe tab no longer sends id lists in the URL (OpenSpec change `fix-1000-row-limit-lists`)
 - [x]  **Translate the hardcoded German strings on the login page** — 13 new `login.*` keys in DE/EN/TR, tested manually (OpenSpec change `translate-login-page`)
