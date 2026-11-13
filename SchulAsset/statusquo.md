@@ -1,6 +1,6 @@
 # SchulAsset — Status Quo & Road Map
 
-Last updated: 2026-11-11 (session 12 — CDN pinning, account-lookup fix, refresh bug fixed)
+Last updated: 2026-11-13 (session 13 — login page fully localised)
 
 ---
 
@@ -326,7 +326,7 @@ Start with **Priority 1** in `TODO.md`. Then the login-page translation fix (Pri
 - **`supabase/db-changes.md`** — log of manual database changes (first entry: `GRANT SELECT, INSERT, UPDATE ON public.user_roles TO service_role`). **Rule: log every SQL/setting we change by hand in Supabase there.** The schema export (TODO Priority 1) is planned for late in the project and must include this log.
 
 ### Refresh bug — OpenSpec change `fix-ipad-detail-refresh` (implemented and tested manually, 2026-11-11)
-Location: `openspec/changes/fix-ipad-detail-refresh/` (not yet archived). Run openspec commands from the `SchulAsset/` folder.
+Location: `openspec/changes/archive/2026-11-11-fix-ipad-detail-refresh/` (archived, committed). Run openspec commands from the `SchulAsset/` folder.
 
 Causes found and fixed:
 1. **Browser reload (F5) on a detail page left a dead list.** The URL said `#ipad-detail` without the id (the id lived only in `window._currentIpadId`); after F5 the app fell back to the list but kept the URL, so clicking an iPad set the same hash again → no `hashchange` → nothing happened. **Now:** detail pages use `#ipad-detail/<id>`, `#pupil-detail/<id>`, `#staff-detail/<id>`. `routeToHash()` in `admin.js` splits `view/id`, sets the `_current…Id` global for the view file, and always replaces the URL (`history.replaceState`, no history entry) when the requested page differs from the address — so the URL always matches the screen. `showIpadDetail/showPupilDetail/showStaffDetail` only write the hash.
@@ -347,3 +347,12 @@ Out of scope, open question: several actions ignore errors of their secondary wr
 - Local test server: `python3 -m http.server 8080` in `SchulAsset/`.
 - The Edge Function in the repo is not deployed automatically: after editing `supabase/functions/create-ipad-account/index.ts`, paste it into Supabase Studio → Edge Functions → Deploy updates. Direct link: https://supabase.com/dashboard/project/uevovvrxwrwvxqnhehmm/functions
 
+
+---
+
+## Session 13 (2026-11-13) — login page localisation
+
+- **`translate-login-page`** (OpenSpec, tested manually in DE/EN/TR; archived, spec `openspec`/specs/login-localisation/): all remaining hardcoded German on `login.html` and in `auth.js` (forgot-password link, auto-login message, forgot/new-password sections, their messages) now goes through `translations.js` (13 new `login.*` keys; the three languages have identical key sets). Supabase's own error text after the "Fehler:/Error:/Hata:" prefix stays as delivered.
+- `TODO.md`: login-translation item ticked; "Add individual pupils and staff" ticked (iPads still open).
+- **Gotcha:** after editing `translations.js` the browser may use a cached copy and show raw keys such as `login.forgotLink` — hard-reload (Cmd+Shift+R). Possible later fix: version suffix on script tags (`translations.js?v=…`) so users don't hit this after a deploy.
+- Next: Priority 2 "Add individual iPads" / CSV import.

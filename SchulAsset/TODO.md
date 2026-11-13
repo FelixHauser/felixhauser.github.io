@@ -9,11 +9,8 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 
 - [ ]  **Upgrade Supabase to the paid plan** — free tier pauses the project after 7 days of inactivity and has no automatic backups. Not acceptable for signed contracts.
 - [ ]  **Export the database schema into the repo** — tables, RLS policies, triggers and grants currently exist only inside Supabase. Save as SQL (e.g. `supabase/schema.sql`) so the database can be rebuilt at any time.
-  - Also include everything logged in `supabase/db-changes.md` (manual changes made so far), the `auth.users` triggers, and the Auth settings (signups off, email confirmation off)
-  - Verify by building an empty second Supabase project from the file and checking the app works against it
-  - Planned for late in the project; until then, log every manual database change in `supabase/db-changes.md`
-- [x]  **Fix the Edge Function 1000-account limit** (done: create first, paged lookup only on conflict; tested live) — `create-ipad-account` uses `listUsers({ perPage: 1000 })`; beyond 1000 accounts, reassignment and password reset fail. Look the user up by email instead.
-- [x]  **Fix refresh bug** (done: detail pages keep their id in the URL so F5 stays on the item, address always matches the screen, page re-renders right after "Zuweisen", latest-render-wins guard; tested manually) — website doesn't refresh correctly after a change. Most noticeable on iPad detail view.
+- [x]  **Fix the Edge Function 1000-account limit** — `create-ipad-account` uses `listUsers({ perPage: 1000 })`; beyond 1000 accounts, reassignment and password reset fail. Look the user up by email instead.
+- [x]  **Fix refresh bug** — website doesn't refresh correctly after a change. Most noticeable on iPad detail view.
 - [x]  **Pin all CDN library versions** (done: lucide 1.72.0, supabase-js 2.119.0; Lucide guarded with `window.lucide?.`) — `lucide@latest` and `supabase-js@2` can change overnight and break the app.
   - Pin both to an exact, currently working version (`lucide` in `admin.html`; `supabase-js` in `login.html`, `portal.html`, `admin.html`); the other CDN libraries are already pinned
   - Make Lucide failures harmless: in `admin.html` change `lucide.createIcons(); initAdmin();` to `window.lucide?.createIcons(); initAdmin();` (plain `lucide?.` still throws when the global is missing) — otherwise a Lucide problem throws and `initAdmin()` never runs, which kills the whole admin app (not just the icons)
@@ -39,7 +36,7 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 - [ ]  **Document admin management** — how a new admin account is created in Supabase Studio, and who holds the Supabase owner login.
 
 ### Localization
-- [ ]  **Translate the hardcoded German strings on the login page** — found: not everything on `login.html` goes through `translations.js`, e.g. "Passwort vergessen?", "Wird angemeldet…" (auto-login), the forgot-password and new-password sections ("Zurück zum Login", "Reset-Link senden", …) and the admin-only hints. These show German whatever language is selected. Add `data-i18n` keys in DE/EN/TR and check `auth.js` messages too (`CLAUDE.md`: login must be fully localised). Other portal strings should be found by the evaluation below.
+- [x]  **Translate the hardcoded German strings on the login page** (done: OpenSpec change `translate-login-page`, 13 new `login.*` keys in DE/EN/TR, tested manually) — found: not everything on `login.html` goes through `translations.js`, e.g. "Passwort vergessen?", "Wird angemeldet…" (auto-login), the forgot-password and new-password sections ("Zurück zum Login", "Reset-Link senden", …) and the admin-only hints. These show German whatever language is selected. Add `data-i18n` keys in DE/EN/TR and check `auth.js` messages too (`CLAUDE.md`: login must be fully localised). Other portal strings should be found by the evaluation below.
 - [ ]  **Evaluate localization** — check the portal in all set languages (DE/EN/TR): missing or empty texts (automated check), translation quality (native speaker)
 
 
@@ -56,7 +53,7 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
       - Implements the retention concept from Priority 2
 - [ ]  **Editable, versioned Leihvertrag** — edit the iPad contract conditions via both a .md file (for displaying it online) and the fillable PDF. `terms_version: '1.0'` is currently hardcoded; every change must create a new version, so it stays recorded which version each family signed.
 
-
+- [ ] **Create an export method** - to avoid the database to grow too much, it should be purged every once in a while. Before 
 
 
 ## Priority 4 — Day-to-day operation

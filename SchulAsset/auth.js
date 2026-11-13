@@ -121,7 +121,7 @@ async function handleForgotPassword() {
   msgEl.hidden  = true;
 
   if (!email) {
-    msgEl.textContent = 'Bitte eine E-Mail-Adresse eingeben.';
+    msgEl.textContent = t('login.errorEmailRequired');
     msgEl.hidden = false;
     return;
   }
@@ -130,13 +130,13 @@ async function handleForgotPassword() {
   const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
 
   if (error) {
-    msgEl.textContent = 'Fehler: ' + error.message;
+    msgEl.textContent = t('login.errorPrefix') + ' ' + error.message;
     msgEl.className   = 'error-msg';
     msgEl.hidden      = false;
     return;
   }
 
-  msgEl.textContent = 'Reset-Link gesendet. Bitte prüfe dein E-Mail-Postfach.';
+  msgEl.textContent = t('login.resetLinkSent');
   msgEl.className   = 'success-msg';
   msgEl.hidden      = false;
 }
@@ -147,7 +147,7 @@ async function handleNewPassword() {
   msgEl.hidden   = true;
 
   if (password.length < 6) {
-    msgEl.textContent = 'Das Passwort muss mindestens 6 Zeichen lang sein.';
+    msgEl.textContent = t('login.errorPasswordTooShort');
     msgEl.hidden = false;
     return;
   }
@@ -155,12 +155,12 @@ async function handleNewPassword() {
   const { error } = await supabase.auth.updateUser({ password });
 
   if (error) {
-    msgEl.textContent = 'Fehler: ' + error.message;
+    msgEl.textContent = t('login.errorPrefix') + ' ' + error.message;
     msgEl.hidden = false;
     return;
   }
 
-  msgEl.textContent = 'Passwort gespeichert. Du wirst weitergeleitet…';
+  msgEl.textContent = t('login.passwordSaved');
   msgEl.hidden = false;
   setTimeout(() => { window.location.href = 'admin.html'; }, 1500);
 }
