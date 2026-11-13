@@ -376,3 +376,8 @@ The earlier rule "no hard deletes" is relaxed for old data, as a **manual, per-i
 ## Cache-busting (OpenSpec change `cache-busting`)
 - All local `<script src>` / `<link rel="stylesheet">` in the five HTML pages carry `?v=<version>` (shared value, e.g. `20261113-1`).
 - **Routine:** before every push that changes a `.js` or `.css` file, run `./bump-version.sh` (optional argument = explicit version). CDN URLs are never touched. If forgotten, users may see stale files (e.g. raw translation keys).
+
+## Translation check (OpenSpec change `check-translations`)
+- `node check-translations.js` (from the SchulAsset folder) checks DE/EN/TR: missing keys, empty texts, placeholder mismatches, and keys used in `.html`/`.js` but not defined in German (errors, exit code 1); unused keys and computed keys are warnings. Run it after every change to texts.
+- State on 2026-11-13: 120 keys per language, no errors.
+- **Finding:** the 46 "defined but never used" warnings are real. The main portal view in `portal.js` (greeting, serial number, storage, "Zugewiesen seit", the Übergabe/Rückgabe steps, etc.) is still **hardcoded German**; the keys `portal.greeting`, `portal.statuses.*`, `portal.uebergabe.*`, `portal.rueckgabe.*` exist but are not wired in. Open item in TODO.md. Translation quality (EN/TR) still needs a native speaker.

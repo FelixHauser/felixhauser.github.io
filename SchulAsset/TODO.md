@@ -34,7 +34,8 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 - [ ]  **Document admin management** — how a new admin account is created in Supabase Studio, and who holds the Supabase owner login.
 
 ### Localization
-- [ ]  **Evaluate localization** — check the portal in all set languages (DE/EN/TR): missing or empty texts (automated check), translation quality (native speaker)
+- [ ]  **Evaluate localization** — translation quality (native speaker review of EN/TR) is still open; the automated completeness check is done (see Done)
+- [ ]  **Wire the unused portal keys into `portal.js`** — the main portal view (greeting, iPad info, status labels, Übergabe/Rückgabe steps) is still hardcoded German although the keys exist in `translations.js`; found by `check-translations.js` (46 unused keys). CLAUDE.md requires the portal to be fully localised.
 
 ## Priority 3 — Administration side
 - [ ]  **Roles** (decision 2026-11-13) — three roles in `user_roles`:
@@ -99,3 +100,4 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 ## Priority 5 — Housekeeping
 - [x]  **Git housekeeping** — `.claude/settings.local.json` is ignored (personal permissions); the OpenSpec setup (`.claude/commands`, `.claude/skills`) is committed; `CLAUDE.md` and `statusquo.md` stay in the (private) repo as a backup — the misleading ignore lines were removed
 - [x]  **Cache-busting for script files** — local scripts and stylesheets carry `?v=<version>`; run `./bump-version.sh` before every push that changes a `.js`/`.css` file (OpenSpec change `cache-busting`)
+- [x]  **Automated translation check** — `node check-translations.js` compares DE/EN/TR (missing/empty keys, placeholders, keys used in code but undefined); all 120 keys complete (OpenSpec change `check-translations`)
