@@ -28,6 +28,7 @@ async function renderIpadList() {
         <option value="student">Schüler</option>
         <option value="staff">Lehrkraft</option>
       </select>
+      <button class="btn-action-detail" onclick="openNewIpadModal()">+ Neues iPad</button>
     </div>
 
     <div id="ipad-count" class="result-count"></div>
@@ -160,4 +161,78 @@ function renderIpadTable(ipads) {
       </table>
     </div>
   `;
+}
+
+
+// ─── Add a single iPad ───────────────────────────────────────
+
+// Opens the "new iPad" dialog (same pattern as new pupil / new staff).
+function openNewIpadModal() {
+  _openModal('Neues iPad anlegen', `
+    <div class="admin-form-group">
+      <label>Seriennummer</label>
+      <input type="text" id="ni-serial" placeholder="z. B. DMPXYZ123456"
+             autocapitalize="characters" spellcheck="false">
+    </div>
+    <div class="admin-form-group">
+      <label>Typ</label>
+      <select id="ni-type">
+        <option value="student">Schüler</option>
+        <option value="staff">Lehrkraft</option>
+      </select>
+    </div>
+    <div class="admin-form-group">
+      <label>Speicher</label>
+      <select id="ni-storage">
+        <option value="64gb">64 GB</option>
+        <option value="128gb" selected>128 GB</option>
+        <option value="256gb">256 GB</option>
+      </select>
+    </div>
+  `, 'Anlegen', submitNewIpad);
+}
+
+// Validates, saves the iPad (status 'available', no assignment), writes the first
+// history row and opens the new iPad's detail page.
+async function submitNewIpad() {
+  // Serial numbers are stored upper case: the portal login and the student RLS
+  // policies compare against the upper-case serial number.
+  const serial = document.getElementById('ni-serial')?.value.trim().toUpperCase();
+  if (!serial) { _modalError('Bitte eine Seriennummer eingeben.'); return; }
+
+  // Friendly duplicate check against the loaded list; the database has the final say (23505).
+  const exists = (window._allIpads || []).some(i => i.serial_number.toUpperCase() === serial);
+  if (exists) { _modalError(`Die Seriennummer ${serial} existiert bereits.`); return; }
+
+  _setBusy(true, 'Anlegen');
+
+  const { data, error } = await supabase
+    .from('ipads')
+    .insert({
+      serial_number:    serial,
+      ipad_type:        document.getElementById('ni-type').value,
+      storage_capacity: document.getElementById('ni-storage').value,
+      status:           'available',
+    })
+    .select('id')
+    .single();
+
+  if (error) {
+    _setBusy(false, 'Anlegen');
+    _modalError(error.code === '23505'
+      ? `Die Seriennummer ${serial} existiert bereits.`
+      : 'Fehler: ' + error.message);
+    return;
+  }
+
+  // First entry in the append-only history.
+  const { error: histError } = await supabase.from('ipad_history').insert({
+    ipad_id: data.id, event_type: 'status_change', status: 'available',
+    changed_by: _adminName(), changed_at: new Date().toISOString(),
+    notes: 'iPad angelegt',
+  });
+  if (histError) console.error('ipad_history insert failed:', histError);
+
+  closeAdminModal();
+  showIpadDetail(data.id);
 }

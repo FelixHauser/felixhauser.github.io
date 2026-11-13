@@ -28,7 +28,7 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 
 ### Getting real data in (part of the admin panel, see Priority 3)
 - [ ]  **Bulk import (CSV)** for iPads, pupils and staff — e.g. from the Logineo export or the school's pupil list
-- [ ]  **Add individual iPads, pupils and staff** in the admin interface — currently iPads can only be created in Supabase Studio
+- [x]  **Add individual iPads, pupils and staff** in the admin interface (done: "+ Neues iPad", "+ Neuer Schüler", "+ Neue Lehrkraft"; iPads via OpenSpec change `add-individual-ipads`)
 - [ ]  Remove the dummy data before go-live
 
 ### Ownership
@@ -45,6 +45,7 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
   - Regular user = **teachers / staff**: new read-only role — can look up whose iPad it is, status, history, etc., but can't change anything
   - Admin users have an Admin panel with the admin options
     - Bulk import and individual adding of iPads, users, staff (see Priority 2 — needed before go-live)
+      - **Move the add buttons into the admin panel**: "+ Neues iPad" (currently in the toolbar of the iPad list, `views/ipad-list.js`) does not belong there — placed temporarily; same decision needed for "+ Neuer Schüler" / "+ Neue Lehrkraft"
     - **Archiving / anonymising** (decision: no hard deletes — the history must survive)
       - iPads are **archived**: hidden from lists, history kept
       - Pupils/staff are **anonymised**: personal data removed, audit trail kept

@@ -1,6 +1,6 @@
 # SchulAsset — Status Quo & Road Map
 
-Last updated: 2026-11-13 (session 13 — login page fully localised)
+Last updated: 2026-11-13 (session 13 — login page localised, add individual iPads)
 
 ---
 
@@ -356,3 +356,6 @@ Out of scope, open question: several actions ignore errors of their secondary wr
 - `TODO.md`: login-translation item ticked; "Add individual pupils and staff" ticked (iPads still open).
 - **Gotcha:** after editing `translations.js` the browser may use a cached copy and show raw keys such as `login.forgotLink` — hard-reload (Cmd+Shift+R). Possible later fix: version suffix on script tags (`translations.js?v=…`) so users don't hit this after a deploy.
 - Next: Priority 2 "Add individual iPads" / CSV import.
+
+- **`add-individual-ipads`** (OpenSpec, tested manually; archived, spec `openspec/specs/admin-ipad-creation/`): "+ Neues iPad" button in the toolbar of the iPad list (`views/ipad-list.js`, `openNewIpadModal` / `submitNewIpad`). Fields: serial number (trimmed, stored upper case), type, storage; status `available`; writes a first `ipad_history` row (`status_change`, "iPad angelegt") and opens the detail page. Duplicates rejected (list check + Postgres `23505`). DB: INSERT grant + admin-only policy `admin_insert_ipads` + case-insensitive unique index — logged in `supabase/db-changes.md`. Not tested: the student-cannot-insert check (optional). Remember to delete the test iPad(s) created while testing. Next on this path: CSV bulk import.
+- **Placement is temporary:** the "+ Neues iPad" button does not belong in the iPad list toolbar (decision 2026-11-13); it moves into the admin panel when the admin UI is reworked (see `TODO.md`, Priority 3).
