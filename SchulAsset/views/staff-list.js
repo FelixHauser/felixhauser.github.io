@@ -16,11 +16,13 @@ async function renderStaffList() {
     <div id="staff-table-wrap"><p class="loading-msg">Wird geladen…</p></div>
   `;
 
-  const { data: staff, error } = await supabase
+  // All staff, paged (a single query would stop at 1000 rows).
+  const { data: staff, error } = await fetchAllRows(() => supabase
     .from('staff')
     .select('id, first_name, last_name, kuerzel, created_at')
     .order('last_name')
-    .order('first_name');
+    .order('first_name')
+    .order('id'));
 
   if (error) {
     document.getElementById('staff-table-wrap').innerHTML =

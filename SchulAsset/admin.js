@@ -147,7 +147,8 @@ function _showDetail(view, id) {
 
 // Loads ALL rows of a query. Supabase returns at most 1000 rows per request, so a plain
 // query silently cuts off larger tables. Pass a function that builds a fresh query
-// (with a stable .order(), ideally on a unique column); it is run page by page.
+// and a UNIQUE ordering — end with .order('id') if the other sort columns can repeat,
+// otherwise rows may appear twice or be skipped between pages); it is run page by page.
 // Returns { data, error } like a normal Supabase call.
 async function fetchAllRows(buildQuery) {
   const pageSize = 1000;

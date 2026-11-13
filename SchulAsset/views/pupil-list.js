@@ -16,11 +16,13 @@ async function renderPupilList() {
     <div id="pupil-table-wrap"><p class="loading-msg">Wird geladen…</p></div>
   `;
 
-  const { data: pupils, error } = await supabase
+  // All pupils, paged (a single query would stop at 1000 rows).
+  const { data: pupils, error } = await fetchAllRows(() => supabase
     .from('pupils')
     .select('id, first_name, last_name, address, created_at')
     .order('last_name')
-    .order('first_name');
+    .order('first_name')
+    .order('id'));
 
   if (error) {
     document.getElementById('pupil-table-wrap').innerHTML =

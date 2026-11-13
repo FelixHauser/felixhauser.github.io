@@ -138,17 +138,10 @@ function downloadIpadCsvTemplate() {
 // Loads every serial number from the database, 1000 per request (Supabase returns at most
 // 1000 rows per request), as an upper-case Set.
 async function _fetchAllSerials() {
-  const serials = new Set();
-  const pageSize = 1000;
-  for (let from = 0; ; from += pageSize) {
-    const { data, error } = await supabase
-      .from('ipads').select('serial_number')
-      .order('serial_number').range(from, from + pageSize - 1);
-    if (error) throw error;
-    data.forEach(r => serials.add(r.serial_number.toUpperCase()));
-    if (data.length < pageSize) break;
-  }
-  return serials;
+  const { data, error } = await fetchAllRows(() =>
+    supabase.from('ipads').select('serial_number').order('serial_number'));
+  if (error) throw error;
+  return new Set(data.map(r => r.serial_number.toUpperCase()));
 }
 
 // Step 2: read the file, validate it and show the preview. Writes nothing.

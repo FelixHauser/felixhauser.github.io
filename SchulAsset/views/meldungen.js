@@ -27,22 +27,26 @@ async function renderMeldungen() {
     uebergabe,
     { data: rueckgabe, error: re },
   ] = await Promise.all([
-    supabase
+    // All lists are paged (a single query would stop at 1000 rows); 'id' makes the order unique.
+    fetchAllRows(() => supabase
       .from('schadenmeldung')
       .select(`*, ipad:ipad_id (serial_number, pupils:assigned_pupil_id (first_name, last_name, address))`)
       .is('resolved_at', null)
-      .order('filed_at', { ascending: false }),
-    supabase
+      .order('filed_at', { ascending: false })
+      .order('id')),
+    fetchAllRows(() => supabase
       .from('verlustmeldung')
       .select(`*, ipad:ipad_id (serial_number, pupils:assigned_pupil_id (first_name, last_name, address))`)
       .is('resolved_at', null)
-      .order('filed_at', { ascending: false }),
+      .order('filed_at', { ascending: false })
+      .order('id')),
     _fetchUebergabePending(),
-    supabase
+    fetchAllRows(() => supabase
       .from('rueckgabeprotokoll')
       .select(`id, accepted_at, ipad_id, ipad:ipad_id (id, serial_number, assigned_pupil_id, pupils:assigned_pupil_id (first_name, last_name))`)
       .not('accepted_at', 'is', null)
-      .order('accepted_at', { ascending: false }),
+      .order('accepted_at', { ascending: false })
+      .order('id')),
   ]);
 
   if (se || ve || re) {
@@ -62,26 +66,26 @@ async function renderMeldungen() {
 
 // Returns iPads that have accepted terms but no Übergabeprotokoll created since the current assignment.
 async function _fetchUebergabePending() {
-  const { data: ipads, error } = await supabase
-    .from('ipads')
-    .select('id, serial_number, assigned_date, assigned_pupil_id, pupils:assigned_pupil_id (first_name, last_name)')
-    .not('assigned_pupil_id', 'is', null);
-
-  if (error || !ipads || ipads.length === 0) return [];
-
-  const ipadIds = ipads.map(i => i.id);
-
-  const [{ data: terms }, { data: ueberg }] = await Promise.all([
-    supabase
+  // All three tables are loaded in pages and combined below. No .in(ids) filter on purpose:
+  // hundreds of ids would make the request URL too long.
+  const [{ data: ipads, error }, { data: terms }, { data: ueberg }] = await Promise.all([
+    fetchAllRows(() => supabase
+      .from('ipads')
+      .select('id, serial_number, assigned_date, assigned_pupil_id, pupils:assigned_pupil_id (first_name, last_name)')
+      .not('assigned_pupil_id', 'is', null)
+      .order('id')),
+    fetchAllRows(() => supabase
       .from('terms_acceptance')
       .select('ipad_id, accepted_at')
-      .in('ipad_id', ipadIds)
-      .is('invalidated_at', null),
-    supabase
+      .is('invalidated_at', null)
+      .order('id')),
+    fetchAllRows(() => supabase
       .from('uebergabeprotokoll')
       .select('ipad_id, created_at')
-      .in('ipad_id', ipadIds),
+      .order('id')),
   ]);
+
+  if (error || !ipads || ipads.length === 0) return [];
 
   const termsSet = new Set((terms || []).map(t => t.ipad_id));
 

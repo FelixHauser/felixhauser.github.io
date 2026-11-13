@@ -2,18 +2,19 @@
 
 Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 
+**Layout:** open items first (by priority), finished items collected under **✅ Done** at the end of the file. When an item is finished, move it down.
 
 ---
+
+# 🔲 Pending
 
 ## Priority 1 — Protect what exists (cheap, do first)
 
 - [ ]  **Upgrade Supabase to the paid plan** — free tier pauses the project after 7 days of inactivity and has no automatic backups. Not acceptable for signed contracts.
 - [ ]  **Export the database schema into the repo** — tables, RLS policies, triggers and grants currently exist only inside Supabase. Save as SQL (e.g. `supabase/schema.sql`) so the database can be rebuilt at any time.
-- [x]  **Fix the Edge Function 1000-account limit** — `create-ipad-account` uses `listUsers({ perPage: 1000 })`; beyond 1000 accounts, reassignment and password reset fail. Look the user up by email instead.
-- [x]  **Fix refresh bug** — website doesn't refresh correctly after a change. Most noticeable on iPad detail view.
-- [x]  **Pin all CDN library versions** (done: lucide 1.72.0, supabase-js 2.119.0; Lucide guarded with `window.lucide?.`) — `lucide@latest` and `supabase-js@2` can change overnight and break the app.
-  - Pin both to an exact, currently working version (`lucide` in `admin.html`; `supabase-js` in `login.html`, `portal.html`, `admin.html`); the other CDN libraries are already pinned
-  - Make Lucide failures harmless: in `admin.html` change `lucide.createIcons(); initAdmin();` to `window.lucide?.createIcons(); initAdmin();` (plain `lucide?.` still throws when the global is missing) — otherwise a Lucide problem throws and `initAdmin()` never runs, which kills the whole admin app (not just the icons)
+  - Also include everything logged in `supabase/db-changes.md` (manual changes made so far), the `auth.users` triggers, and the Auth settings (signups off, email confirmation off)
+  - Verify by building an empty second Supabase project from the file and checking the app works against it
+  - Planned for late in the project; until then, log every manual database change in `supabase/db-changes.md`
 
 ## Priority 2 — Blockers before going live
 
@@ -23,30 +24,28 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 - [ ] Get sign-off from the school's / Schulträger's **Datenschutzbeauftragte(r)** (incl. the US-parent-company question)
 - [ ] Involve the **Stadt Marl** as owner of the iPads
 - [ ] Define a **retention and deletion concept** — when is a pupil's data deleted after leaving?
-- [x] **Datenschutzerklärung** and **Impressum** pages — built (German only, linked from login and portal), with placeholder text
 - [ ] Insert the **real Datenschutzerklärung and Impressum text** from the school — see "How to insert the real legal text" in `statusquo.md`; remove the placeholder banner afterwards
 
 ### Getting real data in (part of the admin panel, see Priority 3)
-- [ ]  **Bulk import (CSV)** for iPads, pupils and staff — **iPads done** (OpenSpec change `import-ipads-csv`: preview, optional status column, tested with 1500 rows); pupils and staff still open — — e.g. from the Logineo export or the school's pupil list
-- [x]  **Add individual iPads, pupils and staff** in the admin interface (done: "+ Neues iPad", "+ Neuer Schüler", "+ Neue Lehrkraft"; iPads via OpenSpec change `add-individual-ipads`)
-- [ ]  **1000-row limit in other lists** — Supabase returns at most 1000 rows per request. The iPad list is fixed (`fetchAllRows()` in `admin.js`); still affected: pupil list, staff list, the pupil/staff dropdowns in the assign dialog (`ipad-detail.js`), the Übergabe query in `meldungen.js`, and the duplicate check in the single "+ Neues iPad" dialog (uses the list, now fixed). Apply `fetchAllRows()` before pupils/staff are bulk-imported.
-- [ ]  Remove the dummy data before go-live
+- [ ]  **Bulk import (CSV) for pupils and staff** — iPads are done (see Done). Open question: names are not unique, so duplicate rules need thought; e.g. from the school's pupil list
+- [ ]  **Searchable person picker in the assign dialog** — the pupil dropdown becomes unwieldy with 1000+ pupils; replace the `<select>` by a search field with results
+- [ ]  **Remove the dummy data before go-live** — incl. the `ZZ…` test iPads from the import tests if still present
 
 ### Ownership
 - [ ]  **Decide hosting and ownership** — the app runs under the personal account `felixhauser.github.io`. Decide whose GitHub account and which domain it lives on, and who can take over if you are unavailable.
 - [ ]  **Document admin management** — how a new admin account is created in Supabase Studio, and who holds the Supabase owner login.
 
 ### Localization
-- [x]  **Translate the hardcoded German strings on the login page** (done: OpenSpec change `translate-login-page`, 13 new `login.*` keys in DE/EN/TR, tested manually) — found: not everything on `login.html` goes through `translations.js`, e.g. "Passwort vergessen?", "Wird angemeldet…" (auto-login), the forgot-password and new-password sections ("Zurück zum Login", "Reset-Link senden", …) and the admin-only hints. These show German whatever language is selected. Add `data-i18n` keys in DE/EN/TR and check `auth.js` messages too (`CLAUDE.md`: login must be fully localised). Other portal strings should be found by the evaluation below.
 - [ ]  **Evaluate localization** — check the portal in all set languages (DE/EN/TR): missing or empty texts (automated check), translation quality (native speaker)
 
-
 ## Priority 3 — Administration side
-- [ ]  **Admin user** — there must be a difference between regular users and admin users
-  - Regular user = **teachers / staff**: new read-only role — can look up whose iPad it is, status, history, etc., but can't change anything
+- [ ]  **Roles** (decision 2026-11-13) — three roles in `user_roles`:
+  - `student` — unchanged: parent/pupil portal, sees only their own iPad
+  - `teacher` — **new, read-only**: can look up whose iPad it is, status, history, etc., but can't change anything (needs a role value in the `user_roles` constraint/type, read-only RLS policies and a read-only admin UI without action buttons; log the SQL in `supabase/db-changes.md`)
+  - `admin` — unchanged name, full rights: sets up the site and modifies things (add / import / delete iPads, assign, settings, purge). No separate "root admin"
   - Admin users have an Admin panel with the admin options
     - Bulk import and individual adding of iPads, users, staff (see Priority 2 — needed before go-live)
-      - **Move the add buttons into the admin panel**: "+ Neues iPad" (currently in the toolbar of the iPad list, `views/ipad-list.js`) does not belong there — placed temporarily; same decision needed for "+ Neuer Schüler" / "+ Neue Lehrkraft"
+      - **Move the add buttons into the admin panel**: "+ Neues iPad" and "CSV importieren" (currently in the toolbar of the iPad list, `views/ipad-list.js`) do not belong there — placed temporarily; same decision needed for "+ Neuer Schüler" / "+ Neue Lehrkraft"
     - **Archiving / anonymising** (decision: no hard deletes — the history must survive)
       - iPads are **archived**: hidden from lists, history kept
       - Pupils/staff are **anonymised**: personal data removed, audit trail kept
@@ -54,9 +53,14 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
       - Archive / Decommission button on iPad detail view
       - Implements the retention concept from Priority 2
 - [ ]  **Editable, versioned Leihvertrag** — edit the iPad contract conditions via both a .md file (for displaying it online) and the fillable PDF. `terms_version: '1.0'` is currently hardcoded; every change must create a new version, so it stays recorded which version each family signed.
-
-- [ ] **Create an export method** - to avoid the database to grow too much, it should be purged every once in a while. Before 
-
+- [ ]  **Manual export + delete of old data (PDF first)** — the database must not grow without limit. Decision 2026-11-13: it is a **manual, per-item process**; nothing is exported or deleted automatically (setting an iPad to decommissioned does *not* trigger anything).
+  - **iPads:** on a decommissioned iPad the admin can click "Verlauf exportieren und löschen": the iPad's full history (master data, history, signed Leihvertrag, protocols, damage/loss reports) is generated as a PDF and downloaded; only after the admin confirms that the PDF was saved is the iPad with all its records deleted. Only offered for status `decommissioned`.
+  - **Pupils and staff:** same pattern ("Daten exportieren und löschen"), but they need an **active / not active** status first (new column on `pupils` and `staff`, e.g. `is_active`, plus a way to set it: "left the school" / "no longer at the school"). Export + delete is only offered for not-active people who have no assigned iPad. Inactive people are hidden from the default lists and from the assign dialog (filter to show them).
+  - **Idle period as a setting (decision 2026-11-13):** an admin setting "number of years before data can be exported and deleted" (default 5). The export + delete button is only enabled once an iPad has been decommissioned / a person has been inactive for that many years. Needs a small settings table (teacher read, admin write)
+  - Needs a confirmation step (what will be deleted, how many records), like the CSV import
+  - This is the implementation of the **retention and deletion concept** (Priority 2, DSGVO) and replaces the earlier decision "no hard deletes" for data past the idle period. The audit-trail rule (`ipad_history` is append-only) needs an explicit, admin-only exception for this delete; `CLAUDE.md` must be updated then.
+  - Open questions: is 5 years legally acceptable (ask the Datenschutzbeauftragte / Stadt Marl); when do the 5 years start (decommissioning date; pupil's leaving date); where the PDF archives are stored (they contain personal data and must be kept as securely as the database)
+  - Related: "Archiving / anonymising" under **Admin user** above overlaps with the active/not-active status — decide together whether anonymising is still needed or replaced by export + delete
 
 ## Priority 4 — Day-to-day operation
 
@@ -70,7 +74,7 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 - [ ]  **Git housekeeping**
   - add `.claude/settings.local.json` to the root `.gitignore`, then commit the OpenSpec setup
   - decide whether `CLAUDE.md` / `statusquo.md` stay in the repo (they are tracked, but `.gitignore` says they shouldn't be)
-
+- [ ]  **Cache-busting for script files** — after a deploy, browsers may keep an old `translations.js` and show raw keys such as `login.forgotLink`; add a version suffix to the script tags (`translations.js?v=…`)
 
 ## Priority 6 — Distribution
 
@@ -78,3 +82,19 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 - [ ] **Config file for Supabase credentials** — one clearly commented file (e.g. `config.js`) the installing school edits once (decision: no GUI page — a static site could only store it in one visitor's browser; the anon key is public, so a file is safe)
 - [ ] **Configurable school details** — school name, logo, Schulträger (currently "Stadt Marl") and document templates, so another school can use its own
 - [ ] **Create a database creation system** — where after installing/copying the files on a server, the database structure can be created without having to enter the Supabase project page (if at all possible)
+
+---
+
+# ✅ Done
+
+## Priority 1 — Protect what exists
+- [x]  **Fix the Edge Function 1000-account limit** — `create-ipad-account` creates first and pages through `listUsers` only if the account exists; tested live (OpenSpec change `fix-account-lookup-limit`)
+- [x]  **Fix refresh bug** — detail pages keep their id in the URL so F5 stays on the item, the address always matches the screen, the page re-renders right after "Zuweisen", latest-render-wins guard; tested manually (OpenSpec change `fix-ipad-detail-refresh`)
+- [x]  **Pin all CDN library versions** — lucide 1.72.0, supabase-js 2.119.0; Lucide guarded with `window.lucide?.` so the admin app starts even if it fails to load (OpenSpec change `pin-cdn-versions`)
+
+## Priority 2 — Blockers before going live
+- [x]  **Datenschutzerklärung** and **Impressum** pages — built (German only, linked from login and portal), with placeholder text (OpenSpec change `add-legal-placeholder-pages`)
+- [x]  **Add individual iPads, pupils and staff** in the admin interface — "+ Neues iPad" (OpenSpec change `add-individual-ipads`), "+ Neuer Schüler", "+ Neue Lehrkraft"
+- [x]  **Bulk import (CSV) for iPads** — preview before writing, optional `status` column, template download; tested with 1500 rows (OpenSpec change `import-ipads-csv`)
+- [x]  **1000-row limit in other lists** — pupil/staff lists, assign dropdowns and Pending tabs use `fetchAllRows()`; the Übergabe tab no longer sends id lists in the URL (OpenSpec change `fix-1000-row-limit-lists`)
+- [x]  **Translate the hardcoded German strings on the login page** — 13 new `login.*` keys in DE/EN/TR, tested manually (OpenSpec change `translate-login-page`)

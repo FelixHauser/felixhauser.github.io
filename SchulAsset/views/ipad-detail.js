@@ -594,11 +594,11 @@ async function _loadPersonList() {
   personSel.innerHTML = '<option value="">Wird geladen…</option>';
 
   if (type === 'pupil') {
-    const { data } = await supabase.from('pupils').select('id,first_name,last_name').order('last_name');
+    const { data } = await fetchAllRows(() => supabase.from('pupils').select('id,first_name,last_name').order('last_name').order('first_name').order('id'));
     personSel.innerHTML = '<option value="">— Bitte wählen —</option>' +
       (data || []).map(p => `<option value="${p.id}">${p.last_name}, ${p.first_name}</option>`).join('');
   } else {
-    const { data } = await supabase.from('staff').select('id,first_name,last_name,kuerzel').order('last_name');
+    const { data } = await fetchAllRows(() => supabase.from('staff').select('id,first_name,last_name,kuerzel').order('last_name').order('first_name').order('id'));
     personSel.innerHTML = '<option value="">— Bitte wählen —</option>' +
       (data || []).map(s => `<option value="${s.id}">${s.last_name}, ${s.first_name} (${s.kuerzel})</option>`).join('');
   }
