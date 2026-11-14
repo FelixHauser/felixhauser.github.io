@@ -28,8 +28,6 @@ async function renderIpadList() {
         <option value="student">Schüler</option>
         <option value="staff">Lehrkraft</option>
       </select>
-      <button class="btn-action-detail" onclick="openNewIpadModal()">+ Neues iPad</button>
-      <button class="btn-action-detail" onclick="openCsvImportModal('ipads')">CSV importieren</button>
     </div>
 
     <div id="ipad-count" class="result-count"></div>

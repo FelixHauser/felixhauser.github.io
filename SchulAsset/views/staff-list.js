@@ -10,9 +10,6 @@ async function renderStaffList() {
     <div class="toolbar">
       <input type="search" id="staff-search" class="search-input"
              placeholder="Name oder Kürzel suchen…">
-      <button class="btn-action-detail" onclick="openNewStaffModal()">+ Neue Lehrkraft</button>
-      <button class="btn-action-detail" onclick="openNewAdminModal()">+ Neuer Admin</button>
-      <button class="btn-action-detail" onclick="openCsvImportModal('staff')">CSV importieren</button>
     </div>
     <div id="staff-count" class="result-count"></div>
     <div id="staff-table-wrap"><p class="loading-msg">Wird geladen…</p></div>
@@ -122,14 +119,14 @@ async function submitNewStaff() {
   }
 }
 
-// ---- New admin (temporary placement next to "+ Neue Lehrkraft"; moves into the admin panel later) ----
+// ---- New admin (opened from the admin panel, views/admin-panel.js) ----
 
 function openNewAdminModal() {
   _openModal('Neuen Admin anlegen', `
     <div class="admin-modal-warn">
       Admins haben Vollzugriff auf alle Daten und Einstellungen. Bitte nur für Personen anlegen,
       die das brauchen. Lehrkräfte, die nur iPads nachschlagen, erhalten stattdessen
-      über „+ Neue Lehrkraft“ einen Zugang.
+      über „Neue Lehrkraft“ einen Zugang.
     </div>
     <div class="admin-form-group" style="margin-top:0.9rem">
       <label>E-Mail</label>

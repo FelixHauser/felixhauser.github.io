@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SchulAsset — Schülerportal</title>
-  <link rel="stylesheet" href="portal.css?v=20261114-8">
+  <link rel="stylesheet" href="portal.css?v=20261114-11">
 </head>
 <body>
 
   <!-- Header -->
   <header class="portal-header">
-    <img src="mlks_logo.png" class="portal-logo" alt="Martin-Luther-King-Schule">
+    <img src="mlks_logo.png" data-school-logo class="portal-logo" alt="Martin-Luther-King-Schule">
     <div class="header-right">
       <div class="lang-switcher">
         <button class="lang-btn" data-lang="de" onclick="setLang('de')">DE</button>
@@ -275,10 +275,11 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.min.js"></script>
   <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-  <script src="supabase-client.js?v=20261114-8"></script>
-  <script src="translations.js?v=20261114-8"></script>
-  <script src="doc-generator.js?v=20261114-8"></script>
-  <script src="portal.js?v=20261114-8"></script>
+  <script src="school-config.js?v=20261114-11"></script>
+  <script src="supabase-client.js?v=20261114-11"></script>
+  <script src="translations.js?v=20261114-11"></script>
+  <script src="doc-generator.js?v=20261114-11"></script>
+  <script src="portal.js?v=20261114-11"></script>
   <script>
     applyTranslations();
     initPortal();

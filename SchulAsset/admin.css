@@ -1390,3 +1390,32 @@ body {
   font-size: 0.875rem;
 }
 .picker-chip[hidden], .picker-search[hidden] { display: none; }
+
+/* ---- Admin panel (Verwaltung) ---- */
+
+.panel-section   { margin-bottom: 1.5rem; }
+.panel-hint      { font-size: 0.78rem; color: var(--text-muted); margin: 0.5rem 0.25rem 0; }
+.panel-hint code { background: var(--border-light); padding: 0 0.3rem; border-radius: 4px; }
+.panel-logo-preview { height: 48px; width: auto; max-width: 120px; object-fit: contain; }
+
+.syscheck-results { margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.35rem; }
+
+.check-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.6rem;
+  padding: 0.55rem 0.8rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+.check-icon  { font-weight: 700; width: 1rem; text-align: center; }
+.check-label { font-weight: 600; color: var(--text-primary); }
+.check-text  { color: var(--text-secondary); overflow-wrap: anywhere; }
+.check-ok   .check-icon { color: #15803D; }
+.check-warn .check-icon { color: #C2410C; }
+.check-warn { border-color: #FDBA74; }
+.check-error .check-icon { color: #B91C1C; }
+.check-error { border-color: #FCA5A5; }

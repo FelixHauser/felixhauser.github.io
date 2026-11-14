@@ -28,7 +28,6 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
     - **Creating logins done 2026-11-14** (OpenSpec change `add-teacher-admin-accounts`): "+ Neue Lehrkraft" with e-mail, "Zugang einrichten", "+ Neuer Admin", optional `email` column in the Lehrkräfte CSV (Edge Function `create-staff-account`).
   - Admin users have an Admin panel with the admin options
     - Bulk import and individual adding of iPads, users, staff (see Priority 2 — needed before go-live)
-      - **Move the add buttons into the admin panel**: "+ Neues iPad" and "CSV importieren" (currently in the toolbar of the iPad list, `views/ipad-list.js`) do not belong there — placed temporarily; same decision needed for "+ Neuer Schüler" / "+ Neue Lehrkraft" / "+ Neuer Admin"
     - **Archiving / anonymising** (decision: no hard deletes — the history must survive)
       - iPads are **archived**: hidden from lists, history kept
       - Pupils/staff are **anonymised**: personal data removed, audit trail kept
@@ -61,7 +60,7 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 - [ ] **Create a distribution package** — create a distribution package so that the web app can be used for other schools
   - **Not part of the package:** `CLAUDE.md`, `statusquo.md`, `TODO.md`, `.claude/`, `openspec/`, the school's own legal texts and logo, and `supabase/db-changes.md` (superseded by the schema export). They stay in the private repo for backup only.
 - [ ] **Config file for Supabase credentials** — one clearly commented file (e.g. `config.js`) the installing school edits once (decision: no GUI page — a static site could only store it in one visitor's browser; the anon key is public, so a file is safe)
-- [ ] **Configurable school details** — school name, logo, Schulträger (currently "Stadt Marl") and document templates, so another school can use its own
+- [ ] **Configurable school details — documents** — school name, logo and Schulträger are done (`school-config.js`, see Done); still open: the document templates (Leihvertrag PDF text, Schadensmeldung PDF, the "Eigentum der Stadt Marl" sentence in the portal) and the legal pages, which stay school-specific
 - [ ] **Create a database creation system** — where after installing/copying the files on a server, the database structure can be created without having to enter the Supabase project page (if at all possible)
 
 ---
@@ -108,6 +107,10 @@ Marçal only develops the product. These items depend on other people at the sch
 - [x]  **Wire the unused portal keys into `portal.js`** — the main portal view (greeting, iPad info, Übergabe/Rückgabe steps) was hardcoded German; found by `check-translations.js` (46 unused keys). CLAUDE.md requires the portal to be fully localised.
   - Done 2026-11-14 (OpenSpec change `wire-portal-translations`, tested manually in DE/EN/TR, archived; spec `openspec/specs/portal-localisation/`). Leihvertrag text and PDFs stay German for now (decide separately whether to translate them).
 - [x]  **Review sheet + first-pass evaluation** — `export-translations.js`, shared `translation-tools.js`, `translation-findings.md` (2 fixes applied, 12 open suggestions) (OpenSpec change `evaluate-translations`, 2026-11-14)
+
+## Priority 3 — Administration side
+- [x]  **Admin panel "Verwaltung"** (OpenSpec change `add-admin-panel`, tested manually 2026-11-14): sidebar item `#admin` with "Daten hinzufügen" (new iPad / pupil / Lehrkraft, three CSV imports), "Zugänge" (new admin), "Schule" (read-only) and a read-only "Systemprüfung" (row counts, Edge Function reachability, `ZZ…` test-data warning, logo file, asset version). The add/import buttons were removed from the three lists; the CSV dialog is opened for one fixed kind (no drop-down). Later admin features (manage logins, purge, settings) become further sections in `views/admin-panel.js`.
+- [x]  **School name, Schulträger and logo in a config file** — `school-config.js` + logo file in the folder, used by login, portal, lookup, print card and the Leihvertrag PDF; defaults if missing; editing needs a file change + push (a static site cannot save files from the browser)
 
 ## Priority 5 — Housekeeping
 - [x]  **Git housekeeping** — `.claude/settings.local.json` is ignored (personal permissions); the OpenSpec setup (`.claude/commands`, `.claude/skills`) is committed; `CLAUDE.md` and `statusquo.md` stay in the (private) repo as a backup — the misleading ignore lines were removed

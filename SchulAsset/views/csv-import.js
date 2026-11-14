@@ -286,21 +286,16 @@ const CSV_KINDS = {
 // ─── Part 3: dialog, preview and import (works for every kind) ───
 
 const IMPORT_CHUNK_SIZE = 200;
-let _importKind = 'ipads';    // key of CSV_KINDS currently selected in the dialog
+let _importKind = 'ipads';    // key of CSV_KINDS this dialog was opened for (fixed while it is open)
 let _importPlan = null;       // validation result of the file currently previewed
 
-// Opens the import dialog with the given kind preselected.
+// Opens the import dialog for one kind of data. The kind is chosen where the dialog is
+// opened (Verwaltung) and cannot be changed inside the dialog, so a file can never be
+// imported as the wrong kind by switching a drop-down.
 function openCsvImportModal(kind = 'ipads') {
   _importKind = CSV_KINDS[kind] ? kind : 'ipads';
   _importPlan = null;
-  _openModal('Aus CSV importieren', `
-    <div class="admin-form-group">
-      <label>Was importieren?</label>
-      <select id="import-kind" onchange="setCsvImportKind(this.value)">
-        ${Object.entries(CSV_KINDS).map(([key, k]) =>
-          `<option value="${key}" ${key === _importKind ? 'selected' : ''}>${k.label}</option>`).join('')}
-      </select>
-    </div>
+  _openModal(`${CSV_KINDS[_importKind].label} aus CSV importieren`, `
     <div id="import-hint"></div>
     <div class="admin-form-group">
       <label>CSV-Datei</label>
@@ -318,18 +313,6 @@ function _renderImportHint() {
   document.getElementById('import-hint').innerHTML = `
     <p class="field-hint">CSV-Datei (UTF-8) mit der ${CSV_KINDS[_importKind].hint}</p>
     <p><a href="#" onclick="downloadCsvTemplate(); return false;">Vorlage herunterladen</a></p>`;
-}
-
-// The admin changed the kind: forget the file and the preview, show the new hint.
-function setCsvImportKind(kind) {
-  _importKind = kind;
-  _importPlan = null;
-  document.getElementById('import-file').value = '';
-  document.getElementById('import-preview').innerHTML = '';
-  const btn = document.getElementById('admin-modal-submit');
-  btn.disabled = true;
-  btn.textContent = 'Importieren';
-  _renderImportHint();
 }
 
 // Creates a small template file in the browser (no extra file in the repo).
@@ -356,7 +339,7 @@ async function previewCsvImport(file) {
   try {
     const text = await file.text();
     const existing = await kind.fetchExisting();
-    // The admin may have switched the kind while we were loading: drop this result then.
+    // A different import dialog may have been opened while we were loading: drop this result then.
     if (CSV_KINDS[_importKind] !== kind) return;
     const plan = kind.validate(parseCsv(text), existing);
 
@@ -399,7 +382,6 @@ async function runCsvImport() {
   const btn  = document.getElementById('admin-modal-submit');
   const box  = document.getElementById('import-preview');
   document.getElementById('import-file').disabled = true;
-  document.getElementById('import-kind').disabled = true;
   btn.disabled = true;
 
   let saved = 0, historyFailed = 0, failure = null;

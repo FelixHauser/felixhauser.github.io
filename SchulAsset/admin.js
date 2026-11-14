@@ -62,6 +62,7 @@ const VIEW_RENDERERS = {
   staff:          () => renderStaffList(),
   meldungen:      () => renderMeldungen(),
   activity:       () => renderActivity(),
+  admin:          () => renderAdminPanel(),
   'ipad-detail':  () => renderIpadDetail(),
   'pupil-detail': () => renderPupilDetail(),
   'staff-detail': () => renderStaffDetail(),

@@ -45,7 +45,7 @@ async function generateLeihvertrag(data) {
   form.getTextField('last_name').setText(data.last_name       || '');
   form.getTextField('first_name').setText(data.first_name     || '');
   form.getTextField('address').setText(data.address           || '');
-  form.getTextField('school_name').setText('Martin Luther King Schule');
+  form.getTextField('school_name').setText(window.SCHOOL?.name || 'Martin Luther King Schule');
   form.getTextField('erz_last_name').setText(data.erz_last_name  || '');
   form.getTextField('erz_first_name').setText(data.erz_first_name || '');
   form.getTextField('erz_address').setText(data.erz_address    || '');

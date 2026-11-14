@@ -413,3 +413,16 @@ The earlier rule "no hard deletes" is relaxed for old data, as a **manual, per-i
 - Other small items still open (see TODO.md): active/not-active status for pupils/staff, admin panel (move the add/import buttons), native-speaker review of EN/TR. Distribution (Priority 6) stays for last.
 - Working on another computer: `git pull` first; start the local server from the SchulAsset folder (`python3 -m http.server 8080`); the OpenSpec CLI must be installed there (`openspec --version`).
 - Loose end: test CSV files may still be on the Desktop of the first computer (safe to delete).
+
+## Session 15 (2026-11-14) — OpenSpec change `add-admin-panel` (done, tested manually, archived; specs `admin-panel`, `admin-system-check`, `school-config`, `admin-pupil-staff-import`)
+
+- **Verwaltung** (`#admin`, `views/admin-panel.js`): sections "Daten hinzufügen" (new iPad / Schüler / Lehrkraft, CSV import of iPads / Schüler / Lehrkräfte), "Zugänge" (new admin), "Schule" (read-only), "Systemprüfung". The add/import buttons are gone from the three lists. To add a feature, add one entry to `ADMIN_PANEL_SECTIONS`. The dialogs still live in their list/import view files; the panel only calls them.
+- **CSV import dialog:** opened for one fixed kind (title "Schüler aus CSV importieren"); the kind drop-down was removed so a file cannot be imported as the wrong kind.
+- **Systemprüfung** (only when "Prüfung starten" is pressed, read-only): row counts (`head: true, count: 'exact'`) of `ipads`, `pupils`, `staff`, `user_roles`; the two Edge Functions are probed with a **bare POST** (401 = deployed, 404 = missing; nothing runs). An `OPTIONS` probe does *not* work: the browser blocks it because the functions do not allow that method. Also: warning for iPads with serial `ZZ…`, check that the logo file loads, asset version.
+- **School identity = config file** (decision 2026-11-14; a static GitHub Pages site cannot write files from the browser, and the user did not want it in the database): `school-config.js` defines `window.SCHOOL = { name, fullName, authority, logo }` (defaults = current values) and `applySchoolBranding()`, which fills `img[data-school-logo]` and `[data-school-name]` with `textContent`. Used by login, portal, lookup, the A5 print card, and `doc-generator.js` (`SCHOOL.name` → PDF field `school_name`). The sidebar keeps the product name "SchulAsset"; legal pages stay static. After changing the logo file: Cmd+Shift+R; after changing the config: `./bump-version.sh`. `authority` is not used in any text yet (portal Leihvertrag sentence "Eigentum der Stadt Marl" is still fixed).
+- No database change. Asset version `20261114-11`. Nothing committed yet.
+
+## Where to continue (end of session 15, 2026-11-14)
+- **No open OpenSpec change.** Uncommitted: everything from session 15 (needs the user's OK to commit and push; run `./bump-version.sh` again only if more `.js`/`.css` files change).
+- Next candidates (see TODO.md, Priority 3): active/not-active status for pupils/staff; manage existing logins (lock/remove, admin password reset, change-password page) as a new panel section; editable, versioned Leihvertrag; manual export + delete of old data (needs the active status and a settings table).
+- Local server: `python3 -m http.server 8080` in the SchulAsset folder.

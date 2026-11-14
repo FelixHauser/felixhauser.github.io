@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SchulAsset — Login</title>
-  <link rel="stylesheet" href="login.css?v=20261114-8">
+  <link rel="stylesheet" href="login.css?v=20261114-11">
 </head>
 <body>
 
@@ -12,7 +12,7 @@
 
     <!-- App header -->
     <div class="login-header">
-      <img src="mlks_logo.png" class="school-logo" alt="Martin-Luther-King-Schule">
+      <img src="mlks_logo.png" data-school-logo class="school-logo" alt="Martin-Luther-King-Schule">
       <div class="login-divider"></div>
       <h1 class="app-title">SchulAsset</h1>
       <p class="app-subtitle" data-i18n="login.subtitle">iPad-Verwaltung</p>
@@ -120,9 +120,10 @@
   <!-- Supabase JS client (CDN) — must come before our own scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.min.js"></script>
   <!-- Our files, in dependency order -->
-  <script src="supabase-client.js?v=20261114-8"></script>
-  <script src="translations.js?v=20261114-8"></script>
-  <script src="auth.js?v=20261114-8"></script>
+  <script src="school-config.js?v=20261114-11"></script>
+  <script src="supabase-client.js?v=20261114-11"></script>
+  <script src="translations.js?v=20261114-11"></script>
+  <script src="auth.js?v=20261114-11"></script>
   <script>
     // Apply translations on first load (language is read from localStorage or defaults to 'de').
     applyTranslations();

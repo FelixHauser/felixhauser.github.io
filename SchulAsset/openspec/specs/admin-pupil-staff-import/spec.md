@@ -6,15 +6,15 @@ Pupils and staff can be imported from CSV files through the combined import dial
 
 ## Requirements
 ### Requirement: Combined import dialog
-The CSV import dialog SHALL let the admin choose what to import — iPads, pupils or staff — and SHALL show the format hint and template download of the chosen kind. The "CSV importieren" buttons on the pupil list and the staff list SHALL open the dialog with the matching kind preselected.
+The CSV import dialog SHALL be opened for one fixed kind of data — iPads, pupils or staff — chosen by the admin in the admin panel (Verwaltung). The dialog SHALL NOT offer a way to change the kind; its title SHALL name the kind (e.g. "Schüler aus CSV importieren") and it SHALL show the format hint and template download of that kind. To import another kind the admin closes the dialog and chooses the other entry in the panel.
 
-#### Scenario: Preselected kind
-- **WHEN** an admin clicks "CSV importieren" on the pupil list
-- **THEN** the dialog opens with "Schüler" selected
+#### Scenario: Kind fixed by the panel entry
+- **WHEN** an admin clicks "Schüler aus CSV importieren" in the panel
+- **THEN** the dialog opens with the title "Schüler aus CSV importieren", the pupil format hint, and no control to switch to another kind
 
-#### Scenario: Changing the kind
-- **WHEN** an admin changes the kind after choosing a file
-- **THEN** the file and the preview are cleared and the hint and template of the new kind are shown
+#### Scenario: Other kind
+- **WHEN** an admin wants to import iPads after opening the pupil dialog
+- **THEN** they close it and click "iPads aus CSV importieren" in the panel, which opens a fresh dialog for iPads
 
 #### Scenario: iPad import unchanged
 - **WHEN** an admin imports iPads through the dialog
