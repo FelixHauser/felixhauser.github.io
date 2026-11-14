@@ -53,14 +53,16 @@ async function handleLogin(event) {
 // On page load: if the URL contains a recovery token (user clicked the reset email link),
 // skip the login form and show the new-password form instead.
 window.addEventListener('load', () => {
-  // QR code auto-login: ?sn=SERIAL&pw=PASSWORD
-  const params = new URLSearchParams(window.location.search);
-  const sn = params.get('sn');
-  const pw = params.get('pw');
-  if (sn && pw) {
+  // QR code auto-login: login.html#sn=SERIAL&pw=PASSWORD (new cards) or
+  // login.html?sn=SERIAL&pw=PASSWORD (cards printed earlier). See qr-login-url.js.
+  const qr = parseQrLogin(window.location.search, window.location.hash);
+  if (qr) {
+    // Remove the credentials from the address bar right away, so they do not stay
+    // visible or in the browser history. replaceState: no reload, no history entry.
+    history.replaceState(null, '', window.location.pathname);
     document.getElementById('login-form').hidden     = true;
     document.getElementById('autologin-msg').hidden  = false;
-    _autoLogin(sn, pw);
+    _autoLogin(qr.sn, qr.pw);
     return;
   }
 

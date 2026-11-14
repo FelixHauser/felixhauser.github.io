@@ -62,6 +62,15 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 - [ ] **Config file for Supabase credentials** — one clearly commented file (e.g. `config.js`) the installing school edits once (decision: no GUI page — a static site could only store it in one visitor's browser; the anon key is public, so a file is safe)
 - [ ] **Configurable school details — documents** — school name, logo and Schulträger are done (`school-config.js`, see Done); still open: the document templates (Leihvertrag PDF text, Schadensmeldung PDF, the "Eigentum der Stadt Marl" sentence in the portal) and the legal pages, which stay school-specific
 - [ ] **Create a database creation system** — where after installing/copying the files on a server, the database structure can be created without having to enter the Supabase project page (if at all possible)
+- [ ] **Deployment to the school's own hosting** (subfolder or subdomain of the school website; decision 2026-11-14: the app will not stay on GitHub Pages)
+  - The code needs no change: all links are relative, and the QR / print-card address and the password-reset link are built from the page's own address (`views/ipad-detail.js`, `auth.js`)
+  - Deploy by uploading the app files (FTP/SFTP/rsync) instead of `git push`; leave out `openspec/`, `.claude/`, `CLAUDE.md`, `statusquo.md`, `TODO.md` and the `supabase/` notes. Keep running `./bump-version.sh` before each upload (browser cache). A small deploy script would help.
+  - **Supabase → Authentication → URL Configuration:** add the new address to the allowed redirect URLs (and set the Site URL), otherwise the "Passwort vergessen?" link does not work
+  - **Do this before printing real QR cards or starting the pilot:** the cards contain the full address, so cards printed under the `github.io` address stop working once that site goes offline (until then they still log in; the same Supabase is behind both). Fix for already printed cards: "Passwort zurücksetzen" gives a new card, or keep a small forwarding `login.html` on GitHub that keeps the `#…` part.
+  - **Login link credentials now sit after the `#`** (OpenSpec change `qr-login-fragment`), so they do not appear in the school server's logs; old `?sn=…&pw=…` cards still work
+  - HTTPS is required (the QR scanner needs the camera); the server must serve `.js`, `.css`, `.pdf` and `.png` normally
+  - School name and logo are then changed by editing `school-config.js` / replacing the logo file on the server (FTP or file manager). Uploading a logo from the browser would need server code (e.g. PHP with a Supabase admin check) and is deliberately not planned.
+  - Open: who has FTP / file-manager access to the school site, and whether it is a plain web space or a CMS that restricts uploads
 
 ---
 

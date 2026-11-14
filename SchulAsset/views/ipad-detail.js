@@ -1210,7 +1210,7 @@ function _finishPasswordCard() {
 function _showPasswordCard(ipad, password, pupilName, onClose) {
   _passwordCardOnClose = onClose;
   const base    = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
-  const loginUrl = `${base}login.html?sn=${encodeURIComponent(ipad.serial_number)}&pw=${encodeURIComponent(password)}`;
+  const loginUrl = buildQrLoginUrl(base, ipad.serial_number, password);   // credentials after the # (qr-login-url.js)
 
   document.getElementById('admin-modal-title').textContent = 'Zugangsdaten Schülerportal';
   document.getElementById('admin-modal-body').innerHTML = `
@@ -1250,7 +1250,7 @@ function _showPasswordCard(ipad, password, pupilName, onClose) {
   document.getElementById('print-pupil-name').textContent = pupilName;
   document.getElementById('print-serial').textContent     = ipad.serial_number;
   document.getElementById('print-password').textContent   = password;
-  document.getElementById('print-url').textContent        = loginUrl;
+  document.getElementById('print-url').textContent        = `${base}login.html`;   // address only: username and password are printed below, no need to repeat them in the link
 
   const printQrEl = document.getElementById('print-qr-code');
   printQrEl.innerHTML = '';
