@@ -189,4 +189,55 @@ function assignedName(ipad) {
   return '—';
 }
 
+// ---- Logins for teachers and admins (Edge Function create-staff-account) ----
+
+// Simple e-mail check, same pattern as in the Edge Function (which checks again).
+function isValidEmail(email) {
+  return email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Creates 1–50 logins in one call. `accounts` = [{ email, role: 'teacher' | 'admin', staff_id? }].
+// Returns one result per entry, in the same order: { email, password } or { email, error }.
+// Throws an Error with a readable text if the whole call fails (function not deployed, not an admin, …).
+async function createStaffAccounts(accounts) {
+  const { data, error } = await supabase.functions.invoke('create-staff-account', { body: { accounts } });
+
+  if (error || !Array.isArray(data?.results)) {
+    // For non-2xx answers the real message is in the response body (read as text first: it may not be JSON).
+    const rawBody = await error?.context?.text?.().catch(() => null);
+    let detail = null;
+    try { detail = JSON.parse(rawBody); } catch { detail = rawBody ? { error: rawBody } : null; }
+    console.error('create-staff-account failed:', error?.context?.status, rawBody);   // error answers contain no passwords
+    throw new Error(detail?.error || error?.message || 'Die Funktion hat nicht geantwortet');
+  }
+  return data.results;
+}
+
+// Shows e-mail and password ONCE in the admin dialog. The password is not stored anywhere;
+// closing the dialog empties it (closeAdminModal), so it cannot be shown again.
+function showCredentialsDialog({ title, email, password, note = '' }) {
+  _openModal(title, `
+    <p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:1rem">
+      Zugangsdaten für <strong>${escapeHtml(email)}</strong>:
+    </p>
+    <div style="background:#F6F9FC;border:1.5px solid var(--border);border-radius:8px;padding:0.9rem;margin-bottom:0.6rem">
+      <div style="font-size:0.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.3rem">Benutzername (E-Mail)</div>
+      <div style="font-family:monospace;font-size:1rem;font-weight:700;color:var(--text-primary);overflow-wrap:anywhere">${escapeHtml(email)}</div>
+    </div>
+    <div style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:8px;padding:0.9rem;margin-bottom:0.75rem">
+      <div style="font-size:0.7rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.3rem">Passwort</div>
+      <div id="cred-password" style="font-family:monospace;font-size:1.4rem;font-weight:700;color:#15803d;letter-spacing:1px">${escapeHtml(password)}</div>
+    </div>
+    <button class="btn-action-detail" type="button"
+            onclick="navigator.clipboard?.writeText(document.getElementById('cred-password').textContent); this.textContent='Kopiert ✓'">Passwort kopieren</button>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.8rem">
+      Das Passwort wird nicht gespeichert und kann später nicht mehr angezeigt werden.
+      Anmeldung auf der Login-Seite; ein neues Passwort gibt es über „Passwort vergessen?“.
+      ${escapeHtml(note)}
+    </p>
+  `, 'Verstanden', closeAdminModal);
+  document.querySelector('.admin-modal-footer').innerHTML =
+    '<button class="btn-primary" onclick="closeAdminModal()">Verstanden</button>';
+}
+
 // initAdmin() is called from admin.html after all view scripts have loaded.

@@ -150,10 +150,14 @@ function validateStaffRows(rows, existingKuerzel) {
   if (h.fatal) { result.fatal = h.fatal; return result; }
   const cell = (r, name) => (r[h.col(name)] ?? '').trim();
 
+  // The column `email` is optional (the header lookup answers -1 when it is missing).
+  // A row with an e-mail also gets a teacher login after the import.
   const seenInFile = new Set();
+  const seenEmails = new Set();
   rows.slice(1).forEach((r, idx) => {
     const line = idx + 2;
     const first = cell(r, 'first_name'), last = cell(r, 'last_name'), kuerzel = cell(r, 'kuerzel');
+    const email = cell(r, 'email').toLowerCase();
     const label = `${last}, ${first} (${kuerzel})`;
     if (!first || !last) return result.invalid.push({ line, label, reason: 'Vor- oder Nachname fehlt' });
     if (!kuerzel)        return result.invalid.push({ line, label, reason: 'Kürzel fehlt' });
@@ -163,7 +167,15 @@ function validateStaffRows(rows, existingKuerzel) {
     seenInFile.add(key);
     if (existingKuerzel.has(key)) return result.existing.push({ line, label, reason: `Kürzel ${kuerzel} ist bereits vergeben` });
 
-    result.valid.push({ line, label, record: { first_name: first, last_name: last, kuerzel } });
+    // E-mail: valid, and not used twice in the file. Only rows that will really be imported count
+    // (a skipped row's e-mail is ignored). Whether it is already registered is only known to the server.
+    if (email && !isValidEmail(email))
+      return result.invalid.push({ line, label, reason: `Ungültige E-Mail-Adresse „${email}“` });
+    if (email && seenEmails.has(email))
+      return result.invalid.push({ line, label, reason: `E-Mail ${email} kommt in der Datei mehrfach vor` });
+    if (email) seenEmails.add(email);
+
+    result.valid.push({ line, label, email: email || null, record: { first_name: first, last_name: last, kuerzel } });
   });
   return result;
 }
@@ -240,12 +252,14 @@ const CSV_KINDS = {
     label: 'Lehrkräfte',
     view: 'staff',
     columnLabel: 'Lehrkraft',
-    hint: `Kopfzeile <code>first_name;last_name;kuerzel</code>. Alle drei Spalten sind Pflicht.
-           Das Kürzel ist eindeutig: ein bereits vergebenes Kürzel wird übersprungen.`,
+    hint: `Kopfzeile <code>first_name;last_name;kuerzel</code> — alle drei sind Pflicht — und optional
+           <code>email</code>. Das Kürzel ist eindeutig: ein bereits vergebenes Kürzel wird übersprungen.
+           Wer eine E-Mail hat, bekommt einen Zugang (Rolle „Lehrkraft“); die erzeugten Passwörter
+           werden nach dem Import einmalig zum Download angeboten.`,
     templateFile: 'lehrkraefte-import-vorlage.csv',
-    template: 'first_name;last_name;kuerzel\n'
-            + 'Anna;Beispiel;BEI\n'
-            + 'Peter;Muster;MUS\n',
+    template: 'first_name;last_name;kuerzel;email\n'
+            + 'Anna;Beispiel;BEI;anna.beispiel@schule.example\n'
+            + 'Peter;Muster;MUS;\n',
     async fetchExisting() {
       const { data, error } = await fetchAllRows(() => supabase
         .from('staff').select('kuerzel').order('id'));
@@ -253,9 +267,18 @@ const CSV_KINDS = {
       return new Set(data.filter(s => s.kuerzel).map(s => s.kuerzel.trim().toUpperCase()));
     },
     validate: validateStaffRows,
-    async insertChunk(records) {
-      const { data, error } = await supabase.from('staff').insert(records).select('id');
-      return error ? { error } : { saved: data.length, historyFailed: 0 };
+    // `rows` are the plan rows of this chunk (they carry the optional e-mail).
+    async insertChunk(records, rows) {
+      const { data, error } = await supabase.from('staff').insert(records).select('id, kuerzel');
+      if (error) return { error };
+      // Match the new ids back to the rows by Kürzel (unique, ignoring case) to know whose login to create.
+      const idByKuerzel = new Map(data.map(s => [s.kuerzel.toUpperCase(), s.id]));
+      const newStaff = rows.map(r => ({
+        id:    idByKuerzel.get(r.record.kuerzel.toUpperCase()),
+        email: r.email,
+        name:  `${r.record.first_name} ${r.record.last_name}`,
+      }));
+      return { saved: data.length, historyFailed: 0, newStaff };
     },
   },
 };
@@ -368,7 +391,7 @@ async function previewCsvImport(file) {
   }
 }
 
-// Step 3: write the valid rows in chunks.
+// Step 3: write the valid rows in chunks (Lehrkräfte with an e-mail then get their logins).
 async function runCsvImport() {
   if (!_importPlan || _importPlan.valid.length === 0) return;
   const kind = CSV_KINDS[_importKind];
@@ -380,16 +403,23 @@ async function runCsvImport() {
   btn.disabled = true;
 
   let saved = 0, historyFailed = 0, failure = null;
+  const newStaff = [];
 
   for (let i = 0; i < plan.valid.length; i += IMPORT_CHUNK_SIZE) {
     const chunk = plan.valid.slice(i, i + IMPORT_CHUNK_SIZE);
     btn.textContent = `Importiere… ${saved} / ${plan.valid.length}`;
 
-    const res = await kind.insertChunk(chunk.map(r => r.record));
+    const res = await kind.insertChunk(chunk.map(r => r.record), chunk);
     if (res.error) { failure = res.error; break; }   // stop here; a re-run skips what is saved
     saved += res.saved;
     historyFailed += res.historyFailed;
+    if (res.newStaff) newStaff.push(...res.newStaff);
   }
+
+  // Lehrkräfte with an e-mail also get a login (including those saved before a failure).
+  const wanted = newStaff.filter(s => s.email && s.id);
+  const logins = wanted.length ? await _createImportLogins(wanted, btn) : null;
+  _importCredentials = logins && logins.created.length ? logins.created : null;
 
   if (failure) {
     box.innerHTML = `<p class="error-inline">Fehler nach ${saved} gespeicherten Datensätzen: ${escapeHtml(failure.message)}<br>
@@ -397,10 +427,12 @@ async function runCsvImport() {
   } else {
     box.innerHTML = `
       <p><strong>${saved} ${escapeHtml(kind.label)} importiert.</strong></p>
-      <p>${plan.existing.length} bereits vorhanden und übersprungen · ${plan.duplicates.length} doppelt in der Datei · ${plan.invalid.length} ungültig</p>
+      <p>${plan.existing.length} bereits vorhanden und übersprungen · ${plan.duplicates.length} doppelt in der Datei · ${plan.invalid.length} ungültig
       ${historyFailed ? `<p class="error-inline">Für ${historyFailed} iPads konnte der Verlaufseintrag nicht geschrieben werden (siehe Konsole).</p>` : ''}
     `;
   }
+  if (logins) box.innerHTML += _loginSummaryHtml(logins);
+
   btn.textContent = 'Schließen';
   btn.disabled = false;
   btn.onclick = closeAdminModal;
@@ -408,4 +440,78 @@ async function runCsvImport() {
 
   // Refresh the list behind the dialog — only if it is the one currently shown.
   if (window.location.hash.slice(1) === kind.view) VIEW_RENDERERS[kind.view]();
+}
+
+// ─── Logins created by the staff import ───
+
+const ACCOUNT_BATCH_SIZE = 25;       // logins per call of the Edge Function
+let _importCredentials = null;       // [{ email, password, name }] — only in memory, until the dialog closes
+
+// Called by closeAdminModal(): the passwords must not outlive the dialog.
+function _discardImportCredentials() { _importCredentials = null; }
+
+// Creates the logins in batches. A failure for one entry (or one whole batch) never stops the others.
+// Returns { created: [{ email, password, name }], failed: [{ email, name, error }] }.
+async function _createImportLogins(accounts, btn) {
+  const created = [], failed = [];
+  for (let i = 0; i < accounts.length; i += ACCOUNT_BATCH_SIZE) {
+    const batch = accounts.slice(i, i + ACCOUNT_BATCH_SIZE);
+    btn.textContent = `Zugänge anlegen… ${i} / ${accounts.length}`;
+
+    let results;
+    try {
+      results = await createStaffAccounts(batch.map(a => ({ email: a.email, role: 'teacher', staff_id: a.id })));
+    } catch (e) {
+      batch.forEach(a => failed.push({ email: a.email, name: a.name, error: e.message }));
+      continue;
+    }
+    results.forEach((res, k) => {
+      const a = batch[k];
+      if (res.password) created.push({ email: res.email, password: res.password, name: a.name });
+      else failed.push({ email: a.email, name: a.name, error: res.error });
+    });
+  }
+  return { created, failed };
+}
+
+// The part of the result dialog about the logins (counts, problems, download).
+function _loginSummaryHtml({ created, failed }) {
+  const shown = failed.slice(0, 20);
+  return `
+    <p><strong>${created.length} Zugänge angelegt</strong> · ${failed.length} nicht angelegt</p>
+    ${failed.length ? `
+      <div class="table-wrap"><table class="data-table"><thead>
+        <tr><th>Lehrkraft</th><th>E-Mail</th><th>Problem</th></tr></thead><tbody>
+        ${shown.map(f => `<tr><td>${escapeHtml(f.name)}</td><td>${escapeHtml(f.email)}</td><td>${escapeHtml(f.error)}</td></tr>`).join('')}
+      </tbody></table></div>
+      ${failed.length > shown.length ? `<p class="field-hint">… und ${failed.length - shown.length} weitere</p>` : ''}
+      <p class="field-hint">Die Lehrkräfte selbst sind angelegt. Auf ihrer Seite kann „Zugang einrichten“ erneut versucht werden.</p>
+    ` : ''}
+    ${created.length ? `
+      <div class="admin-modal-warn" style="margin-top:0.8rem">
+        Die Datei enthält Passwörter im Klartext. Sie werden nirgends gespeichert und können nach dem
+        Schließen dieses Fensters nicht mehr angezeigt werden. Bitte nach dem Verteilen löschen.
+      </div>
+      <button class="btn-action-detail" style="margin-top:0.6rem" onclick="downloadImportCredentials()">Zugangsdaten herunterladen</button>
+    ` : ''}`;
+}
+
+// A cell of the credentials file: quoted when needed, and made harmless for spreadsheets
+// (a text starting with = + - @ would otherwise be run as a formula).
+function _credCell(value) {
+  let text = String(value ?? '');
+  if (/^[=+\-@\t\r]/.test(text)) text = "'" + text;
+  return /[;"\r\n]/.test(text) ? '"' + text.replace(/"/g, '""') + '"' : text;
+}
+
+// Saves the one-time credentials file (UTF-8 with BOM, ";" separated) from memory.
+function downloadImportCredentials() {
+  if (!_importCredentials) return;
+  const lines = ['email;password;name',
+    ..._importCredentials.map(c => [c.email, c.password, c.name].map(_credCell).join(';'))];
+  const url = URL.createObjectURL(new Blob(['﻿' + lines.join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url; a.download = 'zugangsdaten-lehrkraefte.csv';
+  a.click();
+  URL.revokeObjectURL(url);
 }

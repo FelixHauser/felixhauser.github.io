@@ -359,6 +359,10 @@ function _openModal(title, bodyHtml, submitLabel, submitFn) {
 
 function closeAdminModal() {
   document.getElementById('admin-modal').hidden = true;
+  // Empty the body: nothing shown in a dialog (for example a password) stays in the hidden page.
+  document.getElementById('admin-modal-body').innerHTML = '';
+  // The CSV import keeps generated passwords in memory until its dialog closes.
+  if (typeof _discardImportCredentials === 'function') _discardImportCredentials();
   // Restore default footer in case _showPasswordCard replaced it.
   document.querySelector('.admin-modal-footer').innerHTML = `
     <button class="btn-secondary" onclick="closeAdminModal()">Abbrechen</button>

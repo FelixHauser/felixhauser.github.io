@@ -98,6 +98,12 @@ function _staffInfoCard(staff, editMode = false) {
         <span class="detail-key">Kürzel</span>
         <span class="mono">${escapeHtml(staff.kuerzel ?? '—')}</span>
       </div>
+      <div class="detail-field">
+        <span class="detail-key">Zugang</span>
+        ${staff.user_id
+          ? `<span>${escapeHtml(staff.login_email ?? 'ja')} <span class="badge" style="background:#34c759">Lehrkraft-Zugang</span></span>`
+          : `<span>kein Zugang <button class="btn-action-detail" onclick="openStaffAccessModal()">Zugang einrichten</button></span>`}
+      </div>
       <div class="detail-field" style="justify-content:flex-end">
         <button class="btn-action-detail" onclick="_editStaffInfo()">Bearbeiten</button>
       </div>
@@ -132,4 +138,37 @@ async function _saveStaffEdit(id) {
   _currentStaff = { ..._currentStaff, first_name: firstName, last_name: lastName, kuerzel };
   document.getElementById('staff-detail-title').textContent = `${firstName} ${lastName}`;
   document.getElementById('staff-info-card').outerHTML = _staffInfoCard(_currentStaff, false);
+}
+
+// ---- Access (login) for this Lehrkraft ----
+
+function openStaffAccessModal() {
+  _openModal('Zugang einrichten', `
+    <p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:0.9rem">
+      Zugang für <strong>${escapeHtml(_currentStaff.first_name)} ${escapeHtml(_currentStaff.last_name)}</strong>:
+      Rolle „Lehrkraft“ (iPads nachschlagen, nur lesen).
+    </p>
+    <div class="admin-form-group">
+      <label>E-Mail</label>
+      <input type="text" id="sa-email" placeholder="vorname.nachname@schule.de" autocapitalize="off" spellcheck="false">
+    </div>
+  `, 'Zugang erstellen', submitStaffAccess);
+}
+
+async function submitStaffAccess() {
+  const email = (document.getElementById('sa-email')?.value || '').trim().toLowerCase();
+  if (!isValidEmail(email)) { _modalError('Bitte eine gültige E-Mail-Adresse eingeben.'); return; }
+
+  _setBusy(true, 'Zugang erstellen');
+  try {
+    const [result] = await createStaffAccounts([{ email, role: 'teacher', staff_id: _currentStaff.id }]);
+    if (!result.password) { _setBusy(false, 'Zugang erstellen'); _modalError(result.error); return; }
+
+    closeAdminModal();
+    renderStaffDetail();   // now shows the e-mail instead of "kein Zugang"
+    showCredentialsDialog({ title: 'Zugang für die Lehrkraft', email: result.email, password: result.password });
+  } catch (e) {
+    _setBusy(false, 'Zugang erstellen');
+    _modalError('Fehler: ' + e.message);
+  }
 }

@@ -25,15 +25,17 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
   - `student` — unchanged: parent/pupil portal, sees only their own iPad
   - `teacher` — **done 2026-11-14** (OpenSpec change `add-teacher-lookup`, tested manually): read-only, for teachers and repair people; enters or scans a S/N on `lookup.html`, sees the owner's name, then ("Details anzeigen") address, guardian, Leihvertrag date/version + blank template, Übergabeprotokoll, and ("Verlauf anzeigen") history + Schadenmeldungen. No lists, no changes. Access only through two database functions (`supabase/teacher-lookup.sql`).
   - `admin` — unchanged name, full rights: sets up the site and modifies things (add / import / delete iPads, assign, settings, purge). No separate "root admin"
+    - **Creating logins done 2026-11-14** (OpenSpec change `add-teacher-admin-accounts`): "+ Neue Lehrkraft" with e-mail, "Zugang einrichten", "+ Neuer Admin", optional `email` column in the Lehrkräfte CSV (Edge Function `create-staff-account`).
   - Admin users have an Admin panel with the admin options
     - Bulk import and individual adding of iPads, users, staff (see Priority 2 — needed before go-live)
-      - **Move the add buttons into the admin panel**: "+ Neues iPad" and "CSV importieren" (currently in the toolbar of the iPad list, `views/ipad-list.js`) do not belong there — placed temporarily; same decision needed for "+ Neuer Schüler" / "+ Neue Lehrkraft"
+      - **Move the add buttons into the admin panel**: "+ Neues iPad" and "CSV importieren" (currently in the toolbar of the iPad list, `views/ipad-list.js`) do not belong there — placed temporarily; same decision needed for "+ Neuer Schüler" / "+ Neue Lehrkraft" / "+ Neuer Admin"
     - **Archiving / anonymising** (decision: no hard deletes — the history must survive)
       - iPads are **archived**: hidden from lists, history kept
       - Pupils/staff are **anonymised**: personal data removed, audit trail kept
       - Bulk action from a sorted list: e.g. sort users by having an iPad or not, anonymise all users without iPad; archive all decommissioned iPads
       - Archive / Decommission button on iPad detail view
       - Implements the retention concept from Priority 2
+- [ ]  **Manage existing logins** (left out of `add-teacher-admin-accounts` on purpose) — remove or lock the access of a teacher/admin who leaves (today: delete the user in Studio); admin-side password reset for teachers and admins; a "change password" page for logged-in users; optionally force a password change at the first login. Part of the admin panel.
 - [ ]  **Editable, versioned Leihvertrag** — edit the iPad contract conditions via both a .md file (for displaying it online) and the fillable PDF. `terms_version: '1.0'` is currently hardcoded; every change must create a new version, so it stays recorded which version each family signed.
 - [ ]  **Manual export + delete of old data (PDF first)** — the database must not grow without limit. Decision 2026-11-13: it is a **manual, per-item process**; nothing is exported or deleted automatically (setting an iPad to decommissioned does *not* trigger anything).
   - **iPads:** on a decommissioned iPad the admin can click "Verlauf exportieren und löschen": the iPad's full history (master data, history, signed Leihvertrag, protocols, damage/loss reports) is generated as a PDF and downloaded; only after the admin confirms that the PDF was saved is the iPad with all its records deleted. Only offered for status `decommissioned`.

@@ -93,19 +93,24 @@ id, ipad_id → ipads, accepted_at, ip_address (nullable), terms_version
 
 ### user_roles
 ```
-id, user_id → auth.users, role (admin/student), created_at
+id, user_id → auth.users, role (admin/teacher/student), created_at
 ```
 
 ---
 
 ## Authentication
 
-Two user types:
+Three user types:
 
 **Admin**
 - Logs in with real email and password
 - Full access to everything
-- Created manually in Supabase Auth dashboard
+- Created by an existing admin with "+ Neuer Admin" in the admin area (the very first admin is created by hand in the Supabase Auth dashboard)
+
+**Teacher** (also used for the people who repair iPads)
+- Logs in with real email and password; read-only
+- Created by an admin: "+ Neue Lehrkraft" with an e-mail, "Zugang einrichten" on a Lehrkraft, or the optional `email` column of the Lehrkräfte CSV import (all through the Edge Function `create-staff-account`)
+- Sees only `lookup.html`: enters or scans one serial number, sees the owner's name and, after extra clicks, the details and history. Has no access to any table; reads through two database functions (`lookup_ipad`, `lookup_ipad_details`)
 
 **Student/parent**
 - Logs in with serial number as username + `@schulasset.local` suffix (added by app, invisible to user)

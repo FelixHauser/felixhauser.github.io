@@ -74,3 +74,15 @@ ON CONFLICT (user_id) DO UPDATE SET role = 'teacher';
 `user_roles.user_id` is unique, so one role per user. Remove the account's role (or delete the user) to take access away.
 
 **Rollback:** `DROP FUNCTION public.lookup_ipad(text); DROP FUNCTION public.lookup_ipad_details(uuid);`
+
+## 2026-11-14 — logins for teachers and admins: link columns on `staff` + Edge Function
+
+**Why:** OpenSpec change `add-teacher-admin-accounts`. Admins create `teacher` and `admin` logins from the admin area ("+ Neue Lehrkraft" with e-mail, "Zugang einrichten", "+ Neuer Admin", optional `email` column of the Lehrkräfte CSV). A login can only be created with the service role, so it goes through an Edge Function.
+
+**SQL:** `supabase/staff-accounts.sql` (PART 1) — `staff.user_id uuid UNIQUE REFERENCES auth.users(id) ON DELETE SET NULL` (the login of this Lehrkraft; cleared automatically when the login is deleted), `staff.login_email text` (only for display), and `GRANT SELECT, UPDATE ON public.staff TO service_role`. Rollback: `ALTER TABLE public.staff DROP COLUMN user_id, DROP COLUMN login_email;`
+
+**Edge Function `create-staff-account`** (`supabase/functions/create-staff-account/index.ts`): the name must be exactly this (the app calls it by name). Deployed by hand: Studio → Edge Functions → create `create-staff-account` → paste the file → Deploy. Redeploy after every change of the file. Rules: admin callers only (403 otherwise); roles `teacher` / `admin`; 1–50 entries per call with one result each; an already registered e-mail is refused and the account is never changed; `@schulasset.local` is refused; a failing step after the user was created deletes the user again; passwords (12 characters, no look-alikes) come from `crypto.getRandomValues`, are returned once, never stored.
+
+**Tested (2026-11-14):** one teacher; the same e-mail again → refused, account unchanged; `@schulasset.local`, invalid e-mail and unknown role → refused; new admin created; called as a teacher → 403 `Forbidden`; screens and CSV (rows with/without e-mail, duplicate and invalid e-mail, existing Kürzel, already registered e-mail → Lehrkraft saved without access).
+
+**Removing access:** delete the user in Studio → Authentication → Users (the `user_roles` row goes with it, `staff.user_id` becomes empty), or delete only the `user_roles` row to keep the login but remove the role.
