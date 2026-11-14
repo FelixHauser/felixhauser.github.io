@@ -118,15 +118,15 @@ async function renderIpadDetail() {
     <div class="detail-card">
       <div class="detail-field">
         <span class="detail-key">Seriennummer</span>
-        <span class="mono">${ipad.serial_number}</span>
+        <span class="mono">${escapeHtml(ipad.serial_number)}</span>
       </div>
       <div class="detail-field">
         <span class="detail-key">Typ</span>
-        <span>${TYPE_LABEL[ipad.ipad_type] ?? ipad.ipad_type}</span>
+        <span>${escapeHtml(TYPE_LABEL[ipad.ipad_type] ?? ipad.ipad_type)}</span>
       </div>
       <div class="detail-field">
         <span class="detail-key">Speicher</span>
-        <span>${ipad.storage_capacity ?? '—'}</span>
+        <span>${escapeHtml(ipad.storage_capacity ?? '—')}</span>
       </div>
       <div class="detail-field">
         <span class="detail-key">Status</span>
@@ -134,7 +134,7 @@ async function renderIpadDetail() {
       </div>
       <div class="detail-field">
         <span class="detail-key">Zugewiesen an</span>
-        <span>${assignedName(ipad)}</span>
+        <span>${escapeHtml(assignedName(ipad))}</span>
       </div>
       <div class="detail-field">
         <span class="detail-key">Zugewiesen seit</span>
@@ -161,7 +161,7 @@ async function renderIpadDetail() {
 // Builds the history timeline HTML.
 function buildHistoryHtml(history, error) {
   if (error) {
-    return `<p class="error-inline">Verlauf konnte nicht geladen werden: ${error.message}</p>`;
+    return `<p class="error-inline">Verlauf konnte nicht geladen werden: ${escapeHtml(error.message)}</p>`;
   }
   if (!history || history.length === 0) {
     return '<p class="empty-msg">Kein Verlauf vorhanden.</p>';
@@ -177,7 +177,8 @@ function buildHistoryHtml(history, error) {
     const dlLabel = DOWNLOADABLE[entry.event_type];
     const dlBtn   = dlLabel
       ? `<button class="btn-history-download"
-           onclick="downloadHistoryDoc('${entry.event_type}', '${entry.changed_at}')">
+           data-type="${escapeHtml(entry.event_type)}" data-at="${escapeHtml(entry.changed_at)}"
+           onclick="downloadHistoryDoc(this.dataset.type, this.dataset.at)">
            ↓ ${dlLabel}
          </button>`
       : '';
@@ -187,13 +188,13 @@ function buildHistoryHtml(history, error) {
         <div class="timeline-dot"></div>
         <div class="timeline-content">
           <div class="timeline-top">
-            <span class="timeline-event">${EVENT_LABELS[entry.event_type] ?? entry.event_type}</span>
+            <span class="timeline-event">${escapeHtml(EVENT_LABELS[entry.event_type] ?? entry.event_type)}</span>
             <span class="timeline-date">${formatDateTime(entry.changed_at)}</span>
           </div>
           ${entry.status      ? `<div class="timeline-detail">Status: ${statusBadge(entry.status)}</div>` : ''}
-          ${entry.assigned_to ? `<div class="timeline-detail">Zugewiesen an: <strong>${entry.assigned_to}</strong></div>` : ''}
-          ${entry.changed_by  ? `<div class="timeline-detail">Geändert von: ${entry.changed_by}</div>` : ''}
-          ${entry.notes       ? `<div class="timeline-notes">${entry.notes}</div>` : ''}
+          ${entry.assigned_to ? `<div class="timeline-detail">Zugewiesen an: <strong>${escapeHtml(entry.assigned_to)}</strong></div>` : ''}
+          ${entry.changed_by  ? `<div class="timeline-detail">Geändert von: ${escapeHtml(entry.changed_by)}</div>` : ''}
+          ${entry.notes       ? `<div class="timeline-notes">${escapeHtml(entry.notes)}</div>` : ''}
           ${dlBtn}
         </div>
       </div>
@@ -747,7 +748,7 @@ async function openRemoveOwnerModal() {
   _openModal('Zuweisung aufheben', `
     ${warningHtml}
     <p style="font-size:0.9rem;margin-top:0.9rem">
-      Zuweisung von <strong>${prevName}</strong> aufheben?<br>
+      Zuweisung von <strong>${escapeHtml(prevName)}</strong> aufheben?<br>
       <span style="color:var(--text-muted);font-size:0.82rem">
         Der Portalzugang wird gesperrt und der Leihvertrag wird zurückgesetzt.
       </span>
@@ -808,7 +809,7 @@ function openUebergabeModal() {
     </div>
     <div class="admin-form-group">
       <label>Ausgehändigt von (Kürzel)</label>
-      <input type="text" id="md-ue-kurzel" value="${localStorage.getItem('schulasset_kurzel') || adminName.split('@')[0]}">
+      <input type="text" id="md-ue-kurzel" value="${escapeHtml(localStorage.getItem('schulasset_kurzel') || adminName.split('@')[0])}">
     </div>
   `, 'Protokoll erstellen', submitUebergabe);
 }
@@ -875,7 +876,7 @@ function openRueckgabeModal() {
     </div>
     <div class="admin-form-group">
       <label>Abgenommen von (Kürzel)</label>
-      <input type="text" id="md-rg-kurzel" value="${localStorage.getItem('schulasset_kurzel') || adminName.split('@')[0]}">
+      <input type="text" id="md-rg-kurzel" value="${escapeHtml(localStorage.getItem('schulasset_kurzel') || adminName.split('@')[0])}">
     </div>
   `, 'Protokoll erstellen', submitRueckgabe);
 }
@@ -1088,7 +1089,7 @@ async function openResetPortalPasswordModal() {
   _openModal('Portalpasswort zurücksetzen', `
     <p style="font-size:0.9rem;color:var(--text-secondary)">
       Ein neues Passwort für den Portalzugang von
-      <strong>${assignedName(ipad)}</strong> generieren?<br>
+      <strong>${escapeHtml(assignedName(ipad))}</strong> generieren?<br>
       <span style="color:var(--text-muted);font-size:0.82rem">
         Das alte Passwort wird sofort ungültig.
       </span>
@@ -1210,15 +1211,15 @@ function _showPasswordCard(ipad, password, pupilName, onClose) {
   document.getElementById('admin-modal-title').textContent = 'Zugangsdaten Schülerportal';
   document.getElementById('admin-modal-body').innerHTML = `
     <p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:1rem">
-      Zugangsdaten für <strong>${pupilName}</strong>:
+      Zugangsdaten für <strong>${escapeHtml(pupilName)}</strong>:
     </p>
     <div style="background:#F6F9FC;border:1.5px solid var(--border);border-radius:8px;padding:0.9rem;margin-bottom:0.6rem">
       <div style="font-size:0.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.3rem">Benutzername (Seriennummer)</div>
-      <div style="font-family:monospace;font-size:1rem;font-weight:700;color:var(--text-primary)">${ipad.serial_number}</div>
+      <div style="font-family:monospace;font-size:1rem;font-weight:700;color:var(--text-primary)">${escapeHtml(ipad.serial_number)}</div>
     </div>
     <div style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:8px;padding:0.9rem;margin-bottom:0.75rem">
       <div style="font-size:0.7rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.3rem">Passwort</div>
-      <div style="font-family:monospace;font-size:1.4rem;font-weight:700;color:#15803d;letter-spacing:1px">${password}</div>
+      <div style="font-family:monospace;font-size:1.4rem;font-weight:700;color:#15803d;letter-spacing:1px">${escapeHtml(password)}</div>
     </div>
     <div style="text-align:center;margin-bottom:0.5rem">
       <div id="modal-qr-code" style="display:inline-block"></div>

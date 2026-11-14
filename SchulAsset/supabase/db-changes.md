@@ -54,3 +54,23 @@ Existing indexes on `staff` (for the schema export): `staff_pkey (id)`, `staff_k
 ```sql
 ALTER TABLE public.pupils ALTER COLUMN address DROP NOT NULL;
 ```
+
+## 2026-11-14 — teacher role: two lookup functions
+
+**Why:** OpenSpec change `add-teacher-lookup`. Teachers and repair people look up ONE iPad by exact serial number (owner's name first, details after a click). The role `teacher` gets **no policy on any table**; it can only call two functions. `user_roles.role` is plain `text` without a CHECK constraint, so the new value `teacher` needed no change (`ipads.id` is `uuid`; policy "Users can read their own role" `SELECT (user_id = auth.uid())` lets every role read its own row).
+
+**SQL:** `supabase/teacher-lookup.sql` (PART 1) — `lookup_ipad(p_serial text)` and `lookup_ipad_details(p_ipad_id uuid)`; both `SECURITY DEFINER`, `SET search_path = public`, refuse everybody except roles `teacher` / `admin`; `REVOKE ALL … FROM PUBLIC, anon`, `GRANT EXECUTE … TO authenticated`. The details never contain signature images, IP addresses or portal password data.
+
+**Tested (PART 3 of the SQL file, run in a rolled-back transaction):** teacher → step 1 works (also lower case), partial serial → null, `ipads` / `pupils` not readable directly (0 rows), step 2 returns the details; student → `not allowed`; anon → `permission denied for function`.
+
+**How to create a teacher account** (same as for admins, by hand):
+1. Studio → Authentication → Users → Add user → Create new user: e-mail + password, tick "Auto Confirm User".
+2. SQL Editor:
+```sql
+INSERT INTO public.user_roles (user_id, role)
+SELECT id, 'teacher' FROM auth.users WHERE email = 'teacher@example.com'
+ON CONFLICT (user_id) DO UPDATE SET role = 'teacher';
+```
+`user_roles.user_id` is unique, so one role per user. Remove the account's role (or delete the user) to take access away.
+
+**Rollback:** `DROP FUNCTION public.lookup_ipad(text); DROP FUNCTION public.lookup_ipad_details(uuid);`

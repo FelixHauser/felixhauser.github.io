@@ -337,7 +337,7 @@ async function previewCsvImport(file) {
     if (CSV_KINDS[_importKind] !== kind) return;
     const plan = kind.validate(parseCsv(text), existing);
 
-    if (plan.fatal) { box.innerHTML = `<p class="error-inline">${_htmlEsc(plan.fatal)}</p>`; return; }
+    if (plan.fatal) { box.innerHTML = `<p class="error-inline">${escapeHtml(plan.fatal)}</p>`; return; }
 
     _importPlan = plan;
     const problems = [
@@ -354,9 +354,9 @@ async function previewCsvImport(file) {
          ${plan.invalid.length} ungültig</p>
       ${shown.length ? `
         <div class="table-wrap"><table class="data-table"><thead>
-          <tr><th>Zeile</th><th>${_htmlEsc(kind.columnLabel)}</th><th>Problem</th></tr></thead><tbody>
-          ${shown.map(p => `<tr><td>${p.line}</td><td>${_htmlEsc(p.label ?? p.serial)}</td>
-                            <td>${_htmlEsc(p.kind)}: ${_htmlEsc(p.reason)}</td></tr>`).join('')}
+          <tr><th>Zeile</th><th>${escapeHtml(kind.columnLabel)}</th><th>Problem</th></tr></thead><tbody>
+          ${shown.map(p => `<tr><td>${p.line}</td><td>${escapeHtml(p.label ?? p.serial)}</td>
+                            <td>${escapeHtml(p.kind)}: ${escapeHtml(p.reason)}</td></tr>`).join('')}
         </tbody></table></div>
         ${problems.length > shown.length ? `<p class="field-hint">… und ${problems.length - shown.length} weitere</p>` : ''}
       ` : ''}
@@ -364,7 +364,7 @@ async function previewCsvImport(file) {
     btn.textContent = `${plan.valid.length} ${kind.label} importieren`;
     btn.disabled = plan.valid.length === 0;
   } catch (e) {
-    box.innerHTML = `<p class="error-inline">Fehler beim Prüfen: ${_htmlEsc(e.message || String(e))}</p>`;
+    box.innerHTML = `<p class="error-inline">Fehler beim Prüfen: ${escapeHtml(e.message || String(e))}</p>`;
   }
 }
 
@@ -392,11 +392,11 @@ async function runCsvImport() {
   }
 
   if (failure) {
-    box.innerHTML = `<p class="error-inline">Fehler nach ${saved} gespeicherten Datensätzen: ${_htmlEsc(failure.message)}<br>
+    box.innerHTML = `<p class="error-inline">Fehler nach ${saved} gespeicherten Datensätzen: ${escapeHtml(failure.message)}<br>
       Die Datei kann erneut importiert werden — bereits vorhandene Einträge werden übersprungen.</p>`;
   } else {
     box.innerHTML = `
-      <p><strong>${saved} ${_htmlEsc(kind.label)} importiert.</strong></p>
+      <p><strong>${saved} ${escapeHtml(kind.label)} importiert.</strong></p>
       <p>${plan.existing.length} bereits vorhanden und übersprungen · ${plan.duplicates.length} doppelt in der Datei · ${plan.invalid.length} ungültig</p>
       ${historyFailed ? `<p class="error-inline">Für ${historyFailed} iPads konnte der Verlaufseintrag nicht geschrieben werden (siehe Konsole).</p>` : ''}
     `;

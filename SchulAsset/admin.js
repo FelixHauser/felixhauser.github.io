@@ -174,17 +174,12 @@ function showIpadDetail(id)  { _showDetail('ipad-detail', id); }
 function showPupilDetail(id) { _showDetail('pupil-detail', id); }
 function showStaffDetail(id) { _showDetail('staff-detail', id); }
 
-// Escapes a string for safe insertion into HTML attributes and text.
-function _htmlEsc(str) {
-  return (str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
 // ---- Shared rendering helpers (used across views) ----
 
 // Returns an HTML badge for a given status value.
 function statusBadge(status) {
   const cfg = STATUS_CONFIG[status] || { label: status, color: '#8e8e93' };
-  return `<span class="badge" style="background:${cfg.color}">${cfg.label}</span>`;
+  return `<span class="badge" style="background:${cfg.color}">${escapeHtml(cfg.label)}</span>`;
 }
 
 // Returns the full name of whoever an iPad is assigned to, or '—'.

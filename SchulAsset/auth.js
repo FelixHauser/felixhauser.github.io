@@ -45,11 +45,7 @@ async function handleLogin(event) {
   }
 
   // Route to the correct interface.
-  if (roleRow.role === 'admin') {
-    window.location.href = 'admin.html';
-  } else {
-    window.location.href = 'portal.html';
-  }
+  window.location.href = pageForRole(roleRow.role);
 }
 
 // --- Forgot / reset password ---
@@ -93,7 +89,7 @@ async function _autoLogin(sn, pw) {
     return;
   }
 
-  window.location.href = roleRow.role === 'admin' ? 'admin.html' : 'portal.html';
+  window.location.href = pageForRole(roleRow.role);
 }
 
 function showForgotForm() {
@@ -152,7 +148,7 @@ async function handleNewPassword() {
     return;
   }
 
-  const { error } = await supabase.auth.updateUser({ password });
+  const { data, error } = await supabase.auth.updateUser({ password });
 
   if (error) {
     msgEl.textContent = t('login.errorPrefix') + ' ' + error.message;
@@ -162,10 +158,22 @@ async function handleNewPassword() {
 
   msgEl.textContent = t('login.passwordSaved');
   msgEl.hidden = false;
-  setTimeout(() => { window.location.href = 'admin.html'; }, 1500);
+
+  // Admins go back to the admin area, teachers to the lookup page.
+  const { data: roleRow } = await supabase
+    .from('user_roles').select('role').eq('user_id', data.user.id).single();
+  const target = pageForRole(roleRow?.role);
+  setTimeout(() => { window.location.href = target; }, 1500);
 }
 
 // --- Helper functions ---
+
+// The page each role belongs on after login.
+function pageForRole(role) {
+  if (role === 'admin')   return 'admin.html';
+  if (role === 'teacher') return 'lookup.html';
+  return 'portal.html';
+}
 
 function showError(message) {
   const el = document.getElementById('error-msg');

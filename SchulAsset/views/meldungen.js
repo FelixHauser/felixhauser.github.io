@@ -131,9 +131,9 @@ function _renderPendingTab(tab) {
     }
     const rows = _schadenRows.map((r, i) => `
       <tr>
-        <td><button class="btn-link" onclick="showIpadDetail('${r.ipad_id}')">${r.ipad?.serial_number || '—'}</button></td>
-        <td>${r.filed_by || '—'}</td>
-        <td>${DAMAGE_LABELS[r.damage_type] || r.damage_type}</td>
+        <td><button class="btn-link" onclick="showIpadDetail('${r.ipad_id}')">${escapeHtml(r.ipad?.serial_number || '—')}</button></td>
+        <td>${escapeHtml(r.filed_by || '—')}</td>
+        <td>${escapeHtml(DAMAGE_LABELS[r.damage_type] || r.damage_type)}</td>
         <td>${_fmtDate(r.filed_at)}</td>
         <td><button class="btn-history-download" onclick="downloadMeldung('schaden', ${i})">↓ Herunterladen</button></td>
         <td><button class="btn-resolve" onclick="resolveMeldung('schaden', '${r.id}', ${i})">Erledigt</button></td>
@@ -157,8 +157,8 @@ function _renderPendingTab(tab) {
     }
     const rows = _verlustRows.map((r, i) => `
       <tr>
-        <td><button class="btn-link" onclick="showIpadDetail('${r.ipad_id}')">${r.ipad?.serial_number || '—'}</button></td>
-        <td>${r.filed_by || '—'}</td>
+        <td><button class="btn-link" onclick="showIpadDetail('${r.ipad_id}')">${escapeHtml(r.ipad?.serial_number || '—')}</button></td>
+        <td>${escapeHtml(r.filed_by || '—')}</td>
         <td>${_fmtDate(r.date_of_loss)}</td>
         <td>${_fmtDate(r.filed_at)}</td>
         <td><button class="btn-history-download" onclick="downloadMeldung('verlust', ${i})">↓ Herunterladen</button></td>
@@ -183,8 +183,8 @@ function _renderPendingTab(tab) {
     }
     const rows = _uebergabeRows.map(r => `
       <tr>
-        <td><button class="btn-link" onclick="showIpadDetail('${r.id}')">${r.serial_number || '—'}</button></td>
-        <td>${r.pupils ? r.pupils.first_name + ' ' + r.pupils.last_name : '—'}</td>
+        <td><button class="btn-link" onclick="showIpadDetail('${r.id}')">${escapeHtml(r.serial_number || '—')}</button></td>
+        <td>${escapeHtml(r.pupils ? r.pupils.first_name + ' ' + r.pupils.last_name : '—')}</td>
         <td>Übergabeprotokoll erstellen</td>
         <td><button class="btn-goto" onclick="showIpadDetail('${r.id}')">→ Zum iPad</button></td>
       </tr>
@@ -207,8 +207,8 @@ function _renderPendingTab(tab) {
     }
     const rows = _rueckgabeRows.map(r => `
       <tr>
-        <td><button class="btn-link" onclick="showIpadDetail('${r.ipad?.id}')">${r.ipad?.serial_number || '—'}</button></td>
-        <td>${r.ipad?.pupils ? r.ipad.pupils.first_name + ' ' + r.ipad.pupils.last_name : '—'}</td>
+        <td><button class="btn-link" onclick="showIpadDetail('${r.ipad?.id}')">${escapeHtml(r.ipad?.serial_number || '—')}</button></td>
+        <td>${escapeHtml(r.ipad?.pupils ? r.ipad.pupils.first_name + ' ' + r.ipad.pupils.last_name : '—')}</td>
         <td>${_fmtDate(r.accepted_at)}</td>
         <td>Zuweisung aufheben</td>
         <td><button class="btn-goto" onclick="showIpadDetail('${r.ipad?.id}')">→ Zum iPad</button></td>

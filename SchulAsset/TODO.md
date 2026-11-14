@@ -10,7 +10,6 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 
 ## Priority 1 — Protect what exists (cheap, do first)
 
-- [ ]  **Upgrade Supabase to the paid plan** — free tier pauses the project after 7 days of inactivity and has no automatic backups. Not acceptable for signed contracts.
 - [ ]  **Export the database schema into the repo** — tables, RLS policies, triggers and grants currently exist only inside Supabase. Save as SQL (e.g. `supabase/schema.sql`) so the database can be rebuilt at any time.
   - Also include everything logged in `supabase/db-changes.md` (manual changes made so far), the `auth.users` triggers, and the Auth settings (signups off, email confirmation off)
   - Verify by building an empty second Supabase project from the file and checking the app works against it
@@ -18,31 +17,13 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 
 ## Priority 2 — Blockers before going live
 
-### Data protection (DSGVO) 📋 — start early, takes the longest
-- [ ] Sign the **AVV** (data processing agreement) with Supabase
-- [ ] Add the app to the school's **Verarbeitungsverzeichnis**
-- [ ] Get sign-off from the school's / Schulträger's **Datenschutzbeauftragte(r)** (incl. the US-parent-company question)
-- [ ] Involve the **Stadt Marl** as owner of the iPads
-- [ ] Define a **retention and deletion concept** — when is a pupil's data deleted after leaving?
-- [ ] Insert the **real Datenschutzerklärung and Impressum text** from the school — see "How to insert the real legal text" in `statusquo.md`; remove the placeholder banner afterwards
-
 ### Getting real data in (part of the admin panel, see Priority 3)
 - [ ]  **Remove the dummy data before go-live** — incl. the `ZZ…` test iPads from the import tests if still present
-
-### Ownership
-- [ ]  **Decide hosting and ownership** — the app runs under the personal account `felixhauser.github.io`. Decide whose GitHub account and which domain it lives on, and who can take over if you are unavailable.
-- [ ]  **Document admin management** — how a new admin account is created in Supabase Studio, and who holds the Supabase owner login.
-
-### Localization
-- [ ]  **Native-speaker review of EN/TR** — prepared by OpenSpec change `evaluate-translations`: run `node export-translations.js`, give `translation-review.csv` (+ `openspec/changes/evaluate-translations/translation-findings.md`) to a native speaker; they fill `comment_en` / `comment_tr`; apply the answers in `translations.js`. **Open: who reviews?** (colleague, parent representative…). The German questions are settled (2026-11-14: "Sie" everywhere, "Leihvertrag" as the only name) — 10 suggestions F3–F12 remain for the reviewer.
-- [x]  **Wire the unused portal keys into `portal.js`** — the main portal view (greeting, iPad info, Übergabe/Rückgabe steps) was hardcoded German; found by `check-translations.js` (46 unused keys). CLAUDE.md requires the portal to be fully localised.
-  - Done 2026-11-14 (OpenSpec change `wire-portal-translations`, tested manually in DE/EN/TR, archived; spec `openspec/specs/portal-localisation/`). Leihvertrag text and PDFs stay German for now (decide separately whether to translate them).
-- [x]  **Review sheet + first-pass evaluation** — `export-translations.js`, shared `translation-tools.js`, `translation-findings.md` (2 fixes applied, 12 open suggestions) (OpenSpec change `evaluate-translations`, 2026-11-14)
 
 ## Priority 3 — Administration side
 - [ ]  **Roles** (decision 2026-11-13) — three roles in `user_roles`:
   - `student` — unchanged: parent/pupil portal, sees only their own iPad
-  - `teacher` — **new, read-only**: can look up whose iPad it is, status, history, etc., but can't change anything (needs a role value in the `user_roles` constraint/type, read-only RLS policies and a read-only admin UI without action buttons; log the SQL in `supabase/db-changes.md`)
+  - `teacher` — **done 2026-11-14** (OpenSpec change `add-teacher-lookup`, tested manually): read-only, for teachers and repair people; enters or scans a S/N on `lookup.html`, sees the owner's name, then ("Details anzeigen") address, guardian, Leihvertrag date/version + blank template, Übergabeprotokoll, and ("Verlauf anzeigen") history + Schadenmeldungen. No lists, no changes. Access only through two database functions (`supabase/teacher-lookup.sql`).
   - `admin` — unchanged name, full rights: sets up the site and modifies things (add / import / delete iPads, assign, settings, purge). No separate "root admin"
   - Admin users have an Admin panel with the admin options
     - Bulk import and individual adding of iPads, users, staff (see Priority 2 — needed before go-live)
@@ -83,6 +64,28 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 
 ---
 
+# 🤝 Handled by others (not developer work)
+
+Marçal only develops the product. These items depend on other people at the school / Stadt Marl; they are kept here so nothing is lost. Development work that follows from them is listed under **Pending** (e.g. archiving once the retention rules exist).
+
+## Data protection (DSGVO) 📋
+- [ ] Sign the **AVV** (data processing agreement) with Supabase
+- [ ] Add the app to the school's **Verarbeitungsverzeichnis**
+- [ ] Get sign-off from the school's / Schulträger's **Datenschutzbeauftragte(r)** (incl. the US-parent-company question)
+- [ ] Involve the **Stadt Marl** as owner of the iPads
+- [ ] Define a **retention and deletion concept** — when is a pupil's data deleted after leaving?
+- [ ] Insert the **real Datenschutzerklärung and Impressum text** from the school — see "How to insert the real legal text" in `statusquo.md`; remove the placeholder banner afterwards
+
+## Hosting, ownership and accounts
+- [ ]  **Decide hosting and ownership** — the app runs under the personal account `felixhauser.github.io`. Decide whose GitHub account and which domain it lives on, and who can take over if you are unavailable.
+- [ ]  **Document admin management** — how a new admin account is created in Supabase Studio, and who holds the Supabase owner login.
+- [ ]  **Supabase paid plan** — free tier pauses the project after 7 days of inactivity and has no automatic backups. Not acceptable for signed contracts.
+
+## Translation review
+- [ ]  **Native-speaker review of EN/TR** — prepared by OpenSpec change `evaluate-translations`: run `node export-translations.js`, give `translation-review.csv` (+ `openspec/changes/evaluate-translations/translation-findings.md`) to a native speaker; they fill `comment_en` / `comment_tr`; apply the answers in `translations.js`. The German questions are settled (2026-11-14: "Sie" everywhere, "Leihvertrag" as the only name) — 10 suggestions F3–F12 remain for the reviewer.
+
+---
+
 # ✅ Done
 
 ## Priority 1 — Protect what exists
@@ -98,6 +101,11 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
 - [x]  **Searchable person picker in the assign dialog** — search field with results (name, address, Kürzel; umlaut- and case-insensitive; max 20 results) replaces the long drop-down; reusable component `views/person-picker.js` (OpenSpec change `add-person-picker`)
 - [x]  **1000-row limit in other lists** — pupil/staff lists, assign dropdowns and Pending tabs use `fetchAllRows()`; the Übergabe tab no longer sends id lists in the URL (OpenSpec change `fix-1000-row-limit-lists`)
 - [x]  **Translate the hardcoded German strings on the login page** — 13 new `login.*` keys in DE/EN/TR, tested manually (OpenSpec change `translate-login-page`)
+
+## Localization
+- [x]  **Wire the unused portal keys into `portal.js`** — the main portal view (greeting, iPad info, Übergabe/Rückgabe steps) was hardcoded German; found by `check-translations.js` (46 unused keys). CLAUDE.md requires the portal to be fully localised.
+  - Done 2026-11-14 (OpenSpec change `wire-portal-translations`, tested manually in DE/EN/TR, archived; spec `openspec/specs/portal-localisation/`). Leihvertrag text and PDFs stay German for now (decide separately whether to translate them).
+- [x]  **Review sheet + first-pass evaluation** — `export-translations.js`, shared `translation-tools.js`, `translation-findings.md` (2 fixes applied, 12 open suggestions) (OpenSpec change `evaluate-translations`, 2026-11-14)
 
 ## Priority 5 — Housekeeping
 - [x]  **Git housekeeping** — `.claude/settings.local.json` is ignored (personal permissions); the OpenSpec setup (`.claude/commands`, `.claude/skills`) is committed; `CLAUDE.md` and `statusquo.md` stay in the (private) repo as a backup — the misleading ignore lines were removed

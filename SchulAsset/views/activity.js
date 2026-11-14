@@ -32,7 +32,7 @@ async function renderActivity() {
 
   if (error) {
     document.getElementById('activity-body').innerHTML =
-      `<p class="error-inline">Fehler beim Laden: ${error.message}</p>`;
+      `<p class="error-inline">Fehler beim Laden: ${escapeHtml(error.message)}</p>`;
     return;
   }
 
@@ -56,11 +56,11 @@ async function renderActivity() {
     return `
       <tr onclick="showIpadDetail('${ipadId}')">
         <td>
-          <span class="activity-badge" style="background:${color}20;color:${color}">${label}</span>
+          <span class="activity-badge" style="background:${color}20;color:${color}">${escapeHtml(label)}</span>
         </td>
-        <td class="mono">${serial}</td>
-        <td>${detail}</td>
-        <td>${by}</td>
+        <td class="mono">${escapeHtml(serial)}</td>
+        <td>${escapeHtml(detail)}</td>
+        <td>${escapeHtml(by)}</td>
         <td style="white-space:nowrap">${when}</td>
       </tr>
     `;

@@ -48,7 +48,7 @@ async function renderIpadList() {
 
   if (error) {
     document.getElementById('overview-area').innerHTML =
-      `<p class="error-inline">Fehler beim Laden: ${error.message}</p>`;
+      `<p class="error-inline">Fehler beim Laden: ${escapeHtml(error.message)}</p>`;
     document.getElementById('ipad-table-wrap').innerHTML = '';
     return;
   }
@@ -139,11 +139,11 @@ function renderIpadTable(ipads) {
 
   const rows = ipads.map(ipad => `
     <tr onclick="showIpadDetail('${ipad.id}')">
-      <td class="mono">${ipad.serial_number}</td>
-      <td>${TYPE_LABEL[ipad.ipad_type] ?? ipad.ipad_type}</td>
-      <td>${ipad.storage_capacity ?? '—'}</td>
+      <td class="mono">${escapeHtml(ipad.serial_number)}</td>
+      <td>${escapeHtml(TYPE_LABEL[ipad.ipad_type] ?? ipad.ipad_type)}</td>
+      <td>${escapeHtml(ipad.storage_capacity ?? '—')}</td>
       <td>${statusBadge(ipad.status)}</td>
-      <td>${assignedName(ipad)}</td>
+      <td>${escapeHtml(assignedName(ipad))}</td>
     </tr>
   `).join('');
 

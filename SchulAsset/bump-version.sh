@@ -11,7 +11,7 @@
 set -e
 cd "$(dirname "$0")"
 
-PAGES="login.html portal.html admin.html datenschutz.html impressum.html"
+PAGES="login.html portal.html admin.html lookup.html datenschutz.html impressum.html"
 
 # Find the version currently in use (first ?v=... found in the pages).
 CURRENT=$(grep -ho '?v=[0-9A-Za-z-]*' $PAGES | head -1 | sed 's/^?v=//')

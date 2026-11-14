@@ -42,7 +42,7 @@ function _renderStaffBody(staff, ipad) {
     <div class="detail-card">
       <div class="detail-field">
         <span class="detail-key">Seriennummer</span>
-        <button class="btn-link mono" onclick="showIpadDetail('${ipad.id}')">${ipad.serial_number}</button>
+        <button class="btn-link mono" onclick="showIpadDetail('${ipad.id}')">${escapeHtml(ipad.serial_number)}</button>
       </div>
       <div class="detail-field">
         <span class="detail-key">Status</span>
@@ -50,7 +50,7 @@ function _renderStaffBody(staff, ipad) {
       </div>
       <div class="detail-field">
         <span class="detail-key">Typ / Speicher</span>
-        <span>${TYPE_LABEL[ipad.ipad_type] ?? ipad.ipad_type} · ${ipad.storage_capacity ?? '—'}</span>
+        <span>${escapeHtml(TYPE_LABEL[ipad.ipad_type] ?? ipad.ipad_type)} · ${escapeHtml(ipad.storage_capacity ?? '—')}</span>
       </div>
     </div>
   ` : '<p class="empty-msg">Kein iPad zugewiesen.</p>';
@@ -68,15 +68,15 @@ function _staffInfoCard(staff, editMode = false) {
       <div class="detail-card" id="staff-info-card">
         <div class="detail-field">
           <span class="detail-key">Vorname</span>
-          <input class="edit-input" id="edit-first-name" value="${_htmlEsc(staff.first_name)}">
+          <input class="edit-input" id="edit-first-name" value="${escapeHtml(staff.first_name)}">
         </div>
         <div class="detail-field">
           <span class="detail-key">Nachname</span>
-          <input class="edit-input" id="edit-last-name" value="${_htmlEsc(staff.last_name)}">
+          <input class="edit-input" id="edit-last-name" value="${escapeHtml(staff.last_name)}">
         </div>
         <div class="detail-field">
           <span class="detail-key">Kürzel</span>
-          <input class="edit-input" id="edit-kuerzel" value="${_htmlEsc(staff.kuerzel ?? '')}">
+          <input class="edit-input" id="edit-kuerzel" value="${escapeHtml(staff.kuerzel ?? '')}">
         </div>
         <div class="detail-field" style="justify-content:flex-end;gap:0.5rem">
           <button class="btn-action-detail" onclick="_cancelStaffEdit()">Abbrechen</button>
@@ -88,15 +88,15 @@ function _staffInfoCard(staff, editMode = false) {
     <div class="detail-card" id="staff-info-card">
       <div class="detail-field">
         <span class="detail-key">Vorname</span>
-        <span>${_htmlEsc(staff.first_name)}</span>
+        <span>${escapeHtml(staff.first_name)}</span>
       </div>
       <div class="detail-field">
         <span class="detail-key">Nachname</span>
-        <span>${_htmlEsc(staff.last_name)}</span>
+        <span>${escapeHtml(staff.last_name)}</span>
       </div>
       <div class="detail-field">
         <span class="detail-key">Kürzel</span>
-        <span class="mono">${_htmlEsc(staff.kuerzel ?? '—')}</span>
+        <span class="mono">${escapeHtml(staff.kuerzel ?? '—')}</span>
       </div>
       <div class="detail-field" style="justify-content:flex-end">
         <button class="btn-action-detail" onclick="_editStaffInfo()">Bearbeiten</button>

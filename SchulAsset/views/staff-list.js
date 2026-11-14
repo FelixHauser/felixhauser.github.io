@@ -27,7 +27,7 @@ async function renderStaffList() {
 
   if (error) {
     document.getElementById('staff-table-wrap').innerHTML =
-      `<p class="error-inline">Fehler beim Laden: ${error.message}</p>`;
+      `<p class="error-inline">Fehler beim Laden: ${escapeHtml(error.message)}</p>`;
     return;
   }
 
@@ -98,9 +98,9 @@ function renderStaffTable(staff) {
 
   const rows = staff.map(s => `
     <tr onclick="showStaffDetail('${s.id}')">
-      <td>${s.last_name}</td>
-      <td>${s.first_name}</td>
-      <td class="mono">${s.kuerzel ?? '—'}</td>
+      <td>${escapeHtml(s.last_name)}</td>
+      <td>${escapeHtml(s.first_name)}</td>
+      <td class="mono">${escapeHtml(s.kuerzel ?? '—')}</td>
     </tr>
   `).join('');
 

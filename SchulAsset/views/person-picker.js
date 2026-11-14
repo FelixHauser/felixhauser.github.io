@@ -75,9 +75,9 @@ function createPersonPicker(rootId, { items, onSelect }) {
       return;
     }
     results.innerHTML = current.map(item => `
-      <button type="button" class="picker-item" role="option" data-id="${_htmlEsc(item.id)}">
-        <span>${_htmlEsc(item.label)}</span>
-        ${item.sub ? `<span class="picker-sub">${_htmlEsc(item.sub)}</span>` : ''}
+      <button type="button" class="picker-item" role="option" data-id="${escapeHtml(item.id)}">
+        <span>${escapeHtml(item.label)}</span>
+        ${item.sub ? `<span class="picker-sub">${escapeHtml(item.sub)}</span>` : ''}
       </button>`).join('') +
       (matches.length > current.length
         ? `<p class="picker-hint">… ${matches.length - current.length} weitere — Suche eingrenzen</p>` : '');

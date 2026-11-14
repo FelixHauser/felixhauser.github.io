@@ -27,7 +27,7 @@ async function renderPupilList() {
 
   if (error) {
     document.getElementById('pupil-table-wrap').innerHTML =
-      `<p class="error-inline">Fehler beim Laden: ${error.message}</p>`;
+      `<p class="error-inline">Fehler beim Laden: ${escapeHtml(error.message)}</p>`;
     return;
   }
 
@@ -98,9 +98,9 @@ function renderPupilTable(pupils) {
 
   const rows = pupils.map(p => `
     <tr onclick="showPupilDetail('${p.id}')">
-      <td>${p.last_name}</td>
-      <td>${p.first_name}</td>
-      <td>${p.address ?? '—'}</td>
+      <td>${escapeHtml(p.last_name)}</td>
+      <td>${escapeHtml(p.first_name)}</td>
+      <td>${escapeHtml(p.address ?? '—')}</td>
     </tr>
   `).join('');
 

@@ -54,7 +54,7 @@ function _renderPupilBody(pupil, ipad, history) {
     <div class="detail-card">
       <div class="detail-field">
         <span class="detail-key">Seriennummer</span>
-        <button class="btn-link mono" onclick="showIpadDetail('${ipad.id}')">${ipad.serial_number}</button>
+        <button class="btn-link mono" onclick="showIpadDetail('${ipad.id}')">${escapeHtml(ipad.serial_number)}</button>
       </div>
       <div class="detail-field">
         <span class="detail-key">Status</span>
@@ -62,16 +62,16 @@ function _renderPupilBody(pupil, ipad, history) {
       </div>
       <div class="detail-field">
         <span class="detail-key">Typ / Speicher</span>
-        <span>${TYPE_LABEL[ipad.ipad_type] ?? ipad.ipad_type} · ${ipad.storage_capacity ?? '—'}</span>
+        <span>${escapeHtml(TYPE_LABEL[ipad.ipad_type] ?? ipad.ipad_type)} · ${escapeHtml(ipad.storage_capacity ?? '—')}</span>
       </div>
     </div>
   ` : '<p class="empty-msg">Kein iPad zugewiesen.</p>';
 
   const historyRows = history.map(h => `
     <tr onclick="showIpadDetail('${h.ipad?.id}')">
-      <td class="mono">${h.ipad?.serial_number || '—'}</td>
-      <td>${EVENT_LABELS[h.event_type] ?? h.event_type}</td>
-      <td>${h.changed_by || '—'}</td>
+      <td class="mono">${escapeHtml(h.ipad?.serial_number || '—')}</td>
+      <td>${escapeHtml(EVENT_LABELS[h.event_type] ?? h.event_type)}</td>
+      <td>${escapeHtml(h.changed_by || '—')}</td>
       <td>${formatDate(h.changed_at)}</td>
     </tr>
   `).join('');
@@ -102,15 +102,15 @@ function _pupilInfoCard(pupil, editMode = false) {
       <div class="detail-card" id="pupil-info-card">
         <div class="detail-field">
           <span class="detail-key">Vorname</span>
-          <input class="edit-input" id="edit-first-name" value="${_htmlEsc(pupil.first_name)}">
+          <input class="edit-input" id="edit-first-name" value="${escapeHtml(pupil.first_name)}">
         </div>
         <div class="detail-field">
           <span class="detail-key">Nachname</span>
-          <input class="edit-input" id="edit-last-name" value="${_htmlEsc(pupil.last_name)}">
+          <input class="edit-input" id="edit-last-name" value="${escapeHtml(pupil.last_name)}">
         </div>
         <div class="detail-field">
           <span class="detail-key">Adresse</span>
-          <input class="edit-input" id="edit-address" value="${_htmlEsc(pupil.address ?? '')}">
+          <input class="edit-input" id="edit-address" value="${escapeHtml(pupil.address ?? '')}">
         </div>
         <div class="detail-field" style="justify-content:flex-end;gap:0.5rem">
           <button class="btn-action-detail" onclick="_cancelPupilEdit()">Abbrechen</button>
@@ -122,15 +122,15 @@ function _pupilInfoCard(pupil, editMode = false) {
     <div class="detail-card" id="pupil-info-card">
       <div class="detail-field">
         <span class="detail-key">Vorname</span>
-        <span>${_htmlEsc(pupil.first_name)}</span>
+        <span>${escapeHtml(pupil.first_name)}</span>
       </div>
       <div class="detail-field">
         <span class="detail-key">Nachname</span>
-        <span>${_htmlEsc(pupil.last_name)}</span>
+        <span>${escapeHtml(pupil.last_name)}</span>
       </div>
       <div class="detail-field">
         <span class="detail-key">Adresse</span>
-        <span>${_htmlEsc(pupil.address ?? '—')}</span>
+        <span>${escapeHtml(pupil.address ?? '—')}</span>
       </div>
       <div class="detail-field" style="justify-content:flex-end">
         <button class="btn-action-detail" onclick="_editPupilInfo()">Bearbeiten</button>

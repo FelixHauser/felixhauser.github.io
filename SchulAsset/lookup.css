@@ -1,0 +1,106 @@
+/* lookup.css — page shell of lookup.html (teachers and repair people).
+   Everything else (search field, cards, timeline, QR overlay) comes from admin.css. */
+
+/* admin.css locks the body to the screen for the sidebar layout; this page scrolls normally. */
+body.lookup-body {
+  height: auto;
+  min-height: 100dvh;
+  overflow: auto;
+}
+
+.lookup-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.lookup-logo  { height: 28px; width: auto; }
+.lookup-title { font-weight: 700; color: var(--sidebar-text-act); }
+
+.lookup-user {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.lookup-logout {
+  background: #E8EDF5;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  padding: 0.38rem 0.75rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.lookup-main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1rem;            /* 16px side gutter on phones */
+}
+
+.lookup-details {
+  margin-top: 1rem;
+}
+
+/* Owner name on the first result: large and easy to read. */
+.lookup-owner {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0.2rem 0 0.1rem;
+}
+
+.lookup-owner.unassigned { color: var(--text-muted); font-weight: 600; }
+
+.lookup-serial { font-family: 'SF Mono', 'Menlo', 'Consolas', monospace; color: var(--text-secondary); }
+
+.lookup-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.8rem; }
+
+.lookup-btn {
+  padding: 0.55rem 1rem;
+  border-radius: 7px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--navy);
+  background: var(--navy);
+  color: #fff;
+}
+.lookup-btn.secondary { background: var(--surface); color: var(--navy); }
+
+/* Label/value rows that may hold long text (address, notes): the value wraps. */
+.lookup-details .detail-field { align-items: flex-start; gap: 1rem; }
+.lookup-details .detail-value { text-align: right; overflow-wrap: anywhere; min-width: 0; }
+
+.lookup-section-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+  margin: 1.3rem 0 0.5rem;
+}
+
+.lookup-note { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem; }
+
+.lookup-link { color: var(--blue); font-weight: 600; font-size: 0.85rem; }
+
+.lookup-damage { padding: 0.8rem 1.1rem; border-bottom: 1px solid var(--border-light); font-size: 0.85rem; }
+.lookup-damage:last-child { border-bottom: none; }
+.lookup-damage-title { font-weight: 700; margin-bottom: 0.25rem; display: flex; justify-content: space-between; gap: 0.5rem; }
+.lookup-damage-desc  { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0.25rem 0; }
+.lookup-damage-meta  { color: var(--text-muted); font-size: 0.78rem; }
+
+/* History notes can be long; keep them inside the screen. */
+.lookup-details .timeline-notes { overflow-wrap: anywhere; white-space: pre-wrap; }

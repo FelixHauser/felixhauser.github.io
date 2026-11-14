@@ -65,7 +65,7 @@ async function schnellsucheSearch() {
     .limit(5);
 
   if (error) {
-    resultEl.innerHTML = `<p class="error-inline">Fehler: ${error.message}</p>`;
+    resultEl.innerHTML = `<p class="error-inline">Fehler: ${escapeHtml(error.message)}</p>`;
     return;
   }
 
@@ -77,15 +77,15 @@ async function schnellsucheSearch() {
   resultEl.innerHTML = ipads.map(ipad => `
     <div class="result-card">
       <div class="result-row"><span class="result-key">Seriennummer</span>
-        <span class="mono">${ipad.serial_number}</span></div>
+        <span class="mono">${escapeHtml(ipad.serial_number)}</span></div>
       <div class="result-row"><span class="result-key">Typ</span>
-        <span>${TYPE_LABEL[ipad.ipad_type] ?? ipad.ipad_type}</span></div>
+        <span>${escapeHtml(TYPE_LABEL[ipad.ipad_type] ?? ipad.ipad_type)}</span></div>
       <div class="result-row"><span class="result-key">Speicher</span>
-        <span>${ipad.storage_capacity ?? '—'}</span></div>
+        <span>${escapeHtml(ipad.storage_capacity ?? '—')}</span></div>
       <div class="result-row"><span class="result-key">Status</span>
         <span>${statusBadge(ipad.status)}</span></div>
       <div class="result-row"><span class="result-key">Zugewiesen an</span>
-        <span>${assignedName(ipad)}</span></div>
+        <span>${escapeHtml(assignedName(ipad))}</span></div>
       <div class="result-actions">
         <button class="btn-details" onclick="showIpadDetail('${ipad.id}')">Details anzeigen →</button>
       </div>
