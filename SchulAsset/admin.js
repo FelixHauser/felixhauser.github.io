@@ -63,6 +63,7 @@ const VIEW_RENDERERS = {
   meldungen:      () => renderMeldungen(),
   activity:       () => renderActivity(),
   admin:          () => renderAdminPanel(),
+  admins:         () => renderAdmins(),
   'ipad-detail':  () => renderIpadDetail(),
   'pupil-detail': () => renderPupilDetail(),
   'staff-detail': () => renderStaffDetail(),
@@ -212,6 +213,47 @@ async function createStaffAccounts(accounts) {
     throw new Error(detail?.error || error?.message || 'Die Funktion hat nicht geantwortet');
   }
   return data.results;
+}
+
+// ---- Managing existing logins (Edge Function manage-staff-account) ----
+
+// Calls manage-staff-account. Throws an Error with a readable text if the whole call fails.
+async function _invokeManageFunction(body) {
+  const { data, error } = await supabase.functions.invoke('manage-staff-account', { body });
+  if (error || !data) {
+    const rawBody = await error?.context?.text?.().catch(() => null);
+    let detail = null;
+    try { detail = JSON.parse(rawBody); } catch { detail = rawBody ? { error: rawBody } : null; }
+    console.error('manage-staff-account failed:', error?.context?.status, rawBody);   // error answers contain no passwords
+    throw new Error(detail?.error || error?.message || 'Die Funktion hat nicht geantwortet');
+  }
+  return data;
+}
+
+// Teacher and admin logins: [{ user_id, email, role, locked, last_sign_in_at }].
+// Without ids: all of them. With ids (1–50): only those (fast; for one detail page).
+async function listStaffLogins(userIds = null) {
+  const data = await _invokeManageFunction(userIds ? { action: 'list', user_ids: userIds } : { action: 'list' });
+  if (!Array.isArray(data.logins)) throw new Error('Unerwartete Antwort der Funktion');
+  return data.logins;
+}
+
+// Does one action ('lock' | 'unlock' | 'delete' | 'reset_password') for any number of logins,
+// in chunks of 50. Returns one result per id, in order: { user_id, email, ok, password? } or { user_id, error }.
+// A chunk that fails as a whole gives an error result for each of its ids (the other chunks still run).
+async function manageStaffAccounts(action, userIds) {
+  const results = [];
+  for (let i = 0; i < userIds.length; i += 50) {
+    const chunk = userIds.slice(i, i + 50);
+    try {
+      const data = await _invokeManageFunction({ action, user_ids: chunk });
+      if (!Array.isArray(data.results)) throw new Error('Unerwartete Antwort der Funktion');
+      results.push(...data.results);
+    } catch (e) {
+      results.push(...chunk.map(user_id => ({ user_id, error: e.message })));
+    }
+  }
+  return results;
 }
 
 // Shows e-mail and password ONCE in the admin dialog. The password is not stored anywhere;

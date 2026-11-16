@@ -67,10 +67,21 @@ The pupil list and the staff list SHALL show only active people unless the admin
 - **WHEN** no inactive person is hidden, or "Ehemalige anzeigen" is ticked
 - **THEN** the headline shows only the number of rows
 
-### Requirement: Staff login warning
-When an inactive staff member still has a login (`staff.user_id` set), the detail page SHALL say that the login still works and has to be removed separately. The login itself SHALL NOT be changed by the status.
+### Requirement: Inactive staff have no access
+Setting a Lehrkraft to inactive SHALL lock their login if they have one, and reactivating SHALL unlock it. A person without a login SHALL be unaffected. The login SHALL be locked before the status is saved, and unlocked after the status is saved, so that a failure never leaves an inactive person with access.
 
-#### Scenario: Inactive teacher with login
-- **WHEN** an admin sets a teacher with a login to inactive
-- **THEN** the status is saved and the page shows the warning
+#### Scenario: Deactivate a teacher with a login
+- **WHEN** an admin sets a Lehrkraft with a login to inactive
+- **THEN** the login is locked and the status is saved
 
+#### Scenario: Lock fails
+- **WHEN** the login cannot be locked while deactivating
+- **THEN** the status is not changed and the admin sees why
+
+#### Scenario: Reactivate
+- **WHEN** an admin reactivates a Lehrkraft whose login was locked
+- **THEN** the status is saved and the login is unlocked
+
+#### Scenario: Teacher without login
+- **WHEN** a Lehrkraft without a login is set inactive
+- **THEN** only the status changes

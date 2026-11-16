@@ -25,7 +25,7 @@ The form "+ Neue Lehrkraft" SHALL have an optional field "E-Mail (Zugang)". With
 - **THEN** the admin is told that the Lehrkraft exists without access and why, and the detail page offers "Zugang einrichten"
 
 ### Requirement: Access status on the Lehrkraft pages
-The Lehrkraft detail page SHALL show whether the person has a login and which e-mail, and SHALL offer "Zugang einrichten" (asking for an e-mail) only when there is none. The list SHALL mark Lehrkräfte that have a login.
+The Lehrkraft detail page SHALL show whether the person has a login, which e-mail, and whether it is active or locked. It SHALL offer "Zugang einrichten" (asking for an e-mail) only when there is no login, and, when there is one, "Zugang sperren" or "Zugang entsperren", "Zugang löschen" and "Neues Passwort setzen". The list SHALL show for each Lehrkraft whether there is no login, an active or a locked one.
 
 #### Scenario: Lehrkraft without access
 - **WHEN** an admin opens a Lehrkraft without login
@@ -36,8 +36,12 @@ The Lehrkraft detail page SHALL show whether the person has a login and which e-
 - **THEN** a `teacher` login is created and linked, the credentials are shown once, and the page now shows the e-mail
 
 #### Scenario: Lehrkraft with access
-- **WHEN** a Lehrkraft has a login
-- **THEN** the page shows the e-mail and no "Zugang einrichten" button
+- **WHEN** a Lehrkraft has an active login
+- **THEN** the page shows the e-mail, "aktiv", and the buttons to lock, delete and set a new password, but no "Zugang einrichten"
+
+#### Scenario: Locked access
+- **WHEN** a Lehrkraft's login is locked
+- **THEN** the page shows "gesperrt" and offers "Zugang entsperren" instead of "Zugang sperren"
 
 ### Requirement: New admin
 A button "+ Neuer Admin" SHALL ask for an e-mail, create a login with the role `admin` (no Lehrkraft row), and show the credentials once. The dialog SHALL state that admins have full access.

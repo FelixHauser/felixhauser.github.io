@@ -9,7 +9,8 @@
 -- PART 1 — the two lookup functions
 -- ======================================================================
 -- The `teacher` role has NO policy on any table. It can only call these two functions,
--- which return one iPad at a time. Callers must be logged in as teacher or admin.
+-- which return one iPad at a time. Callers must be logged in as teacher or admin and not locked.
+-- Re-running this part is safe (CREATE OR REPLACE); it was re-run on 2026-11-16 to add the lock check.
 
 -- Step 1 of the lookup page: exact serial number → id, serial number, owner's name.
 CREATE OR REPLACE FUNCTION public.lookup_ipad(p_serial text)
@@ -21,9 +22,13 @@ AS $$
 DECLARE
   v_result jsonb;
 BEGIN
+  -- Teacher or admin, and NOT locked: a locked (banned) login may still hold a valid token for up
+  -- to an hour, so the ban is checked here too (OpenSpec change `manage-logins`).
   IF NOT EXISTS (
-    SELECT 1 FROM public.user_roles
-    WHERE user_id = auth.uid() AND role IN ('teacher', 'admin')
+    SELECT 1 FROM public.user_roles r
+      JOIN auth.users u ON u.id = r.user_id
+    WHERE r.user_id = auth.uid() AND r.role IN ('teacher', 'admin')
+      AND (u.banned_until IS NULL OR u.banned_until <= now())
   ) THEN
     RAISE EXCEPTION 'not allowed' USING ERRCODE = '42501';
   END IF;
@@ -63,9 +68,13 @@ DECLARE
   v_has_terms boolean;
   v_result    jsonb;
 BEGIN
+  -- Teacher or admin, and NOT locked: a locked (banned) login may still hold a valid token for up
+  -- to an hour, so the ban is checked here too (OpenSpec change `manage-logins`).
   IF NOT EXISTS (
-    SELECT 1 FROM public.user_roles
-    WHERE user_id = auth.uid() AND role IN ('teacher', 'admin')
+    SELECT 1 FROM public.user_roles r
+      JOIN auth.users u ON u.id = r.user_id
+    WHERE r.user_id = auth.uid() AND r.role IN ('teacher', 'admin')
+      AND (u.banned_until IS NULL OR u.banned_until <= now())
   ) THEN
     RAISE EXCEPTION 'not allowed' USING ERRCODE = '42501';
   END IF;
@@ -212,5 +221,15 @@ GRANT EXECUTE ON FUNCTION public.lookup_ipad_details(uuid) TO authenticated;
 -- Test C — not logged in (anon): must fail with "permission denied for function".
 -- begin;
 -- set local role anon;
+-- select public.lookup_ipad('SERIAL');
+-- rollback;
+
+-- Test D — a LOCKED teacher is refused (needs the manage-logins lock, or: in Studio → Authentication →
+--          Users → ⋯ → Ban user). Expected: ERROR "not allowed" for both functions; after unlocking, results again.
+-- begin;
+-- select set_config('request.jwt.claims',
+--   json_build_object('sub', (select id from auth.users where email = 'LOCKED-TEST-EMAIL'),
+--                     'role', 'authenticated')::text, true);
+-- set local role authenticated;
 -- select public.lookup_ipad('SERIAL');
 -- rollback;

@@ -79,7 +79,7 @@ Before anything is written the dialog SHALL show how many rows will be updated (
 - **THEN** no status has changed
 
 ### Requirement: Writing and result
-On confirmation the changes SHALL be written in chunks and a summary SHALL be shown (deactivated, reactivated, unchanged, skipped). If a write fails the update SHALL stop and show how many were saved. A shown list SHALL refresh afterwards without a manual reload.
+On confirmation the changes SHALL be written in chunks and a summary SHALL be shown (deactivated, reactivated, unchanged, skipped). For staff, the logins of the people who were deactivated SHALL be locked and the logins of those reactivated SHALL be unlocked, in chunks of at most 50, and the summary SHALL state how many logins were locked or unlocked and which failed. If a write fails the update SHALL stop and show how many were saved. A shown list SHALL refresh afterwards without a manual reload.
 
 #### Scenario: Successful update
 - **WHEN** the admin confirms a preview with rows to update
@@ -89,10 +89,17 @@ On confirmation the changes SHALL be written in chunks and a summary SHALL be sh
 - **WHEN** the same file is imported again
 - **THEN** every valid row is reported as unchanged and nothing is written
 
+#### Scenario: Staff with logins deactivated
+- **WHEN** a staff file deactivates 8 Lehrkräfte of whom 6 have a login
+- **THEN** the 6 logins are locked and the summary says so
+
+#### Scenario: A lock fails
+- **WHEN** one login cannot be locked
+- **THEN** that person's status is not changed, the summary names them and the others are done
+
 ### Requirement: Hint about the export
 The status update dialogs SHALL tell the admin that the matching export file (Verwaltung → Daten exportieren) can be edited and used as the status file.
 
 #### Scenario: Dialog hint
 - **WHEN** the dialog "Status Schüler aus CSV aktualisieren" is opened
 - **THEN** the hint mentions the export file as a starting point
-

@@ -73,7 +73,7 @@ async function openInactiveDialog(kind) {
   const name = `${person.first_name} ${person.last_name}`;
   const loginNote = (kind === 'staff' && person.user_id)
     ? `<p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.6rem">
-         Hinweis: Der Zugang dieser Lehrkraft bleibt bestehen und muss gesondert entfernt werden.</p>`
+         Hinweis: Der Zugang dieser Lehrkraft wird gesperrt. Beim Wiederaktivieren wird er entsperrt.</p>`
     : '';
   _openModal(`${PERSON_KINDS[kind].noun} als ausgeschieden markieren`, `
     <p style="font-size:0.875rem;margin-bottom:0.9rem">
@@ -102,6 +102,17 @@ async function submitInactive(kind) {
   catch (e) { _setBusy(false, 'Speichern'); _modalError('Fehler: ' + e.message); return; }
   if (serials.length) { _setBusy(false, 'Speichern'); _modalError(assignedIpadMessage(serials)); return; }
 
+  // A person who is not active must not keep access: lock the login FIRST, then save the status.
+  // If the lock fails nothing changes; if the save fails afterwards the person is only locked (harmless).
+  if (kind === 'staff' && person.user_id) {
+    const [lock] = await manageStaffAccounts('lock', [person.user_id]);
+    if (!lock.ok) {
+      _setBusy(false, 'Speichern');
+      _modalError('Der Zugang konnte nicht gesperrt werden, die Lehrkraft wurde nicht geändert: ' + lock.error);
+      return;
+    }
+  }
+
   const { error } = await supabase
     .from(PERSON_KINDS[kind].table)
     .update({ is_active: false, inactive_since: date })
@@ -120,5 +131,15 @@ async function reactivatePerson(kind) {
     .update({ is_active: true, inactive_since: null })
     .eq('id', person.id);
   if (error) { alert('Fehler: ' + error.message); return; }
+
+  // Back at the school: unlock the login AFTER the status is saved (a failure leaves the person
+  // active but locked, which is harmless; the admin can unlock it on the Lehrkraft page).
+  if (kind === 'staff' && person.user_id) {
+    const [unlock] = await manageStaffAccounts('unlock', [person.user_id]);
+    if (!unlock.ok) {
+      alert('Die Lehrkraft ist wieder aktiv, aber der Zugang konnte nicht entsperrt werden: ' + unlock.error
+          + '\nBitte auf der Seite der Lehrkraft „Zugang entsperren“ wählen.');
+    }
+  }
   PERSON_KINDS[kind].detailView();
 }

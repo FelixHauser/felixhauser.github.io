@@ -66,9 +66,10 @@ const ADMIN_PANEL_SECTIONS = [
     title: 'Zugänge',
     render: () => `
       <div class="action-group-rows">
-        ${_panelRow('Neuer Admin', 'openNewAdminModal()')}
+        ${_panelRow('Admins verwalten', "routeToHash('admins')", 'Alle Admin-Zugänge: sperren, löschen, neues Passwort setzen')}
+        ${_panelRow('Neuer Admin', 'openNewAdminModal()', 'Einen Admin-Zugang anlegen (nur E-Mail, keine Person)')}
       </div>
-      <p class="panel-hint">Zugänge für Lehrkräfte werden auf der Seite „Lehrkräfte“ eingerichtet.</p>`,
+      <p class="panel-hint">Zugänge für Lehrkräfte werden auf der Seite „Lehrkräfte“ eingerichtet und verwaltet (auch mehrere auf einmal).</p>`,
   },
   {
     title: 'Schule',
@@ -161,7 +162,7 @@ async function runSystemCheck() {
   const version = (document.querySelector('script[src*="admin.js"]')?.src.match(/[?&]v=([\w-]+)/) || [])[1] || 'unbekannt';
 
   const tables = ['ipads', 'pupils', 'staff', 'user_roles'];
-  const functions = ['create-ipad-account', 'create-staff-account'];
+  const functions = ['create-ipad-account', 'create-staff-account', 'manage-staff-account'];
 
   // Result rows first, all "pending", so the admin sees what is being checked.
   const rows = [

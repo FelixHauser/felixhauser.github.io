@@ -1,7 +1,18 @@
-// Staff list view — searchable table of all staff members.
+// Staff list view — searchable, sortable table of all staff members, with batch actions on logins.
 
-async function renderStaffList() {
+// State of the list. Selection and sorting survive a refresh after a batch action (keepState),
+// but are reset when the admin opens the page again.
+window._staffSort     = { key: 'name', dir: 1 };   // key: name | kuerzel | access | status
+window._staffSelected = new Set();                 // ids of the selected Lehrkräfte (visible rows only)
+window._staffLogins   = null;                      // Map(user_id → login) from listStaffLogins(), null if unreadable
+window._staffLoginsError = '';
+
+async function renderStaffList(keepState = false) {
   const container = document.getElementById('view-container');
+  if (keepState !== true) {          // VIEW_RENDERERS calls this without arguments
+    window._staffSort     = { key: 'name', dir: 1 };
+    window._staffSelected = new Set();
+  }
 
   container.innerHTML = `
     <div class="view-header">
@@ -15,6 +26,7 @@ async function renderStaffList() {
       </label>
     </div>
     <div id="staff-count" class="result-count"></div>
+    <div id="staff-batch-bar"></div>
     <div id="staff-table-wrap"><p class="loading-msg">Wird geladen…</p></div>
   `;
 
@@ -33,6 +45,15 @@ async function renderStaffList() {
   }
 
   window._allStaff = staff;
+
+  // Is a login active or locked? Only the server knows (Supabase Auth). If this fails the list
+  // still works; the access column then just says "Zugang" and the batch actions are off.
+  window._staffLogins = null;
+  window._staffLoginsError = '';
+  if (staff.some(s => s.user_id)) {
+    try { window._staffLogins = new Map((await listStaffLogins()).map(l => [l.user_id, l])); }
+    catch (e) { window._staffLoginsError = e.message; }
+  }
 
   document.getElementById('staff-search').addEventListener('input', applyStaffFilter);
   document.getElementById('staff-show-former').addEventListener('change', applyStaffFilter);
@@ -59,7 +80,14 @@ function applyStaffFilter() {
     return matches;
   });
 
-  renderStaffTable(filtered, hiddenFormer);
+  const sorted = sortStaff(filtered, window._staffSort.key, window._staffSort.dir, window._staffLogins);
+
+  // Only visible rows can stay selected (a batch action must never touch rows the admin cannot see).
+  const visible = new Set(sorted.map(s => s.id));
+  window._staffSelected = new Set([...window._staffSelected].filter(id => visible.has(id)));
+
+  window._visibleStaff = sorted;
+  renderStaffTable(sorted, hiddenFormer);
 }
 
 function openNewStaffModal() {
@@ -168,7 +196,9 @@ async function submitNewAdmin() {
 function renderStaffTable(staff, hiddenFormer = 0) {
   document.getElementById('staff-count').textContent =
     `${staff.length} Lehrkraft${staff.length !== 1 ? 'kräfte' : ''}` +
-    (hiddenFormer ? ` · ${hiddenFormer} ehemalige ausgeblendet` : '');
+    (hiddenFormer ? ` · ${hiddenFormer} ehemalige ausgeblendet` : '') +
+    (window._staffLoginsError ? ' · Zustand der Zugänge nicht lesbar' : '');
+  _renderStaffBatchBar();
 
   if (staff.length === 0) {
     document.getElementById('staff-table-wrap').innerHTML =
@@ -176,12 +206,20 @@ function renderStaffTable(staff, hiddenFormer = 0) {
     return;
   }
 
+  const allSelected = staff.every(s => window._staffSelected.has(s.id));
   const rows = staff.map(s => `
     <tr onclick="showStaffDetail('${s.id}')">
+      <td onclick="event.stopPropagation()">
+        <input type="checkbox" aria-label="Auswählen" ${window._staffSelected.has(s.id) ? 'checked' : ''}
+               onchange="toggleStaffSelected('${s.id}', this.checked)">
+      </td>
       <td>${escapeHtml(s.last_name)}</td>
-      <td>${escapeHtml(s.first_name)}${s.is_active === false ? ' <span class="badge badge-inactive">nicht aktiv</span>' : ''}</td>
+      <td>${escapeHtml(s.first_name)}</td>
       <td class="mono">${escapeHtml(s.kuerzel ?? '—')}</td>
-      <td>${s.user_id ? '<span class="badge" style="background:#34c759">Zugang</span>' : '—'}</td>
+      <td>${_staffAccessBadge(s)}</td>
+      <td>${s.is_active === false
+            ? '<span class="badge badge-inactive">nicht aktiv</span>'
+            : '<span class="badge" style="background:#34c759">aktiv</span>'}</td>
     </tr>
   `).join('');
 
@@ -190,14 +228,85 @@ function renderStaffTable(staff, hiddenFormer = 0) {
       <table class="data-table">
         <thead>
           <tr>
-            <th>Nachname</th>
+            <th style="width:2rem"><input type="checkbox" aria-label="Alle sichtbaren auswählen"
+                title="Alle sichtbaren auswählen" ${allSelected ? 'checked' : ''}
+                onchange="toggleAllVisibleStaff(this.checked)"></th>
+            ${_sortHeader('name', 'Nachname')}
             <th>Vorname</th>
-            <th>Kürzel</th>
-            <th>Zugang</th>
+            ${_sortHeader('kuerzel', 'Kürzel')}
+            ${_sortHeader('access', 'Zugang')}
+            ${_sortHeader('status', 'Status')}
           </tr>
         </thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
   `;
+}
+
+// A column header that sorts when clicked; the arrow shows the current sort.
+function _sortHeader(key, label) {
+  const { key: current, dir } = window._staffSort;
+  const arrow = key === current ? (dir === 1 ? ' ▲' : ' ▼') : '';
+  return `<th class="sortable" onclick="sortStaffBy('${key}')">${label}${arrow}</th>`;
+}
+
+// First click on a column sorts ascending, a second click reverses.
+function sortStaffBy(key) {
+  const cur = window._staffSort;
+  window._staffSort = { key, dir: cur.key === key ? -cur.dir : 1 };
+  applyStaffFilter();
+}
+
+function _staffAccessBadge(s) {
+  const state = staffAccessState(s, window._staffLogins);
+  if (state === 'none')   return '—';
+  if (state === 'active') return loginStateBadge({ locked: false });
+  if (state === 'locked') return loginStateBadge({ locked: true });
+  return '<span class="badge" style="background:#8e8e93">Zugang</span>';   // has a login, state unknown
+}
+
+// ---- Selection and batch actions on logins ----
+
+function toggleStaffSelected(id, on) {
+  if (on) window._staffSelected.add(id); else window._staffSelected.delete(id);
+  applyStaffFilter();   // redraws the table, the headline and the batch bar
+}
+
+function toggleAllVisibleStaff(on) {
+  window._staffSelected = on ? new Set((window._visibleStaff || []).map(s => s.id)) : new Set();
+  applyStaffFilter();
+}
+
+// The bar above the table: how many are selected and what can be done with them.
+function _renderStaffBatchBar() {
+  const bar = document.getElementById('staff-batch-bar');
+  const n = window._staffSelected.size;
+  if (!n) { bar.innerHTML = ''; return; }
+
+  const withLogin = _selectedStaffWithLogin().length;
+  const off = window._staffLoginsError ? 'disabled title="Der Zustand der Zugänge konnte nicht gelesen werden"' : '';
+  bar.innerHTML = `
+    <div class="batch-bar">
+      <strong>${n} ausgewählt</strong> <span class="field-hint">(${withLogin} mit Zugang)</span>
+      <button class="btn-action-detail" ${off} onclick="batchLoginAction('lock')">Zugang sperren</button>
+      <button class="btn-action-detail" ${off} onclick="batchLoginAction('unlock')">Zugang entsperren</button>
+      <button class="btn-action-detail" ${off} onclick="batchLoginAction('reset_password')">Neue Passwörter setzen</button>
+      <button class="btn-action-detail" ${off} onclick="batchLoginAction('delete')">Zugang löschen</button>
+      <button class="btn-action-detail" onclick="toggleAllVisibleStaff(false)">Auswahl aufheben</button>
+    </div>`;
+}
+
+// The selected Lehrkräfte that have a login, as the dialog wants them.
+function _selectedStaffWithLogin() {
+  return (window._allStaff || [])
+    .filter(s => window._staffSelected.has(s.id) && s.user_id)
+    .map(s => ({ user_id: s.user_id, email: s.login_email ?? '', name: `${s.first_name} ${s.last_name}` }));
+}
+
+function batchLoginAction(action) {
+  const people = _selectedStaffWithLogin();
+  if (!people.length) { alert('Keine der ausgewählten Personen hat einen Zugang.'); return; }
+  // After the server answered, reload the list (keeping selection and sort) so every state is current.
+  openLoginActionDialog(action, people, () => renderStaffList(true));
 }

@@ -1,6 +1,8 @@
 // Staff detail view — info card (editable) + current iPad.
 
 let _currentStaff = null;
+let _staffLogin = null;        // the Lehrkraft's login as listStaffLogins() returns it (null: none / not loaded)
+let _staffLoginError = '';     // why the state of the login could not be read (shown instead of the state)
 
 async function renderStaffDetail() {
   const id = window._currentStaffId;
@@ -33,6 +35,14 @@ async function renderStaffDetail() {
   _currentStaff = staff;
   document.getElementById('staff-detail-title').textContent =
     `${staff.first_name} ${staff.last_name}`;
+
+  // Is the login active or locked? Only the server can tell (Supabase Auth); one lookup for this login.
+  _staffLogin = null;
+  _staffLoginError = '';
+  if (staff.user_id) {
+    try { _staffLogin = (await listStaffLogins([staff.user_id]))[0] ?? null; }
+    catch (e) { _staffLoginError = e.message; }
+  }
 
   _renderStaffBody(staff, ipad);
 }
@@ -101,17 +111,41 @@ function _staffInfoCard(staff, editMode = false) {
       <div class="detail-field">
         <span class="detail-key">Zugang</span>
         ${staff.user_id
-          ? `<span>${escapeHtml(staff.login_email ?? 'ja')} <span class="badge" style="background:#34c759">Lehrkraft-Zugang</span></span>`
+          ? `<span>${escapeHtml(staff.login_email ?? 'ja')}
+               ${_staffLoginError ? '' : loginStateBadge(_staffLogin)}</span>`
           : `<span>kein Zugang <button class="btn-action-detail" onclick="openStaffAccessModal()">Zugang einrichten</button></span>`}
       </div>
+      ${staff.user_id ? _staffLoginActions() : ''}
       ${personStatusRow('staff', staff)}
-      ${staff.is_active === false && staff.user_id
-        ? '<p class="error-inline" style="margin:0.25rem 1rem 0.75rem">Der Zugang dieser Lehrkraft funktioniert weiterhin und muss gesondert entfernt werden.</p>'
-        : ''}
       <div class="detail-field" style="justify-content:flex-end">
         <button class="btn-action-detail" onclick="_editStaffInfo()">Bearbeiten</button>
       </div>
     </div>`;
+}
+
+// Buttons for the login of this Lehrkraft (lock / unlock, delete, new password).
+function _staffLoginActions() {
+  if (_staffLoginError) {
+    return `<p class="error-inline" style="margin:0.25rem 1rem 0.75rem">
+              Der Zustand des Zugangs konnte nicht gelesen werden: ${escapeHtml(_staffLoginError)}</p>`;
+  }
+  const lockButton = _staffLogin?.locked
+    ? `<button class="btn-action-detail" onclick="staffLoginAction('unlock')">Zugang entsperren</button>`
+    : `<button class="btn-action-detail" onclick="staffLoginAction('lock')">Zugang sperren</button>`;
+  return `
+      <div class="detail-field" style="justify-content:flex-end;gap:0.5rem;flex-wrap:wrap">
+        ${lockButton}
+        <button class="btn-action-detail" onclick="staffLoginAction('reset_password')">Neues Passwort setzen</button>
+        <button class="btn-action-detail" onclick="staffLoginAction('delete')">Zugang löschen</button>
+      </div>`;
+}
+
+// Opens the confirmation dialog of views/login-actions.js for this Lehrkraft's login.
+function staffLoginAction(action) {
+  const s = _currentStaff;
+  openLoginActionDialog(action,
+    [{ user_id: s.user_id, email: s.login_email ?? '', name: `${s.first_name} ${s.last_name}` }],
+    () => renderStaffDetail());
 }
 
 function _editStaffInfo() {

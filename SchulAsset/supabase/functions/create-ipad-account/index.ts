@@ -90,6 +90,10 @@ Deno.serve(async (req) => {
     if (!roleRow || roleRow.role !== 'admin') {
       return json({ error: 'Forbidden' }, 403)
     }
+    // A locked (banned) admin may still hold a valid token for a while: refuse them here.
+    if (user.banned_until && new Date(user.banned_until).getTime() > Date.now()) {
+      return json({ error: 'Forbidden' }, 403)
+    }
 
     // Parse request.
     const { serial_number } = await req.json()

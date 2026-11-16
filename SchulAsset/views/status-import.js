@@ -174,10 +174,11 @@ const STATUS_KINDS = {
   staff: {
     label: 'Lehrkräfte', view: 'staff', table: 'staff', ipadColumn: 'assigned_staff_id',
     hint: `Kopfzeile <code>kuerzel;is_active;inactive_since</code>. <code>inactive_since</code> ist optional.
-           Zugeordnet wird über das Kürzel; der Zugang einer Lehrkraft wird nicht verändert.`,
+           Zugeordnet wird über das Kürzel. Der Zugang einer Lehrkraft wird gesperrt, wenn sie „nicht aktiv“
+           wird, und entsperrt, wenn sie wieder aktiv wird.`,
     templateFile: 'lehrkraefte-status-vorlage.csv',
     template: 'kuerzel;is_active;inactive_since\nMUS;nein;31.07.2026\nBEI;nein;\n',
-    select: 'id, first_name, last_name, kuerzel, is_active, inactive_since',
+    select: 'id, first_name, last_name, kuerzel, user_id, is_active, inactive_since',
     validate: validateStaffStatusRows,
   },
 };
@@ -185,6 +186,7 @@ const STATUS_KINDS = {
 const STATUS_CHUNK_SIZE = 50;       // ids per update call (the ids go into the request address)
 let _statusKind = 'pupils';
 let _statusPlan = null;
+let _statusPeople = new Map();      // id -> person of the previewed file (staff: carries user_id for the login lock)
 
 // Opens the dialog for one kind (chosen in the admin panel; fixed while it is open).
 function openStatusImportModal(kind = 'pupils') {
@@ -244,6 +246,7 @@ async function previewStatusImport(file) {
     const { people, assigned } = await _fetchStatusData(k);
     if (STATUS_KINDS[_statusKind] !== k) return;      // another dialog was opened meanwhile
     const plan = k.validate(parseCsv(text), people, assigned, todayIso());
+    _statusPeople = new Map(people.map(p => [p.id, p]));
 
     if (plan.fatal) { box.innerHTML = `<p class="error-inline">${escapeHtml(plan.fatal)}</p>`; return; }
     _statusPlan = plan;
@@ -299,25 +302,74 @@ async function runStatusImport() {
     groups.get(key).ids.push(u.id);
   });
 
-  let saved = 0, failure = null;
+  // Staff: a person who is not active must not keep access. Deactivated people get their login
+  // locked FIRST (if that fails their status stays unchanged); reactivated people are unlocked
+  // AFTER their status is saved (a failure leaves them active but locked, which is harmless).
+  const isStaff = _statusKind === 'staff';
+  const labelOf = new Map(plan.update.map(u => [u.id, u.label]));
+  const loginOf = id => _statusPeople.get(id)?.user_id || null;
+  let saved = 0, failure = null, locked = 0, unlocked = 0;
+  const lockFailed = [], unlockFailed = [];          // [{ label, error }]
+
   outer:
   for (const { values, ids } of groups.values()) {
     for (let i = 0; i < ids.length; i += STATUS_CHUNK_SIZE) {
-      const chunk = ids.slice(i, i + STATUS_CHUNK_SIZE);
+      let chunk = ids.slice(i, i + STATUS_CHUNK_SIZE);
       btn.textContent = `Aktualisiere… ${saved} / ${plan.update.length}`;
-      const { error } = await supabase.from(k.table).update(values).in('id', chunk);
-      if (error) { failure = error; break outer; }
-      saved += chunk.length;
+
+      if (isStaff && !values.is_active) {
+        const withLogin = chunk.filter(loginOf);
+        if (withLogin.length) {
+          const results = await manageStaffAccounts('lock', withLogin.map(loginOf));
+          const failedUsers = new Set();
+          results.forEach(r => { if (r.ok) locked++; else failedUsers.add(r.user_id); });
+          withLogin.filter(id => failedUsers.has(loginOf(id))).forEach(id => {
+            const r = results.find(x => x.user_id === loginOf(id));
+            lockFailed.push({ label: labelOf.get(id), error: r.error });
+          });
+          chunk = chunk.filter(id => !failedUsers.has(loginOf(id)));   // not locked => status stays unchanged
+        }
+      }
+
+      if (chunk.length) {
+        const { error } = await supabase.from(k.table).update(values).in('id', chunk);
+        if (error) { failure = error; break outer; }
+        saved += chunk.length;
+      }
+
+      if (isStaff && values.is_active) {
+        const withLogin = chunk.filter(loginOf);
+        if (withLogin.length) {
+          const results = await manageStaffAccounts('unlock', withLogin.map(loginOf));
+          results.forEach(r => {
+            if (r.ok) { unlocked++; return; }
+            const id = withLogin.find(x => loginOf(x) === r.user_id);
+            unlockFailed.push({ label: labelOf.get(id), error: r.error });
+          });
+        }
+      }
     }
   }
 
   const n = c => plan.update.filter(u => u.change === c).length;
+  const problemRows = list => list.slice(0, 20)
+    .map(f => `<tr><td>${escapeHtml(f.label)}</td><td>${escapeHtml(f.error)}</td></tr>`).join('');
+  const loginLines = !isStaff ? '' : `
+       <p>${locked} Zugänge gesperrt · ${unlocked} Zugänge entsperrt</p>
+       ${lockFailed.length ? `<p class="error-inline">${lockFailed.length} nicht geändert, weil der Zugang nicht gesperrt werden konnte:</p>
+         <div class="table-wrap"><table class="data-table"><thead><tr><th>Lehrkraft</th><th>Problem</th></tr></thead>
+         <tbody>${problemRows(lockFailed)}</tbody></table></div>` : ''}
+       ${unlockFailed.length ? `<p class="error-inline">${unlockFailed.length} wieder aktiv, aber der Zugang konnte nicht entsperrt werden
+         (auf der Seite der Lehrkraft „Zugang entsperren“ wählen):</p>
+         <div class="table-wrap"><table class="data-table"><thead><tr><th>Lehrkraft</th><th>Problem</th></tr></thead>
+         <tbody>${problemRows(unlockFailed)}</tbody></table></div>` : ''}`;
   box.innerHTML = failure
     ? `<p class="error-inline">Fehler nach ${saved} gespeicherten Änderungen: ${escapeHtml(failure.message)}<br>
-       Die Datei kann erneut verwendet werden — bereits geänderte Einträge gelten dann als unverändert.</p>`
+       Die Datei kann erneut verwendet werden — bereits geänderte Einträge gelten dann als unverändert.</p>${loginLines}`
     : `<p><strong>${saved} ${escapeHtml(k.label)} aktualisiert</strong>
          (${n('deactivate')} auf „nicht aktiv“, ${n('reactivate')} wieder aktiviert, ${n('date')} Datum korrigiert).</p>
-       <p>${plan.unchanged.length} unverändert · ${plan.notFound.length + plan.ambiguous.length + plan.duplicates.length + plan.invalid.length + plan.blocked.length} übersprungen</p>`;
+       <p>${plan.unchanged.length} unverändert · ${plan.notFound.length + plan.ambiguous.length + plan.duplicates.length + plan.invalid.length + plan.blocked.length} übersprungen</p>
+       ${loginLines}`;
 
   btn.textContent = 'Schließen';
   btn.disabled = false;

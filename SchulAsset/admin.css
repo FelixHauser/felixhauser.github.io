@@ -1438,3 +1438,21 @@ body {
 .check-warn { border-color: #FDBA74; }
 .check-error .check-icon { color: #B91C1C; }
 .check-error { border-color: #FCA5A5; }
+
+/* ---- Sortable headers and batch bar (Lehrkräfte list) ---- */
+
+.data-table th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+.data-table th.sortable:hover { color: var(--text-primary); }
+
+.batch-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.6rem;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.6rem;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+}

@@ -117,3 +117,24 @@ SELECT count(*) FILTER (WHERE is_active) AS active, count(*) FILTER (WHERE NOT i
 ALTER TABLE public.pupils DROP COLUMN is_active, DROP COLUMN inactive_since;
 ALTER TABLE public.staff  DROP COLUMN is_active, DROP COLUMN inactive_since;
 ```
+
+## 2026-11-16 — lookup functions refuse locked logins
+
+**Why:** OpenSpec change `manage-logins`. A locked (banned) login can no longer sign in, but a session that is already open keeps working until its token expires (default 1 hour; confirmed by a test). For teachers, the only access is the two lookup functions, so they now also refuse a caller whose `auth.users.banned_until` lies in the future.
+
+**SQL:** `supabase/teacher-lookup.sql` PART 1 — the role check in `lookup_ipad` and `lookup_ipad_details` now joins `auth.users` and requires `banned_until IS NULL OR banned_until <= now()`. Re-run PART 1 (it is `CREATE OR REPLACE`; the REVOKE/GRANT lines are repeated harmlessly). Test D at the end of the file checks a locked teacher.
+
+**Rollback:** re-run the previous version of PART 1 from git history (`git show cfc82c0:SchulAsset/supabase/teacher-lookup.sql`).
+
+**Also:** the Edge Functions `create-ipad-account`, `create-staff-account` and `manage-staff-account` now answer 403 to a locked admin (code only; redeploy them).
+
+## 2026-11-16 — Edge Function `manage-staff-account` (no SQL)
+
+**Why:** OpenSpec change `manage-logins`. Lists, locks, unlocks, deletes and sets new passwords for teacher and admin logins (admin callers only).
+
+**Deploy:** Studio → Edge Functions → `manage-staff-account` (exactly this name; the app calls it by name) → paste `supabase/functions/manage-staff-account/index.ts` → Deploy. Redeploy after every change. No new secrets, no database change: a lock is a Supabase Auth ban; `user_roles` and `staff.user_id` clear when a user is deleted (the function clears `staff.login_email` first). The functions `create-ipad-account` and `create-staff-account` were redeployed on the same day (they now answer 403 to a locked admin).
+
+**Rules (server side):** only logins with the role `teacher` or `admin`, never `@schulasset.local`; your own login cannot be locked or deleted; the last active admin cannot be locked or deleted; 1–50 ids per call.
+
+**Tested (2026-11-16):** all actions from the Lehrkraft page, the Lehrkräfte list (sorting, batch), the Admins page, "nicht aktiv" locking by hand and by CSV, lock of a teacher with an open session (refused by the lookup functions).
+
