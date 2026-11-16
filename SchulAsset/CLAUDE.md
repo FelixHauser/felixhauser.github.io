@@ -19,6 +19,12 @@
 - **All work goes through OpenSpec**: /opsx:propose → /opsx:apply → /opsx:archive.
   No ad-hoc changes, including small cleanups. If something small comes up, ask
   whether to put it in a change.
+- **Hand over one step at a time.** When something has to be done by me (deploying a
+  function, running SQL, testing in the browser), give only the next single step, say
+  exactly where to click or what to paste, and wait for my answer before giving the next
+  one. No checklists with several steps. If you are not sure whether I already did
+  something, ask about it in that step instead of assuming. Reporting what you did
+  yourself (finished work, ticked tasks) can stay as a short summary.
 
 ---
 
