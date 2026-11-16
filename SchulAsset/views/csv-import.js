@@ -478,19 +478,11 @@ function _loginSummaryHtml({ created, failed }) {
     ` : ''}`;
 }
 
-// A cell of the credentials file: quoted when needed, and made harmless for spreadsheets
-// (a text starting with = + - @ would otherwise be run as a formula).
-function _credCell(value) {
-  let text = String(value ?? '');
-  if (/^[=+\-@\t\r]/.test(text)) text = "'" + text;
-  return /[;"\r\n]/.test(text) ? '"' + text.replace(/"/g, '""') + '"' : text;
-}
-
 // Saves the one-time credentials file (UTF-8 with BOM, ";" separated) from memory.
 function downloadImportCredentials() {
   if (!_importCredentials) return;
   const lines = ['email;password;name',
-    ..._importCredentials.map(c => [c.email, c.password, c.name].map(_credCell).join(';'))];
+    ..._importCredentials.map(c => [c.email, c.password, c.name].map(csvCell).join(';'))];
   const url = URL.createObjectURL(new Blob(['﻿' + lines.join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8' }));
   const a = document.createElement('a');
   a.href = url; a.download = 'zugangsdaten-lehrkraefte.csv';

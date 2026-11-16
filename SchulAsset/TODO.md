@@ -125,6 +125,7 @@ Marçal only develops the product. These items depend on other people at the sch
 - [x]  **School name, Schulträger and logo in a config file** — `school-config.js` + logo file in the folder, used by login, portal, lookup, print card and the Leihvertrag PDF; defaults if missing; editing needs a file change + push (a static site cannot save files from the browser)
 
 ## Priority 5 — Housekeeping
+- [x]  **Small list cleanups (session 17)** — lists say how many former people are hidden ("· 35 ehemalige ausgeblendet"), credentials download uses the shared `csvCell`, unused key `login.errorGeneric` removed (OpenSpec change `list-cleanups-session-17`, documented after the fact, tested 2026-11-16)
 - [x]  **Git housekeeping** — `.claude/settings.local.json` is ignored (personal permissions); the OpenSpec setup (`.claude/commands`, `.claude/skills`) is committed; `CLAUDE.md` and `statusquo.md` stay in the (private) repo as a backup — the misleading ignore lines were removed
 - [x]  **Cache-busting for script files** — local scripts and stylesheets carry `?v=<version>`; run `./bump-version.sh` before every push that changes a `.js`/`.css` file (OpenSpec change `cache-busting`)
 - [x]  **Automated translation check** — `node check-translations.js` compares DE/EN/TR (missing/empty keys, placeholders, keys used in code but undefined); all 120 keys complete (OpenSpec change `check-translations`)

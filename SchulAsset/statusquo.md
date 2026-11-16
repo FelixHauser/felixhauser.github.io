@@ -455,7 +455,7 @@ The earlier rule "no hard deletes" is relaxed for old data, as a **manual, per-i
 
 ## Where to continue (end of session 16, 2026-11-16)
 - **No open OpenSpec change.** Session 16 built and archived `add-active-status`, `export-csv-lists` and `regroup-admin-panel` (all pushed; last code commit `e012ae4`). Asset version `20261116-3`. The database change of `add-active-status` is applied in Supabase.
-- **Small tasks to pick up (about 2–5 minutes each), to be done from another computer:**
+- **Small tasks (all four done 2026-11-16 in session 17, not committed; asset version `20261116-4`):**
   1. **Count of hidden people in the lists:** the pupil and staff lists hide inactive people without saying so. Show a count like "1200 Schüler · 35 ehemalige ausgeblendet" (`views/pupil-list.js`, `views/staff-list.js`; the "Ehemalige anzeigen" check boxes are `#pupil-show-former` / `#staff-show-former`).
   2. **Refresh these "Where to continue" notes** at the end of the next session (the older ones above are history).
   3. **Remove the duplicate cell function:** `_credCell` in `views/csv-import.js` has the same rules as `csvCell` in `views/csv-export.js`; make the credentials download use `csvCell` (it is only called at click time, so the script load order does not matter).
@@ -463,3 +463,17 @@ The earlier rule "no hard deletes" is relaxed for old data, as a **manual, per-i
 - **Bigger candidates (TODO.md):** manage existing logins (lock/remove, admin password reset, change-password page); editable, versioned Leihvertrag; manual export + delete of old data (needs a settings table for the idle years; `inactive_since` exists now); overview of inactive people.
 - **Before go-live:** delete the `ZZ…` test iPads and dummy data (the Systemprüfung warns about `ZZ…` serials).
 - Working on another computer: `git pull` first; start the local server in the SchulAsset folder (`python3 -m http.server 8080`); before every push that changes a `.js`/`.css` file run `./bump-version.sh`; after text changes `node check-translations.js`.
+
+## Session 17 (2026-11-16) — four small cleanups (OpenSpec change `list-cleanups-session-17`, archived; spec `person-active-status` updated)
+- **Process note:** the cleanups were first done directly (without asking and without OpenSpec); the user then added a rule to `CLAUDE.md` to work only via OpenSpec and only after asking, and had the change documented afterwards (proposal written after the implementation). Work now goes through `/opsx:propose` → `/opsx:apply` → `/opsx:archive`.
+- **Hidden former people are counted:** pupil and staff list headline reads e.g. "1200 Schüler · 35 ehemalige ausgeblendet" (only people matching the current search; nothing shown when the "Ehemalige anzeigen" box is ticked or none are hidden). Tested by the user.
+- **One cell function for CSV files:** `_credCell` removed from `views/csv-import.js`; the credentials download uses `csvCell` from `views/csv-export.js`. Tested by the user with a CSV containing an umlaut, a name starting with `=` and a row without e-mail (the `ZZA`–`ZZD` test staff and their three test logins `zz.test.*@example.com` must be deleted in Supabase Studio if still there).
+- **`login.errorGeneric` removed** from DE/EN/TR (117 keys per language; the only remaining warning is the computed key in `portal.js`).
+- Asset version `20261116-4`.
+
+## Where to continue (end of session 17, 2026-11-16)
+- **No open OpenSpec change.** Everything is committed and pushed.
+- **Next candidates (TODO.md, Priority 3):** manage existing logins (lock/remove, admin password reset, change-password page); editable, versioned Leihvertrag; manual export + delete of old data (needs a settings table for the idle years; `inactive_since` exists); overview of inactive people. Priority 4: pilot with one class, school-year bulk actions.
+- **Before go-live:** delete the `ZZ…` test iPads and dummy data (the Systemprüfung warns about `ZZ…` serials), and the `ZZ…` test staff if still present.
+- **Untested QR cases** from `qr-login-fragment` (old `?` link, wrong password, reset link, iPad camera app) are still worth a check before real cards are printed.
+- Working rules: ask before changing anything; use OpenSpec for all work; `git pull` first on another computer; local server `python3 -m http.server 8080` in the SchulAsset folder; `./bump-version.sh` before every push that changes a `.js`/`.css` file; after text changes `node check-translations.js`.

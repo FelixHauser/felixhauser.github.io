@@ -45,15 +45,21 @@ function applyStaffFilter() {
   // Inactive staff (left the school) are hidden unless "Ehemalige anzeigen" is ticked.
   const showFormer = document.getElementById('staff-show-former').checked;
 
+  // Inactive staff that match the search but are hidden, so the count can say so.
+  let hiddenFormer = 0;
+
   const filtered = (window._allStaff || []).filter(s => {
-    if (!showFormer && s.is_active === false) return false;
-    if (!search) return true;
     const full = `${s.last_name} ${s.first_name}`.toLowerCase();
-    return full.includes(search) || (s.kuerzel ?? '').toLowerCase().includes(search)
-        || (s.login_email ?? '').toLowerCase().includes(search);
+    const matches = !search || full.includes(search) || (s.kuerzel ?? '').toLowerCase().includes(search)
+                            || (s.login_email ?? '').toLowerCase().includes(search);
+    if (!showFormer && s.is_active === false) {
+      if (matches) hiddenFormer++;
+      return false;
+    }
+    return matches;
   });
 
-  renderStaffTable(filtered);
+  renderStaffTable(filtered, hiddenFormer);
 }
 
 function openNewStaffModal() {
@@ -159,9 +165,10 @@ async function submitNewAdmin() {
   }
 }
 
-function renderStaffTable(staff) {
+function renderStaffTable(staff, hiddenFormer = 0) {
   document.getElementById('staff-count').textContent =
-    `${staff.length} Lehrkraft${staff.length !== 1 ? 'kräfte' : ''}`;
+    `${staff.length} Lehrkraft${staff.length !== 1 ? 'kräfte' : ''}` +
+    (hiddenFormer ? ` · ${hiddenFormer} ehemalige ausgeblendet` : '');
 
   if (staff.length === 0) {
     document.getElementById('staff-table-wrap').innerHTML =

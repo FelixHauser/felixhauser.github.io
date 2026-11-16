@@ -45,14 +45,19 @@ function applyPupilFilter() {
   // Inactive pupils (left the school) are hidden unless "Ehemalige anzeigen" is ticked.
   const showFormer = document.getElementById('pupil-show-former').checked;
 
+  // Inactive pupils that match the search but are hidden, so the count can say so.
+  let hiddenFormer = 0;
+
   const filtered = (window._allPupils || []).filter(p => {
-    if (!showFormer && p.is_active === false) return false;
-    if (!search) return true;
-    const full = `${p.last_name} ${p.first_name}`.toLowerCase();
-    return full.includes(search);
+    const matches = !search || `${p.last_name} ${p.first_name}`.toLowerCase().includes(search);
+    if (!showFormer && p.is_active === false) {
+      if (matches) hiddenFormer++;
+      return false;
+    }
+    return matches;
   });
 
-  renderPupilTable(filtered);
+  renderPupilTable(filtered, hiddenFormer);
 }
 
 function openNewPupilModal() {
@@ -92,9 +97,9 @@ async function submitNewPupil() {
   showPupilDetail(data.id);
 }
 
-function renderPupilTable(pupils) {
+function renderPupilTable(pupils, hiddenFormer = 0) {
   document.getElementById('pupil-count').textContent =
-    `${pupils.length} Schüler${pupils.length !== 1 ? '' : ''}`;
+    `${pupils.length} Schüler` + (hiddenFormer ? ` · ${hiddenFormer} ehemalige ausgeblendet` : '');
 
   if (pupils.length === 0) {
     document.getElementById('pupil-table-wrap').innerHTML =
