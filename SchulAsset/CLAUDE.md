@@ -12,6 +12,14 @@
 **Commit and push to GitHub**
 > never without the explicitly OK from the user
 
+## Working rules
+
+- **Ask before changing anything.** Propose what you intend to do and wait for my OK
+  before editing, creating or deleting files. Reading and investigating is always fine.
+- **All work goes through OpenSpec**: /opsx:propose → /opsx:apply → /opsx:archive.
+  No ad-hoc changes, including small cleanups. If something small comes up, ask
+  whether to put it in a change.
+
 ---
 
 ## Project overview
