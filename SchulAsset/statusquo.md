@@ -447,3 +447,8 @@ The earlier rule "no hard deletes" is relaxed for old data, as a **manual, per-i
 - **Verwaltung → "Daten exportieren"**: "Schüler als CSV", "Lehrkräfte als CSV", "iPads als CSV" (`views/csv-export.js`). All rows (inactive people included), paged with `fetchAllRows`; UTF-8 with BOM, `;`, quoted fields, formula-safe cells (`csvCell`, same rules as `_credCell`). File names `…-export-<Datum>.csv`.
 - Columns: pupils `first_name;last_name;address;is_active;inactive_since` and staff `kuerzel;first_name;last_name;is_active;inactive_since` (same as the status import, `ja`/`nein`, date `yyyy-mm-dd`) — edit in Excel and import again. iPads `serial_number;ipad_type;storage_capacity;status;assigned_to` (for inventory; not meant for re-import). No logins, e-mails, passwords, signatures or history are exported.
 - Pure functions tested in Node. Status dialog hint mentions the export. Asset version `20261116-2`.
+
+## OpenSpec change `regroup-admin-panel` (implemented 2026-11-16, archived; all panel entries checked by the user and working; not committed)
+- **Verwaltung is grouped by subject:** sections Schüler, Lehrkräfte, iPads (icons as in the sidebar), then Zugänge, Schule, Systemprüfung. Each subject lists new → "Aus CSV importieren" → "Status aus CSV aktualisieren" (not for iPads) → "Als CSV exportieren", every row with a short description (`_panelRow(label, onclick, description)`). Dialog titles still carry the subject.
+- The export progress line is per section (`#export-status-pupils|staff|ipads`, `_exportStatus(kind, text)`); the privacy note sits under each export row. To add a feature for a subject, add a row to its section in `ADMIN_PANEL_SECTIONS`.
+- No behaviour, dialog or database change. Asset version `20261116-3`.

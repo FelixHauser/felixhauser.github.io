@@ -840,6 +840,18 @@ body {
   color: var(--text-primary);
 }
 
+.action-row-text { flex: 1; display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+.action-row-text .action-row-label { flex: none; }
+.action-row-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+/* Admin panel: section title with icon */
+.panel-section .action-group-label { display: flex; align-items: center; gap: 0.4rem; }
+.panel-section-icon { width: 14px; height: 14px; flex: none; }
+
 .action-row-chevron {
   font-size: 1.1rem;
   color: var(--text-muted);

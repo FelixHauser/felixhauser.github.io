@@ -8,42 +8,59 @@
 // The panel only calls them.
 
 // One row of the iOS-style grouped list (same look as the iPad detail actions).
-function _panelRow(label, onclick) {
+// `description` is a short second line that says what the row does.
+function _panelRow(label, onclick, description = '') {
   return `<button class="action-row" onclick="${onclick}">
-            <span class="action-row-label">${label}</span>
+            <span class="action-row-text">
+              <span class="action-row-label">${label}</span>
+              ${description ? `<span class="action-row-desc">${description}</span>` : ''}
+            </span>
             <span class="action-row-chevron">›</span>
           </button>`;
 }
 
-// Each section: { title, render() → HTML string, after() → optional, runs once the HTML is in the page }.
+// The privacy note under the export row of a subject section.
+const _EXPORT_NOTE = 'Die Datei enthält personenbezogene Daten — sicher speichern und nach Gebrauch löschen.';
+
+// Each section: { title, icon (Lucide name, optional), render() → HTML string,
+//                 after() → optional, runs once the HTML is in the page }.
+// Sections are grouped by subject. Every subject lists its actions in the same order:
+// new → import from CSV → update status from CSV → export as CSV.
 const ADMIN_PANEL_SECTIONS = [
   {
-    title: 'Daten hinzufügen',
+    title: 'Schüler', icon: 'users',
     render: () => `
       <div class="action-group-rows">
-        ${_panelRow('Neues iPad',         'openNewIpadModal()')}
-        ${_panelRow('Neuer Schüler',      'openNewPupilModal()')}
-        ${_panelRow('Neue Lehrkraft',     'openNewStaffModal()')}
-        ${_panelRow('iPads aus CSV importieren',       "openCsvImportModal('ipads')")}
-        ${_panelRow('Schüler aus CSV importieren',     "openCsvImportModal('pupils')")}
-        ${_panelRow('Lehrkräfte aus CSV importieren',  "openCsvImportModal('staff')")}
-        ${_panelRow('Status Schüler aus CSV aktualisieren',    "openStatusImportModal('pupils')")}
-        ${_panelRow('Status Lehrkräfte aus CSV aktualisieren', "openStatusImportModal('staff')")}
-      </div>`,
+        ${_panelRow('Neuer Schüler', 'openNewPupilModal()', 'Einen Schüler von Hand anlegen')}
+        ${_panelRow('Aus CSV importieren', "openCsvImportModal('pupils')", 'Mehrere neue Schüler aus einer Datei anlegen')}
+        ${_panelRow('Status aus CSV aktualisieren', "openStatusImportModal('pupils')", 'Ehemalige Schüler als „nicht aktiv“ markieren (oder wieder aktivieren)')}
+        ${_panelRow('Als CSV exportieren', 'exportPupils()', 'Alle Schüler als Datei, auch ehemalige — zum Bearbeiten und erneuten Einlesen')}
+      </div>
+      <p id="export-status-pupils" class="panel-hint"></p>
+      <p class="panel-hint">${_EXPORT_NOTE}</p>`,
   },
   {
-    title: 'Daten exportieren',
+    title: 'Lehrkräfte', icon: 'user-check',
     render: () => `
       <div class="action-group-rows">
-        ${_panelRow('Schüler als CSV',    'exportPupils()')}
-        ${_panelRow('Lehrkräfte als CSV', 'exportStaff()')}
-        ${_panelRow('iPads als CSV',      'exportIpads()')}
+        ${_panelRow('Neue Lehrkraft', 'openNewStaffModal()', 'Eine Lehrkraft von Hand anlegen, optional mit Zugang')}
+        ${_panelRow('Aus CSV importieren', "openCsvImportModal('staff')", 'Mehrere neue Lehrkräfte aus einer Datei anlegen')}
+        ${_panelRow('Status aus CSV aktualisieren', "openStatusImportModal('staff')", 'Ehemalige Lehrkräfte als „nicht aktiv“ markieren (oder wieder aktivieren)')}
+        ${_panelRow('Als CSV exportieren', 'exportStaff()', 'Alle Lehrkräfte als Datei, auch ehemalige — ohne Zugangsdaten')}
       </div>
-      <p id="export-status" class="panel-hint"></p>
-      <p class="panel-hint">Die Dateien enthalten alle Einträge (auch ehemalige Personen) und
-        <strong>personenbezogene Daten</strong> — sicher speichern und nach Gebrauch löschen.
-        Die Schüler- und Lehrkräfte-Datei kann bearbeitet und mit „Status … aus CSV aktualisieren“
-        wieder eingelesen werden.</p>`,
+      <p id="export-status-staff" class="panel-hint"></p>
+      <p class="panel-hint">${_EXPORT_NOTE}</p>`,
+  },
+  {
+    title: 'iPads', icon: 'tablet',
+    render: () => `
+      <div class="action-group-rows">
+        ${_panelRow('Neues iPad', 'openNewIpadModal()', 'Ein iPad von Hand anlegen')}
+        ${_panelRow('Aus CSV importieren', "openCsvImportModal('ipads')", 'Mehrere neue iPads aus einer Datei anlegen')}
+        ${_panelRow('Als CSV exportieren', 'exportIpads()', 'Alle iPads mit Status und Besitzer — für Bestandslisten')}
+      </div>
+      <p id="export-status-ipads" class="panel-hint"></p>
+      <p class="panel-hint">${_EXPORT_NOTE}</p>`,
   },
   {
     title: 'Zugänge',
@@ -85,10 +102,13 @@ function renderAdminPanel() {
     <div class="view-header"><h2>Verwaltung</h2></div>
     ${ADMIN_PANEL_SECTIONS.map(s => `
       <div class="action-group panel-section">
-        <div class="action-group-label">${escapeHtml(s.title)}</div>
+        <div class="action-group-label">
+          ${s.icon ? `<i data-lucide="${s.icon}" class="panel-section-icon"></i>` : ''}${escapeHtml(s.title)}
+        </div>
         ${s.render()}
       </div>`).join('')}
   `;
+  window.lucide?.createIcons();        // icons of the section titles (the panel works without Lucide)
   ADMIN_PANEL_SECTIONS.forEach(s => s.after?.());
 }
 

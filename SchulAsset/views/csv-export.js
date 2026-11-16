@@ -43,9 +43,10 @@ function _downloadCsv(filename, text) {
   URL.revokeObjectURL(url);
 }
 
-// Shows progress / result next to the export entries in the admin panel.
-function _exportStatus(text, isError = false) {
-  const el = document.getElementById('export-status');
+// Shows progress / result in the section of the export that was started
+// (kind = 'pupils' | 'staff' | 'ipads', the id of the line in the admin panel).
+function _exportStatus(kind, text, isError = false) {
+  const el = document.getElementById('export-status-' + kind);
   if (!el) return;
   el.textContent = text;
   el.className = isError ? 'panel-hint error-inline' : 'panel-hint';
@@ -53,15 +54,15 @@ function _exportStatus(text, isError = false) {
 
 // Loads all rows (paged), turns them into file rows and saves the file.
 // `loadRows()` returns { data, error }; `toRow` maps a database row to a file row.
-async function _runExport(kindLabel, filePrefix, columns, loadRows, toRow) {
-  _exportStatus(`${kindLabel}: wird geladen…`);
+async function _runExport(kind, filePrefix, columns, loadRows, toRow) {
+  _exportStatus(kind, 'Wird geladen…');
   try {
     const { data, error } = await loadRows();
     if (error) throw error;
     _downloadCsv(`${filePrefix}-export-${todayIso()}.csv`, buildCsv(columns, data.map(toRow)));
-    _exportStatus(`${kindLabel}: ${data.length} Zeilen exportiert.`);
+    _exportStatus(kind, `${data.length} Zeilen exportiert.`);
   } catch (e) {
-    _exportStatus(`${kindLabel}: Fehler beim Export — ${e.message || e}`, true);
+    _exportStatus(kind, `Fehler beim Export — ${e.message || e}`, true);
   }
 }
 
@@ -69,7 +70,7 @@ async function _runExport(kindLabel, filePrefix, columns, loadRows, toRow) {
 const _jaNein = flag => (flag === false ? 'nein' : 'ja');
 
 function exportPupils() {
-  return _runExport('Schüler', 'schueler', PUPIL_EXPORT_COLUMNS,
+  return _runExport('pupils', 'schueler', PUPIL_EXPORT_COLUMNS,
     () => fetchAllRows(() => supabase.from('pupils')
       .select('first_name, last_name, address, is_active, inactive_since')
       .order('last_name').order('first_name').order('id')),
@@ -77,7 +78,7 @@ function exportPupils() {
 }
 
 function exportStaff() {
-  return _runExport('Lehrkräfte', 'lehrkraefte', STAFF_EXPORT_COLUMNS,
+  return _runExport('staff', 'lehrkraefte', STAFF_EXPORT_COLUMNS,
     () => fetchAllRows(() => supabase.from('staff')
       .select('kuerzel, first_name, last_name, is_active, inactive_since')
       .order('last_name').order('first_name').order('id')),
@@ -85,7 +86,7 @@ function exportStaff() {
 }
 
 function exportIpads() {
-  return _runExport('iPads', 'ipads', IPAD_EXPORT_COLUMNS,
+  return _runExport('ipads', 'ipads', IPAD_EXPORT_COLUMNS,
     () => fetchAllRows(() => supabase.from('ipads')
       .select(`serial_number, ipad_type, storage_capacity, status,
                pupils:assigned_pupil_id (first_name, last_name),
