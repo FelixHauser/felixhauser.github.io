@@ -452,3 +452,14 @@ The earlier rule "no hard deletes" is relaxed for old data, as a **manual, per-i
 - **Verwaltung is grouped by subject:** sections Schüler, Lehrkräfte, iPads (icons as in the sidebar), then Zugänge, Schule, Systemprüfung. Each subject lists new → "Aus CSV importieren" → "Status aus CSV aktualisieren" (not for iPads) → "Als CSV exportieren", every row with a short description (`_panelRow(label, onclick, description)`). Dialog titles still carry the subject.
 - The export progress line is per section (`#export-status-pupils|staff|ipads`, `_exportStatus(kind, text)`); the privacy note sits under each export row. To add a feature for a subject, add a row to its section in `ADMIN_PANEL_SECTIONS`.
 - No behaviour, dialog or database change. Asset version `20261116-3`.
+
+## Where to continue (end of session 16, 2026-11-16)
+- **No open OpenSpec change.** Session 16 built and archived `add-active-status`, `export-csv-lists` and `regroup-admin-panel` (all pushed; last code commit `e012ae4`). Asset version `20261116-3`. The database change of `add-active-status` is applied in Supabase.
+- **Small tasks to pick up (about 2–5 minutes each), to be done from another computer:**
+  1. **Count of hidden people in the lists:** the pupil and staff lists hide inactive people without saying so. Show a count like "1200 Schüler · 35 ehemalige ausgeblendet" (`views/pupil-list.js`, `views/staff-list.js`; the "Ehemalige anzeigen" check boxes are `#pupil-show-former` / `#staff-show-former`).
+  2. **Refresh these "Where to continue" notes** at the end of the next session (the older ones above are history).
+  3. **Remove the duplicate cell function:** `_credCell` in `views/csv-import.js` has the same rules as `csvCell` in `views/csv-export.js`; make the credentials download use `csvCell` (it is only called at click time, so the script load order does not matter).
+  4. **Remove the unused translation key** `login.errorGeneric` from the three languages in `translations.js` (the only warning left in `node check-translations.js`), then `node export-translations.js`.
+- **Bigger candidates (TODO.md):** manage existing logins (lock/remove, admin password reset, change-password page); editable, versioned Leihvertrag; manual export + delete of old data (needs a settings table for the idle years; `inactive_since` exists now); overview of inactive people.
+- **Before go-live:** delete the `ZZ…` test iPads and dummy data (the Systemprüfung warns about `ZZ…` serials).
+- Working on another computer: `git pull` first; start the local server in the SchulAsset folder (`python3 -m http.server 8080`); before every push that changes a `.js`/`.css` file run `./bump-version.sh`; after text changes `node check-translations.js`.
