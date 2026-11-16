@@ -3,7 +3,6 @@
 ## Purpose
 
 Pupils and staff can be imported from CSV files through the combined import dialog (iPads / Schüler / Lehrkräfte), with a preview before anything is written. Pupils are matched on first name + last name + address; staff on their unique Kürzel, which the database enforces case-insensitively. A staff file may have an `email` column: those rows also get a teacher login, with a one-time download of the generated passwords.
-
 ## Requirements
 ### Requirement: Combined import dialog
 The CSV import dialog SHALL be opened for one fixed kind of data — iPads, pupils or staff — chosen by the admin in the admin panel (Verwaltung). The dialog SHALL NOT offer a way to change the kind; its title SHALL name the kind (e.g. "Schüler aus CSV importieren") and it SHALL show the format hint and template download of that kind. To import another kind the admin closes the dialog and chooses the other entry in the panel.
@@ -124,3 +123,11 @@ When the import created at least one login, the result dialog SHALL offer "Zugan
 #### Scenario: Dialog closed
 - **WHEN** the dialog has been closed
 - **THEN** the passwords can no longer be downloaded or shown
+
+### Requirement: Imported people are active
+People created by the pupil and staff CSV imports SHALL be active. The import formats SHALL stay unchanged (no status column).
+
+#### Scenario: Import creates active people
+- **WHEN** an admin imports a valid pupil file
+- **THEN** the new pupils are active and appear in the default list and the assign picker
+

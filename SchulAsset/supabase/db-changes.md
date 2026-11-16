@@ -86,3 +86,34 @@ ON CONFLICT (user_id) DO UPDATE SET role = 'teacher';
 **Tested (2026-11-14):** one teacher; the same e-mail again → refused, account unchanged; `@schulasset.local`, invalid e-mail and unknown role → refused; new admin created; called as a teacher → 403 `Forbidden`; screens and CSV (rows with/without e-mail, duplicate and invalid e-mail, existing Kürzel, already registered e-mail → Lehrkraft saved without access).
 
 **Removing access:** delete the user in Studio → Authentication → Users (the `user_roles` row goes with it, `staff.user_id` becomes empty), or delete only the `user_roles` row to keep the login but remove the role.
+
+## 2026-11-16 — active status for pupils and staff
+
+**Why:** OpenSpec change `add-active-status`. People who left the school are marked inactive (hidden from the default lists and the assign picker). `inactive_since` is the date since when — the start of the idle period for the later "export + delete old data" feature. The two CHECK constraints keep both columns consistent: inactive ⇔ date set. No new policy needed (admin UPDATE on both tables exists). Existing rows become active with an empty date.
+
+```sql
+ALTER TABLE public.pupils
+  ADD COLUMN is_active boolean NOT NULL DEFAULT true,
+  ADD COLUMN inactive_since date,
+  ADD CONSTRAINT pupils_active_date_check
+    CHECK ((is_active AND inactive_since IS NULL) OR (NOT is_active AND inactive_since IS NOT NULL));
+
+ALTER TABLE public.staff
+  ADD COLUMN is_active boolean NOT NULL DEFAULT true,
+  ADD COLUMN inactive_since date,
+  ADD CONSTRAINT staff_active_date_check
+    CHECK ((is_active AND inactive_since IS NULL) OR (NOT is_active AND inactive_since IS NOT NULL));
+```
+
+**Check afterwards:**
+```sql
+SELECT count(*) FILTER (WHERE is_active) AS active, count(*) FILTER (WHERE NOT is_active) AS inactive FROM public.pupils;
+-- must be refused (constraint):
+-- UPDATE public.pupils SET is_active = false WHERE id = (SELECT id FROM public.pupils LIMIT 1);
+```
+
+**Rollback:**
+```sql
+ALTER TABLE public.pupils DROP COLUMN is_active, DROP COLUMN inactive_since;
+ALTER TABLE public.staff  DROP COLUMN is_active, DROP COLUMN inactive_since;
+```

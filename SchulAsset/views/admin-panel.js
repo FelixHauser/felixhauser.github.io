@@ -27,7 +27,23 @@ const ADMIN_PANEL_SECTIONS = [
         ${_panelRow('iPads aus CSV importieren',       "openCsvImportModal('ipads')")}
         ${_panelRow('Schüler aus CSV importieren',     "openCsvImportModal('pupils')")}
         ${_panelRow('Lehrkräfte aus CSV importieren',  "openCsvImportModal('staff')")}
+        ${_panelRow('Status Schüler aus CSV aktualisieren',    "openStatusImportModal('pupils')")}
+        ${_panelRow('Status Lehrkräfte aus CSV aktualisieren', "openStatusImportModal('staff')")}
       </div>`,
+  },
+  {
+    title: 'Daten exportieren',
+    render: () => `
+      <div class="action-group-rows">
+        ${_panelRow('Schüler als CSV',    'exportPupils()')}
+        ${_panelRow('Lehrkräfte als CSV', 'exportStaff()')}
+        ${_panelRow('iPads als CSV',      'exportIpads()')}
+      </div>
+      <p id="export-status" class="panel-hint"></p>
+      <p class="panel-hint">Die Dateien enthalten alle Einträge (auch ehemalige Personen) und
+        <strong>personenbezogene Daten</strong> — sicher speichern und nach Gebrauch löschen.
+        Die Schüler- und Lehrkräfte-Datei kann bearbeitet und mit „Status … aus CSV aktualisieren“
+        wieder eingelesen werden.</p>`,
   },
   {
     title: 'Zugänge',

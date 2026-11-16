@@ -10,6 +10,9 @@ async function renderPupilList() {
     <div class="toolbar">
       <input type="search" id="pupil-search" class="search-input"
              placeholder="Name suchen…">
+      <label class="toolbar-check">
+        <input type="checkbox" id="pupil-show-former"> Ehemalige anzeigen
+      </label>
     </div>
     <div id="pupil-count" class="result-count"></div>
     <div id="pupil-table-wrap"><p class="loading-msg">Wird geladen…</p></div>
@@ -18,7 +21,7 @@ async function renderPupilList() {
   // All pupils, paged (a single query would stop at 1000 rows).
   const { data: pupils, error } = await fetchAllRows(() => supabase
     .from('pupils')
-    .select('id, first_name, last_name, address, created_at')
+    .select('id, first_name, last_name, address, created_at, is_active')
     .order('last_name')
     .order('first_name')
     .order('id'));
@@ -32,13 +35,18 @@ async function renderPupilList() {
   window._allPupils = pupils;
 
   document.getElementById('pupil-search').addEventListener('input', applyPupilFilter);
+  document.getElementById('pupil-show-former').addEventListener('change', applyPupilFilter);
   applyPupilFilter();
 }
 
 function applyPupilFilter() {
   const search = document.getElementById('pupil-search').value.trim().toLowerCase();
 
+  // Inactive pupils (left the school) are hidden unless "Ehemalige anzeigen" is ticked.
+  const showFormer = document.getElementById('pupil-show-former').checked;
+
   const filtered = (window._allPupils || []).filter(p => {
+    if (!showFormer && p.is_active === false) return false;
     if (!search) return true;
     const full = `${p.last_name} ${p.first_name}`.toLowerCase();
     return full.includes(search);
@@ -97,7 +105,7 @@ function renderPupilTable(pupils) {
   const rows = pupils.map(p => `
     <tr onclick="showPupilDetail('${p.id}')">
       <td>${escapeHtml(p.last_name)}</td>
-      <td>${escapeHtml(p.first_name)}</td>
+      <td>${escapeHtml(p.first_name)}${p.is_active === false ? ' <span class="badge badge-inactive">nicht aktiv</span>' : ''}</td>
       <td>${escapeHtml(p.address ?? '—')}</td>
     </tr>
   `).join('');

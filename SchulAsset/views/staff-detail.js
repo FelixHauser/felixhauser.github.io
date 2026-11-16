@@ -104,6 +104,10 @@ function _staffInfoCard(staff, editMode = false) {
           ? `<span>${escapeHtml(staff.login_email ?? 'ja')} <span class="badge" style="background:#34c759">Lehrkraft-Zugang</span></span>`
           : `<span>kein Zugang <button class="btn-action-detail" onclick="openStaffAccessModal()">Zugang einrichten</button></span>`}
       </div>
+      ${personStatusRow('staff', staff)}
+      ${staff.is_active === false && staff.user_id
+        ? '<p class="error-inline" style="margin:0.25rem 1rem 0.75rem">Der Zugang dieser Lehrkraft funktioniert weiterhin und muss gesondert entfernt werden.</p>'
+        : ''}
       <div class="detail-field" style="justify-content:flex-end">
         <button class="btn-action-detail" onclick="_editStaffInfo()">Bearbeiten</button>
       </div>

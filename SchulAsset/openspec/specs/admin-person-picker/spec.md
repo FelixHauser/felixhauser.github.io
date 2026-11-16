@@ -3,7 +3,6 @@
 ## Purpose
 
 Choosing a pupil or staff member in the assign dialog works by searching (name, address, Kürzel; case, umlauts and word order ignored) instead of from a long drop-down, with a short result list and a changeable selection.
-
 ## Requirements
 ### Requirement: Search instead of a long drop-down
 The "iPad zuweisen" dialog SHALL let the admin choose the pupil or staff member by typing into a search field and tapping a result, instead of choosing from a drop-down of all people.
@@ -67,3 +66,11 @@ The "+ Neu anlegen" option in the assign dialog SHALL keep working as before.
 #### Scenario: New person
 - **WHEN** an admin chooses "+ Neu anlegen", fills in the fields and confirms
 - **THEN** the person is created and the iPad is assigned to them
+
+### Requirement: Only active people in the picker
+The person picker in "iPad zuweisen" SHALL offer only active pupils or staff.
+
+#### Scenario: Inactive pupil
+- **WHEN** an admin searches for a pupil who is inactive
+- **THEN** the pupil is not offered
+

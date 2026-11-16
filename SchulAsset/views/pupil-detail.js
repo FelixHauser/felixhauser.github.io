@@ -132,6 +132,7 @@ function _pupilInfoCard(pupil, editMode = false) {
         <span class="detail-key">Adresse</span>
         <span>${escapeHtml(pupil.address ?? '—')}</span>
       </div>
+      ${personStatusRow('pupil', pupil)}
       <div class="detail-field" style="justify-content:flex-end">
         <button class="btn-action-detail" onclick="_editPupilInfo()">Bearbeiten</button>
       </div>

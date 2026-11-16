@@ -602,10 +602,10 @@ async function _loadPersonList() {
   // Pupils are told apart by their address, staff by their Kürzel.
   let items;
   if (type === 'pupil') {
-    const { data } = await fetchAllRows(() => supabase.from('pupils').select('id,first_name,last_name,address').order('last_name').order('first_name').order('id'));
+    const { data } = await fetchAllRows(() => supabase.from('pupils').select('id,first_name,last_name,address').eq('is_active', true).order('last_name').order('first_name').order('id'));
     items = (data || []).map(p => ({ id: p.id, label: `${p.last_name}, ${p.first_name}`, sub: p.address || '' }));
   } else {
-    const { data } = await fetchAllRows(() => supabase.from('staff').select('id,first_name,last_name,kuerzel').order('last_name').order('first_name').order('id'));
+    const { data } = await fetchAllRows(() => supabase.from('staff').select('id,first_name,last_name,kuerzel').eq('is_active', true).order('last_name').order('first_name').order('id'));
     items = (data || []).map(s => ({ id: s.id, label: `${s.last_name}, ${s.first_name}`, sub: s.kuerzel || '' }));
   }
   // The picker keeps the selected id in <input id="md-person">, which submitAssign() reads.

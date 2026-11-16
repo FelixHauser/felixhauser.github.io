@@ -181,7 +181,7 @@ function validateStaffRows(rows, existingKuerzel) {
 }
 
 // Make the pure functions testable from Node (no effect in the browser).
-if (typeof module !== 'undefined') module.exports = { parseCsv, validateIpadRows, validatePupilRows, validateStaffRows, pupilKey };
+if (typeof module !== 'undefined') module.exports = { parseCsv, validateIpadRows, validatePupilRows, validateStaffRows, pupilKey, _csvHeader };
 
 // ─── Part 2: the kinds of import (browser only) ───
 //

@@ -371,6 +371,13 @@ body {
   letter-spacing: 0.2px;
 }
 
+/* Inactive (left the school) — grey badge in detail pages and lists */
+.badge-inactive { background: #8e8e93; }
+
+/* "Ehemalige anzeigen" check box next to the search field */
+.toolbar-check { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem;
+                 color: var(--text-secondary); white-space: nowrap; }
+
 /* =========================================================
    State messages
    ========================================================= */

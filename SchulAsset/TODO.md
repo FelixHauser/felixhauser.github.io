@@ -45,6 +45,9 @@ Created: 2026-11-09 · Decision: **stay on Supabase (Frankfurt)**
   - Open questions: is 5 years legally acceptable (ask the Datenschutzbeauftragte / Stadt Marl); when do the 5 years start (decommissioning date; pupil's leaving date); where the PDF archives are stored (they contain personal data and must be kept as securely as the database)
   - Related: "Archiving / anonymising" under **Admin user** above overlaps with the active/not-active status — decide together whether anonymising is still needed or replaced by export + delete
 
+- [x]  **Active / not-active status for pupils and staff** — built and tested 2026-11-16 (OpenSpec change `add-active-status`), see `statusquo.md`.
+- [~]  **Exports (lists)** — CSV download of pupils, staff and iPads done 2026-11-16 (OpenSpec change `export-csv-lists`). Still open under Priority 4 "Exports": PDF lists, filtered exports, lost/stolen/damaged lists for the Stadt Marl.
+
 ## Priority 4 — Day-to-day operation
 
 - [ ]  **Pilot with one class** — real pupils, real parents using the portal from home; collect feedback before rolling out to 1000+ iPads

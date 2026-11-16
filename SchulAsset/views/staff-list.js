@@ -10,6 +10,9 @@ async function renderStaffList() {
     <div class="toolbar">
       <input type="search" id="staff-search" class="search-input"
              placeholder="Name oder Kürzel suchen…">
+      <label class="toolbar-check">
+        <input type="checkbox" id="staff-show-former"> Ehemalige anzeigen
+      </label>
     </div>
     <div id="staff-count" class="result-count"></div>
     <div id="staff-table-wrap"><p class="loading-msg">Wird geladen…</p></div>
@@ -18,7 +21,7 @@ async function renderStaffList() {
   // All staff, paged (a single query would stop at 1000 rows).
   const { data: staff, error } = await fetchAllRows(() => supabase
     .from('staff')
-    .select('id, first_name, last_name, kuerzel, created_at, user_id, login_email')
+    .select('id, first_name, last_name, kuerzel, created_at, user_id, login_email, is_active')
     .order('last_name')
     .order('first_name')
     .order('id'));
@@ -32,13 +35,18 @@ async function renderStaffList() {
   window._allStaff = staff;
 
   document.getElementById('staff-search').addEventListener('input', applyStaffFilter);
+  document.getElementById('staff-show-former').addEventListener('change', applyStaffFilter);
   applyStaffFilter();
 }
 
 function applyStaffFilter() {
   const search = document.getElementById('staff-search').value.trim().toLowerCase();
 
+  // Inactive staff (left the school) are hidden unless "Ehemalige anzeigen" is ticked.
+  const showFormer = document.getElementById('staff-show-former').checked;
+
   const filtered = (window._allStaff || []).filter(s => {
+    if (!showFormer && s.is_active === false) return false;
     if (!search) return true;
     const full = `${s.last_name} ${s.first_name}`.toLowerCase();
     return full.includes(search) || (s.kuerzel ?? '').toLowerCase().includes(search)
@@ -164,7 +172,7 @@ function renderStaffTable(staff) {
   const rows = staff.map(s => `
     <tr onclick="showStaffDetail('${s.id}')">
       <td>${escapeHtml(s.last_name)}</td>
-      <td>${escapeHtml(s.first_name)}</td>
+      <td>${escapeHtml(s.first_name)}${s.is_active === false ? ' <span class="badge badge-inactive">nicht aktiv</span>' : ''}</td>
       <td class="mono">${escapeHtml(s.kuerzel ?? '—')}</td>
       <td>${s.user_id ? '<span class="badge" style="background:#34c759">Zugang</span>' : '—'}</td>
     </tr>

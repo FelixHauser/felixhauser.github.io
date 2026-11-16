@@ -3,7 +3,6 @@
 ## Purpose
 
 The admin interface has a Verwaltung panel, a single place for setup and data-management jobs (add and import data, create admin logins, view the school identity), instead of buttons scattered in the lists.
-
 ## Requirements
 ### Requirement: Admin panel view
 The admin interface SHALL have a sidebar item "Verwaltung" that opens a view at `#admin`, organised in titled sections. The URL SHALL match the screen, like every other view.
@@ -44,3 +43,18 @@ The panel SHALL be usable at phone width without horizontal page scrolling.
 #### Scenario: Narrow screen
 - **WHEN** the panel is opened on a phone-width screen
 - **THEN** sections stack vertically and all buttons are reachable
+
+### Requirement: Status updates in the panel
+The section "Daten hinzufügen" of the admin panel SHALL contain the entries "Status Schüler aus CSV aktualisieren" and "Status Lehrkräfte aus CSV aktualisieren", each opening the batch status dialog for that kind.
+
+#### Scenario: Open the dialog
+- **WHEN** an admin clicks "Status Schüler aus CSV aktualisieren"
+- **THEN** the dialog for pupil status files opens, with its format hint and template download
+
+### Requirement: Export section in the panel
+The admin panel SHALL have a section "Daten exportieren" with the entries "Schüler als CSV", "Lehrkräfte als CSV" and "iPads als CSV", and a note that the files contain personal data.
+
+#### Scenario: Open the panel
+- **WHEN** an admin opens Verwaltung
+- **THEN** the section "Daten exportieren" with the three entries is shown
+
